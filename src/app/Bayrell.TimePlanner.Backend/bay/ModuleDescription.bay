@@ -76,6 +76,15 @@ static class ModuleDescription
 			"value": "Bayrell.TimePlanner.Backend.Auth::renderChainChangeLayoutModel",
 			"pos": RenderDriver::RENDER_CHAIN_CHANGE_LAYOUT_MODEL,
 		},
+		
+		
+		/* Render Chain. Set enviroments */
+		new LambdaChain
+		{
+			"name": RenderDriver::RENDER_CHAIN,
+			"value": "Bayrell.TimePlanner.Backend.Auth::renderChainSetFrontendEnv",
+			"pos": RenderDriver::RENDER_CHAIN_SET_FRONTEND_ENVIROMENTS,
+		},
 	];
 	
 }

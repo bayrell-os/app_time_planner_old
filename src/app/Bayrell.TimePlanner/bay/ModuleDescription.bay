@@ -119,6 +119,7 @@ static class ModuleDescription
 		},
 		
 		/* Register routes */
+		new RouteList{ "name": "Bayrell.TimePlanner.AdminInfo" },
 		new RouteList{ "name": "Bayrell.TimePlanner.MainPage" },
 		
 		

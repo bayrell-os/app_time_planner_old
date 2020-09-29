@@ -191,8 +191,8 @@ span.lpad5{
 					</div>
 					<div class='layout_menu_items'>
 						<ul>
-							<li class={ rs::start(layout["route", "name"], "app.users") ? "active": "" }>
-								<a class='nolink' href={ layout.route_prefix ~ '/dashboard/' }>
+							<li class={ rs::start(layout["route", "name"], "app.index") ? "active": "" }>
+								<a class='nolink' href={ layout.route_prefix ~ '/' }>
 									{ _("Bayrell.TimePlanner", "Dashboard") }
 								</a>
 							</li>
@@ -217,6 +217,11 @@ span.lpad5{
 							<li class={ rs::start(layout["route", "name"], "app.users") ? "active": "" }>
 								<a class='nolink' href={ layout.route_prefix ~ '/admin/projects/' }>
 									{ _("Bayrell.TimePlanner", "Projects settings") }
+								</a>
+							</li>
+							<li class={ rs::start(layout["route", "name"], "app.admin.info") ? "active": "" }>
+								<a class='nolink' href={ layout.route_prefix ~ '/admin/info/' }>
+									{ _("Bayrell.TimePlanner", "Layer info") }
 								</a>
 							</li>
 						</ul>

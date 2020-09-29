@@ -17,7 +17,7 @@
 -->
 
 <class version="1.0"
-	name="Bayrell.TimePlanner.Admin.MainPage" extends="Runtime.Web.Component" 
+	name="Bayrell.TimePlanner.AdminInfo" extends="Runtime.Web.Component" 
 	module="Bayrell.TimePlanner" model="Runtime.Dict"
 >
 
@@ -30,7 +30,7 @@
 <use name="Runtime.Web.RouteList" />
 <use name="Runtime.Web.RouteMiddleware" />
 <use name="Runtime.Web.Events.MouseClickEvent" />
-<use name="Bayrell.TimePlanner.Admin.MainPage" />
+<use name="Bayrell.TimePlanner.AdminInfo" />
 
 
 <script>
@@ -39,8 +39,7 @@
  * Route Action
  * @return RenderContainer
  */
-@Route{ "uri": "/", "name": "app.main" }
-@RouteMiddleware{ "value": "Runtime.Web.Auth.AuthFrontend::checkAuthMiddleware" }
+@Route{ "uri": "/admin/info/", "name": "app.main" }
 static async RenderContainer MainPage(RenderContainer container)
 {
 	/* Set title */
@@ -48,7 +47,7 @@ static async RenderContainer MainPage(RenderContainer container)
 	container <= layout <= layout_name <= "admin";
 	
 	/* Set model */
-	container <= layout <= page_class <= classof MainPage;
+	container <= layout <= page_class <= classof AdminInfo;
 	container <= layout <= page_model <= new Dict();
 	
 	return [ container ];
@@ -57,17 +56,17 @@ static async RenderContainer MainPage(RenderContainer container)
 </script>
 
 
+
 <style>
-%content{
-	padding: 20px;
-}
+
 </style>
 
 
 <template name="render">
-	<div class='content'>
-		<a class='link' href={ layout.route_prefix ~ "/adminer/" } target="_self">Adminer</a><br/>
-		<a class='link' href={ layout.route_prefix ~ "/adminer/info/" } target="_self">PHP info</a>
+	<div class="content">
+		Layer UID: { @.env("X-LAYER-UID") }<br/>
+		Layer ID: { @.env("X-LAYER-ID") }<br/>
+		Space ID: { @.env("X-SPACE-ID") }<br/>
 	</div>
 </template>
 

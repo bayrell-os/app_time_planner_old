@@ -27,6 +27,19 @@ static class Auth
 {
 	
 	/**
+	 * Layout chain
+	 */
+	pure RenderContainer renderChainSetFrontendEnv(RenderContainer container)
+	{
+		container <= frontend_env <= "X-LAYER-ID" <= @.env("X-LAYER-ID", "");
+		container <= frontend_env <= "X-LAYER-UID" <= @.env("X-LAYER-UID", "");
+		container <= frontend_env <= "X-SPACE-ID" <= @.env("X-SPACE-ID", "");
+		return [ container ];
+	}
+	
+	
+	
+	/**
 	 * Save Auth Token in keep data
 	 */
 	static list renderChainChangeLayoutModel(RenderContainer container)

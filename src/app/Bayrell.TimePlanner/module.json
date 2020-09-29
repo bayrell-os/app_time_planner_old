@@ -2,6 +2,7 @@
 	"name": "Bayrell.TimePlanner",
 	"assets":
 	[
+		"AdminInfo",
 		"AdminLayout",
 		"DefaultLayout",
 		"MainPage",
