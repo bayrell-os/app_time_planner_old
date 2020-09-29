@@ -1,0 +1,13 @@
+{
+	"name": "Bayrell.TimePlanner",
+	"assets":
+	[
+		"AdminLayout",
+		"DefaultLayout",
+		"MainPage",
+		"MainPageModel",
+		"Page404",
+		"Routes",
+		"ModuleDescription"
+	]
+}
