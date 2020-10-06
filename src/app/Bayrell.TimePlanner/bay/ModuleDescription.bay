@@ -119,7 +119,9 @@ static class ModuleDescription
 		},
 		
 		/* Register routes */
-		new RouteList{ "name": "Bayrell.TimePlanner.AdminInfo" },
+		new RouteList{ "name": "Bayrell.TimePlanner.Admin.AdminInfo" },
+		new RouteList{ "name": "Bayrell.TimePlanner.Admin.AdminProjects" },
+		new RouteList{ "name": "Bayrell.TimePlanner.Tasks.TasksPage" },
 		new RouteList{ "name": "Bayrell.TimePlanner.MainPage" },
 		
 		
@@ -186,6 +188,7 @@ static class ModuleDescription
 					"username": env.get("MYSQL_USERNAME", ""),
 					"password": env.get("MYSQL_PASSWORD", ""),
 					"db": env.get("MYSQL_DB", ""),
+					"prefix": env.get("MYSQL_PREFIX", ""),
 				},
 			},
 			

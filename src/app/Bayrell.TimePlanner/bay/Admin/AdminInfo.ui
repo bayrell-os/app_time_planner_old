@@ -17,7 +17,7 @@
 -->
 
 <class version="1.0"
-	name="Bayrell.TimePlanner.AdminInfo" extends="Runtime.Web.Component" 
+	name="Bayrell.TimePlanner.Admin.AdminInfo" extends="Runtime.Web.Component" 
 	module="Bayrell.TimePlanner" model="Runtime.Dict"
 >
 
@@ -30,7 +30,7 @@
 <use name="Runtime.Web.RouteList" />
 <use name="Runtime.Web.RouteMiddleware" />
 <use name="Runtime.Web.Events.MouseClickEvent" />
-<use name="Bayrell.TimePlanner.AdminInfo" />
+<use name="Bayrell.TimePlanner.Admin.AdminInfo" />
 
 
 <script>
@@ -39,7 +39,7 @@
  * Route Action
  * @return RenderContainer
  */
-@Route{ "uri": "/admin/info/", "name": "app.main" }
+@Route{ "uri": "/admin/info/", "name": "app.admin.info" }
 static async RenderContainer MainPage(RenderContainer container)
 {
 	/* Set title */
@@ -64,9 +64,7 @@ static async RenderContainer MainPage(RenderContainer container)
 
 <template name="render">
 	<div class="content">
-		Layer UID: { @.env("X-LAYER-UID") }<br/>
-		Layer ID: { @.env("X-LAYER-ID") }<br/>
-		Space ID: { @.env("X-SPACE-ID") }<br/>
+		Admin info
 	</div>
 </template>
 

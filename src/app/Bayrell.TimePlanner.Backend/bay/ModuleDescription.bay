@@ -64,7 +64,8 @@ static class ModuleDescription
 	pure Collection<Dict> entities() => 
 	[
 		/* Register api */
-		/* new Entity{ "name": "Bayrell.TimePlanner.Backend.API.Balancer" }, */
+		new Entity{ "name": "Bayrell.TimePlanner.Backend.API.AdminProjectCrud" },
+		new Entity{ "name": "Bayrell.TimePlanner.Backend.API.TaskCrud" },
 		
 		/* Tasks */
 		/* new Entity{ "name": "Bayrell.TimePlanner.Backend.DockerTasks" }, */

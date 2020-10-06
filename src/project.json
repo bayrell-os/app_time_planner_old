@@ -1,6 +1,7 @@
 {
 	"name": "Time planner",
 	"cache": "var/bundler",
+	"assets": "assets/",
 	"bundles":
 	[
 		{
@@ -27,7 +28,7 @@
 			]
 		},
 		{
-			"dest": "html/js/app.js",
+			"dest": "html/app.js",
 			"lang": "es6",
 			"modules":
 			[
@@ -36,7 +37,7 @@
 			"websocket": true
 		},
 		{
-			"dest": "admin/js/app.js",
+			"dest": "html_sys/app.js",
 			"lang": "es6",
 			"modules":
 			[
@@ -47,8 +48,9 @@
 	],
 	"modules":
 	[
-		"app",
-		"lib"
+		"app/",
+		"app_sys/",
+		"lib/"
 	],
 	"plugins":
 	[

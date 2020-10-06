@@ -42,7 +42,7 @@
 
 <script src={ model.route_prefix ~ "/assets/runtime.js?_=" ~ model.f_inc }></script>
 <script src={ model.route_prefix ~ "/assets/components.js?_=" ~ model.f_inc }></script>
-<script src={ model.route_prefix ~ "/js/app.js?_=" ~ model.f_inc }></script>
+<script src={ model.route_prefix ~ "/app.js?_=" ~ model.f_inc }></script>
 
 <script>
 runWebApp(@json{ @.main_module }, @json{ container.frontend_env });

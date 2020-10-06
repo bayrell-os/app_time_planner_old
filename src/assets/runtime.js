@@ -8106,7 +8106,7 @@ Object.assign(Runtime.ModuleDescription,
 	 */
 	getModuleVersion: function(ctx)
 	{
-		return "0.10.3";
+		return "0.10.4";
 	},
 	/**
 	 * Returns required modules
@@ -8984,6 +8984,10 @@ Object.assign(Runtime.Core.Context,
 							e.push(ctx, item2);
 						}
 					}
+				}
+				else
+				{
+					throw new Runtime.Exceptions.FileNotFound(ctx, class_name, "Entity")
 				}
 			}
 		}
@@ -11514,7 +11518,7 @@ Object.assign(Runtime.Core.ModuleDescription,
 	 */
 	getModuleVersion: function(ctx)
 	{
-		return "0.10.3";
+		return "0.10.4";
 	},
 	/**
 	 * Returns required modules

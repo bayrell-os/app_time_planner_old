@@ -3237,6 +3237,10 @@ Object.assign(Runtime.Web.CRUD.FieldInfo,
 	filterForm: function(ctx, settings, form_type, field_name)
 	{
 		var info = this.getFieldInfo(ctx, settings, field_name);
+		if (info == null)
+		{
+			return false;
+		}
 		if (form_type == "create" && info.can_create == false)
 		{
 			return false;

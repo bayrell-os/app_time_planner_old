@@ -31,9 +31,7 @@ static class Auth
 	 */
 	pure RenderContainer renderChainSetFrontendEnv(RenderContainer container)
 	{
-		container <= frontend_env <= "X-LAYER-ID" <= @.env("X-LAYER-ID", "");
-		container <= frontend_env <= "X-LAYER-UID" <= @.env("X-LAYER-UID", "");
-		container <= frontend_env <= "X-SPACE-ID" <= @.env("X-SPACE-ID", "");
+		/* container <= frontend_env <= "X-LAYER-UID" <= @.env("X-LAYER-UID", ""); */
 		return [ container ];
 	}
 	

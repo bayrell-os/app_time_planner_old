@@ -21,6 +21,7 @@ namespace Bayrell.TimePlanner;
 use Runtime.Core.RemoteCallAnswer;
 use Runtime.ORM.MySQL.Driver as MySQLDriver;
 use Runtime.ORM.MySQL.Settings as MySQLSettings;
+use Runtime.Web.Auth.AuthToken;
 use Runtime.Web.Layout;
 use Runtime.Web.LayoutModel;
 use Runtime.Web.RenderContainer;
@@ -99,6 +100,13 @@ static class Routes
 		
 		/* Set 404 code */
 		container <= new_http_code <= 404;
+		
+		/* Get auth token */
+		AuthToken auth_token = container.layout.keep_data[classof AuthToken] |> default AuthToken null;
+		if (auth_token)
+		{
+			container <= layout <= layout_name <= "admin";
+		}
 		
 		return [ container ];
 	}
