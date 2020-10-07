@@ -75,6 +75,31 @@ static class AdminProjectCrud extends CrudApi
 	
 	
 	/**
+	 * Extend search filter
+	 */
+	Collection<list> extendSearchFilter(Collection<list> filter)
+	{
+		int layer_id = this.request.storage["X-LAYER-ID"];
+		filter = filter.prependIm(["layer_id", "=", layer_id]);
+		return filter;
+	}
+	
+	
+	
+	/**
+	 * Convert item before save to database
+	 */
+	async Dict convertItem(Dict item)
+	{
+		int layer_id = this.request.storage["X-LAYER-ID"];
+		item = await parent::convertItem(item);
+		item <= layer_id <= layer_id;
+		return item;
+	}
+	
+	
+	
+	/**
 	 * Init request
 	 */
 	async void init()

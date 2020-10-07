@@ -22,7 +22,6 @@ use Runtime.Core.Context;
 use Runtime.Core.Entity;
 use Runtime.Core.LambdaChain;
 use Runtime.Web.RenderDriver;
-use Runtime.Web.Auth.AuthBackend;
 
 
 static class ModuleDescription
@@ -74,17 +73,15 @@ static class ModuleDescription
 		new LambdaChain
 		{
 			"name": RenderDriver::RENDER_CHAIN,
-			"value": "Bayrell.TimePlanner.Backend.Auth::renderChainChangeLayoutModel",
+			"value": "Bayrell.TimePlanner.Backend.Helper::renderChainChangeLayoutModel",
 			"pos": RenderDriver::RENDER_CHAIN_CHANGE_LAYOUT_MODEL,
 		},
 		
-		
-		/* Render Chain. Set enviroments */
+		/* External bus storage */
 		new LambdaChain
 		{
-			"name": RenderDriver::RENDER_CHAIN,
-			"value": "Bayrell.TimePlanner.Backend.Auth::renderChainSetFrontendEnv",
-			"pos": RenderDriver::RENDER_CHAIN_SET_FRONTEND_ENVIROMENTS,
+			"name": RenderDriver::API_EXTERNAL_BUS_PREPARE_CHAIN,
+			"value": "Bayrell.TimePlanner.Backend.Helper::apiExternalBusPrepareChain",
 		},
 	];
 	

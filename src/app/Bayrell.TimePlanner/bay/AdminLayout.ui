@@ -196,11 +196,6 @@ span.lpad5{
 									{ _("Bayrell.TimePlanner", "Dashboard") }
 								</a>
 							</li>
-							<li class={ rs::start(layout["route", "name"], "app.projects") ? "active": "" }>
-								<a class='nolink' href={ layout.route_prefix ~ '/projects/' }>
-									{ _("Bayrell.TimePlanner", "Projects") }
-								</a>
-							</li>
 							<li class={ rs::start(layout["route", "name"], "app.tasks") ? "active": "" }>
 								<a class='nolink' href={ layout.route_prefix ~ '/tasks/' }>
 									{ _("Bayrell.TimePlanner", "Find task") }

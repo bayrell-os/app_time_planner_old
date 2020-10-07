@@ -182,9 +182,9 @@ static async RenderContainer actionIndex(RenderContainer container)
 	
 	%var Dict messages =
 	{
-		"add": _("Bayrell.CloudOS", "Add software"),
+		"add": _("Bayrell.CloudOS", "Add task"),
 		"delete": string (Dict item) =>
-			_("Runtime.Web.CRUD", "Do you realy want to delete '%name%' ?", { "name": item["api_name"] } ),
+			_("Runtime.Web.CRUD", "Do you realy want to delete '%name%' ?", { "name": item["task_name"] } ),
 	};
 	
 	<CrudPage @name="crud"

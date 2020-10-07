@@ -14989,8 +14989,8 @@ Object.assign(Runtime.Web.RenderDriver,
 		items = items.copy(ctx, Runtime.Dict.from({"app_name":items.get(ctx, "app_name", "self"),"interface_name":items.get(ctx, "interface_name", "default")}));
 		/* Change api request */
 		var request = new Runtime.Core.RemoteCallRequest(ctx, items);
-		var res = await ctx.chainAsync(ctx, Runtime.Web.RenderDriver.API_EXTERNAL_BUS_PREPARE_CHAIN, Runtime.Collection.from([container,request]));
-		request = Runtime.rtl.get(ctx, res, 1);
+		var res = await ctx.chainAsync(ctx, Runtime.Web.RenderDriver.API_EXTERNAL_BUS_PREPARE_CHAIN, Runtime.Collection.from([request,container]));
+		request = Runtime.rtl.get(ctx, res, 0);
 		/* Restore request */
 		request = request.copy(ctx, Runtime.Dict.from({"uri":items.get(ctx, "uri", ""),"app_name":items.get(ctx, "app_name", "self"),"object_name":items.get(ctx, "object_name", ""),"interface_name":items.get(ctx, "interface_name", "default"),"method_name":items.get(ctx, "method_name", "")}));
 		/* Send request */

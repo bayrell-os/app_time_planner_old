@@ -564,9 +564,9 @@ Object.assign(Bayrell.TimePlanner.Tasks.TasksPage,
 			
 			var table_fields = Runtime.Collection.from(["number","project_id","task_name","edit-buttons"]);
 			
-			var messages = Runtime.Dict.from({"add":ctx.translate(ctx, "Bayrell.CloudOS", "Add software"),"delete":(ctx, item) => 
+			var messages = Runtime.Dict.from({"add":ctx.translate(ctx, "Bayrell.CloudOS", "Add task"),"delete":(ctx, item) => 
 			{
-				return ctx.translate(ctx, "Runtime.Web.CRUD", "Do you realy want to delete '%name%' ?", Runtime.Dict.from({"name":Runtime.rtl.get(ctx, item, "api_name")}));
+				return ctx.translate(ctx, "Runtime.Web.CRUD", "Do you realy want to delete '%name%' ?", Runtime.Dict.from({"name":Runtime.rtl.get(ctx, item, "task_name")}));
 			}});
 			
 			[__vnull, __control_childs] = RenderDriver.e(__control, __control_childs, "component", {"name": "Runtime.Web.CRUD.CrudPage","attrs": {"@name":["Bayrell.TimePlanner.Tasks.TasksPage","crud"],"object_name":"Bayrell.TimePlanner.Task","struct":struct,"filter_fields":filter_fields,"form_fields":form_fields,"table_fields":table_fields,"messages":messages}, "layout": layout});
@@ -984,19 +984,6 @@ Object.assign(Bayrell.TimePlanner.AdminLayout,
 			
 			/* Text */
 			[__vnull, __v7_childs] = RenderDriver.e(__v7, __v7_childs, "text", {"content": ctx.translate(ctx, "Bayrell.TimePlanner", "Dashboard")});
-			RenderDriver.p(__v7, __v7_childs);
-			RenderDriver.p(__v6, __v6_childs);
-			
-			/* Element 'li' */
-			var __v6; var __v6_childs = [];
-			[__v6, __v5_childs] = RenderDriver.e(__v5, __v5_childs, "element", {"name": "li","attrs": {"class":[((Runtime.rs.start(ctx, Runtime.rtl.attr(ctx, layout, ["route", "name"]), "app.projects")) ? ("active") : ("")), this.getCssHash(ctx)].join(" ")}});
-			
-			/* Element 'a.nolink' */
-			var __v7; var __v7_childs = [];
-			[__v7, __v6_childs] = RenderDriver.e(__v6, __v6_childs, "element", {"name": "a","attrs": {"href":layout.route_prefix + Runtime.rtl.toStr("/projects/"),"class":["nolink", this.getCssHash(ctx)].join(" "),"@elem_name":"nolink"}});
-			
-			/* Text */
-			[__vnull, __v7_childs] = RenderDriver.e(__v7, __v7_childs, "text", {"content": ctx.translate(ctx, "Bayrell.TimePlanner", "Projects")});
 			RenderDriver.p(__v7, __v7_childs);
 			RenderDriver.p(__v6, __v6_childs);
 			

@@ -18,18 +18,24 @@
 
 namespace Bayrell.TimePlanner.Backend;
 
+use Runtime.Core.RemoteCallAnswer;
+use Runtime.Core.RemoteCallRequest;
+use Runtime.ORM.ConnectionInterface as Connection;
+use Runtime.ORM.CursorInterface as Cursor;
+use Runtime.ORM.Record;
 use Runtime.Web.Cookie;
 use Runtime.Web.RenderContainer;
 use Runtime.Web.Auth.AuthToken;
+use Bayrell.TimePlanner.Backend.ORM.Layer;
 
 
-static class Auth
+static class Helper
 {
 	
 	/**
 	 * Layout chain
 	 */
-	pure RenderContainer renderChainSetFrontendEnv(RenderContainer container)
+	static async RenderContainer renderChainSetFrontendEnv(RenderContainer container)
 	{
 		/* container <= frontend_env <= "X-LAYER-UID" <= @.env("X-LAYER-UID", ""); */
 		return [ container ];
@@ -55,7 +61,44 @@ static class Auth
 		container <= layout <= keep_data <= { classof AuthToken } <= token;
 		container <= backend_storage <= { classof AuthToken } <= token;
 		
+		/* Find layer id */
+		string uid = @.env("X-LAYER-UID", "");
+		
+		/* Find item */
+		Layer item = Layer::select()
+			|> .filter([
+				["layer_uid", "=", uid]
+			])
+			|> await .one()
+		;
+		if (item == null)
+		{
+			item = Layer::save
+			{
+				"layer_uid": uid,
+			}
+		}
+		
+		container <= backend_storage <= "X-LAYER-ID" <= item["layer_id"];
+		container <= backend_storage <= "X-LAYER-UID" <= uid;
+		
 		return [ container ];
+	}
+	
+	
+	
+	/**
+	 * Api routes storage chain
+	 */
+	static async list apiExternalBusPrepareChain(RemoteCallRequest request, RenderContainer container = null)
+	{
+		/* Add layer id */
+		if (container != null)
+		{
+			request <= storage <= "X-LAYER-ID" <= container["backend_storage", "X-LAYER-ID"];
+			request <= storage <= "X-LAYER-UID" <= container["backend_storage", "X-LAYER-UID"];
+		}
+		return [ request, container ];
 	}
 	
 	

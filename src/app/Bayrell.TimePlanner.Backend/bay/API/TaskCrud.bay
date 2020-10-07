@@ -41,6 +41,7 @@ use Bayrell.TimePlanner.Backend.ORM.Task;
 @ApiMiddleware{ "value": "Runtime.Web.Auth.AuthBackend::apiCheckAuthMiddleware" }
 static class TaskCrud extends CrudApi
 {
+	
 	/**
 	 * Returns orm class name
 	 */
@@ -55,9 +56,18 @@ static class TaskCrud extends CrudApi
 	[
 		new AllowFields{ "fields": ["project_id", "task_name"] },
 		new Required{ "api_name": "task_name" },
-		new Dictionary{ "class_name": classof Project, "field_name": "projects" },
+		new Dictionary
+		{
+			"class_name": classof Project,
+			"field_name": "projects",
+			"buildSearchQuery": QueryBuilder (QueryBuilder q)
+			{
+				int layer_id = this.request.storage["X-LAYER-ID"];
+				q = q.prependFilter(["layer_id", "=", layer_id]);
+				return q;
+			},
+		},
 	];
-	
 	
 	
 	
@@ -75,6 +85,31 @@ static class TaskCrud extends CrudApi
 	 * Build query
 	 */
 	QueryBuilder buildSearchQuery(QueryBuilder q) => parent::buildSearchQuery(q);
+	
+	
+	
+	/**
+	 * Extend search filter
+	 */
+	Collection<list> extendSearchFilter(Collection<list> filter)
+	{
+		int layer_id = this.request.storage["X-LAYER-ID"];
+		filter = filter.prependIm(["layer_id", "=", layer_id]);
+		return filter;
+	}
+	
+	
+	
+	/**
+	 * Convert item before save to database
+	 */
+	async Dict convertItem(Dict item)
+	{
+		int layer_id = this.request.storage["X-LAYER-ID"];
+		item = await parent::convertItem(item);
+		item <= layer_id <= layer_id;
+		return item;
+	}
 	
 	
 	
