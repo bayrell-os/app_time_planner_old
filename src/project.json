@@ -11,7 +11,8 @@
 			[
 				"Runtime",
 				"Runtime.Core",
-				"Runtime.Web"
+				"Runtime.Web",
+				"@jQuery/jquery-3.5.1.min.js"
 			]
 		},
 		{
@@ -64,19 +65,23 @@
 	{
 		"Bayrell.Bundler.Plugins.BayLang":
 		{
+			"php":
+			{
+				"enable_check_types": true,
+				"enable_context": true,
+				"backend": true,
+				"frontend": false
+			},
 			"es6":
 			{
 				"use_module_name": false,
 				"use_strict": true,
 				"enable_async_await": true,
-				"emulate_async_await": false
-			},
-			"nodejs":
-			{
-				"use_module_name": true,
-				"use_strict": true,
-				"enable_async_await": true,
-				"emulate_async_await": false
+				"emulate_async_await": false,
+				"enable_check_types": true,
+				"enable_context": true,
+				"backend": false,
+				"frontend": true
 			}
 		}
 	},

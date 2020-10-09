@@ -17,8 +17,8 @@
 -->
 
 <class version="1.0"
-	name="Bayrell.TimePlanner.Admin.AdminProjects" extends="Runtime.Web.Component" 
-	module="Bayrell.TimePlanner" model="Bayrell.TimePlanner.Admin.AdminProjectsModel"
+	name="Bayrell.TimePlanner.Admin.AdminProjects" extends="Runtime.Web.CRUD.CrudPage"
+	module="Bayrell.TimePlanner" model="Bayrell.TimePlanner.Admin.CrudPageModel"
 >
 
 <use name="Runtime.Exceptions.RuntimeException" />
@@ -31,20 +31,25 @@
 <use name="Runtime.Web.RouteList" />
 <use name="Runtime.Web.RouteMiddleware" />
 <use name="Runtime.Web.Events.MouseClickEvent" />
-<use name="Runtime.Web.CRUD.CrudPage" component="true" />
-<use name="Runtime.Web.CRUD.CrudPageModel" />
 <use name="Runtime.Web.CRUD.FieldInfo" />
+<use name="Runtime.Web.CRUD.Form" />
 <use name="Runtime.Web.Input.Input" component="true" />
 <use name="Runtime.Web.Input.Label" component="true" />
 <use name="Runtime.Web.Input.Select" component="true" />
 <use name="Runtime.Web.Input.SelectText" component="true" />
 <use name="Runtime.Web.Input.TextArea" component="true" />
 <use name="Runtime.Web.Table.TableModel" />
-<use name="Bayrell.TimePlanner.Admin.AdminProjects" />
-<use name="Bayrell.TimePlanner.Admin.AdminProjectsModel" />
 
 
 <script>
+
+
+/**
+ * Returns object name
+ */
+pure string getCrudObjectName() => "Bayrell.TimePlanner.Admin.Project";
+
+
 
 /**
  * Route Action
@@ -55,18 +60,15 @@
 static async RenderContainer actionIndex(RenderContainer container)
 {
 	/* Create model */
-	AdminProjectsModel page_model = new AdminProjectsModel
-	{
-		"crud": await CrudPageModel::crudSearch
-		(
-			{
-				"object_name": "Bayrell.TimePlanner.Admin.Project",
-				"interface_name": "core.crud",
-				"method_name": "search",
-			},
-			container
-		)
-	};
+	CrudPageModel page_model = await CrudPageModel::crudSearch
+	(
+		{
+			"object_name": static::getCrudObjectName(),
+			"interface_name": "core.crud",
+			"method_name": "search",
+		},
+		container
+	);
 	
 	/* Set title */
 	container <= layout <= title <= "Projects page";
@@ -79,112 +81,125 @@ static async RenderContainer actionIndex(RenderContainer container)
 	return [ container ];
 }
 
-</script>
 
 
-<style>
-</style>
+/**
+ * Returns options
+ */
+pure Collection getOptions(LayoutModel layout, CrudPageModel model, Dict params, string name = "")
+{
+	return parent::getOptions(layout, model, params, name);
+}
 
 
-<template name="render">
-	
-	%var Collection<FieldInfo> struct =
-	[
-		new FieldInfo
-		{
-			"api_name": "project_id",
-			"primary": true,
-		},
-		
-		new FieldInfo
-		{
-			"api_name": "number",
-			"label": "",
-			"class_name": classof Label,
-			"class_settings":
-			{
-				"render": html (LayoutModel layout, var model, Dict params, var content)
-				{
-					TableModel table_model = params["table-model"];
-					int index = params["row-index"];
-					if (table_model)
-					{
-						return index + 1;
-					}
-					return "";
-				},
-			},
-		},
-		
-		new FieldInfo
-		{
-			"api_name": "project_name",
-			"label": "Name",
-			"class_name": classof Input,
-			"class_name_table": classof Label,
-		},
-		
-		new FieldInfo
-		{
-			"api_name": "edit-buttons",
-			"label": "",
-			"class_name": classof Label,
-			"class_settings":
-			{
-				"render": html (LayoutModel layout, var model, Dict params, var content)
-				{
-					return
-					[
-						CrudPage::buttonEdit(layout, model, params, content),
-						CrudPage::buttonDelete(layout, model, params, content),
-					];
-				},
-			},
-		}
-	];
-	
-	%var Collection<string> filter_fields =
-	[
-		"project_name",
-	];
-	
-	%var Collection<string> form_fields =
-	[
-		"project_name",
-	];
-	
-	%var Collection<string> table_fields =
-	[
-		"number",
-		"project_name",
-		"edit-buttons",
-	];
-	
-	%var Dict messages =
+
+/**
+ * Returns crud struct
+ */
+pure Collection<FieldInfo> getStruct(LayoutModel layout, CrudPageModel model, Dict params) =>
+[
+	new FieldInfo
 	{
-		"add": _("Bayrell.CloudOS", "Add project"),
-		"delete": string (Dict item) =>
-			_("Runtime.Web.CRUD", "Do you realy want to delete '%name%' ?", { "name": item["project_name"] } ),		
-	};
+		"api_name": "project_id",
+		"primary": true,
+	},
 	
-	<CrudPage @name="crud"
-		object_name="Bayrell.TimePlanner.Admin.Project"
-		struct={ struct }
-		filter_fields={ filter_fields }
-		form_fields={ form_fields }
-		table_fields={ table_fields }
-		messages={ messages }
-		dialog_form={{
-			/*"width": "800px"*/
-		}}
-	/>
+	new FieldInfo
+	{
+		"api_name": "number",
+		"label": "",
+		"class_name": classof Label,
+		"class_settings":
+		{
+			"render": method static::renderNumber,
+		},
+	},
 	
-</template>
+	new FieldInfo
+	{
+		"api_name": "project_name",
+		"label": "Name",
+		"class_name": classof Input,
+		"class_name_table": classof Label,
+	},
+	
+	new FieldInfo
+	{
+		"api_name": "edit-buttons",
+		"label": "",
+		"class_name": classof Label,
+		"class_settings":
+		{
+			"render": method static::renderButtons,
+		},
+	}
+];
 
 
-<script type="frontend">
+
+/**
+ * Returns filter fields
+ */
+pure Collection<string> getFilterFields(LayoutModel layout, CrudPageModel model, Dict params) =>
+[
+	"project_name",
+];
+
+
+
+/**
+ * Returns form fields
+ */
+pure Collection<string> getFormFields(LayoutModel layout, CrudPageModel model, Dict params) =>
+[
+	"project_name",
+];
+
+
+
+/**
+ * Returns table fields
+ */
+pure Collection<string> getTableFields(LayoutModel layout, CrudPageModel model, Dict params) =>
+[
+	"number",
+	"project_name",
+	"edit-buttons",
+];
+
+
+
+/**
+ * Returns messages
+ */
+pure Dict<string> getMessages(LayoutModel layout, CrudPageModel model, Dict params) =>
+{
+	"add": _("Bayrell.CloudOS", "Add project"),
+	"delete": string (Dict item) =>
+		_("Runtime.Web.CRUD", "Do you realy want to delete '%name%' ?", { "name": item["project_name"] } ),	
+};
+
+
+
+/**
+ * Dialog settings
+ */
+pure Dict getDialogSettings(LayoutModel layout, CrudPageModel model, Dict params) =>
+{
+};
+
+
+
+/**
+ * Form settings
+ */
+pure Dict getFormSettings(LayoutModel layout, CrudPageModel model, Dict params) =>
+{
+	"class_name": classof Form,
+};
 
 </script>
+
 
 
 </class>

@@ -54,8 +54,23 @@ static class TaskCrud extends CrudApi
 	 */
 	Collection<Rule> rules() =>
 	[
-		new AllowFields{ "fields": ["project_id", "task_name"] },
+		new AllowFields
+		{
+			"fields":
+			[
+				"project_id",
+				"task_name",
+				"state",
+				"user",
+				"plan_begin",
+				"plan_end",
+				"real_begin",
+				"real_end",
+			]
+		},
 		new Required{ "api_name": "task_name" },
+		new ReadOnly{ "api_name": "real_begin" },
+		new ReadOnly{ "api_name": "real_end" },
 		new Dictionary
 		{
 			"class_name": classof Project,
@@ -76,7 +91,7 @@ static class TaskCrud extends CrudApi
 	 */
 	Collection<Collection<string>> getDefaultOrder() =>
 	[ 
-		["task_name", "desc"]
+		["task_id", "desc"]
 	];
 	
 	

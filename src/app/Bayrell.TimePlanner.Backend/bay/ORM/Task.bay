@@ -18,14 +18,17 @@
 
 namespace Bayrell.TimePlanner.Backend.ORM;
 
+use Runtime.DateTime;
 use Runtime.ORM.Annotations.AutoIncrement;
 use Runtime.ORM.Annotations.BigIntType;
 use Runtime.ORM.Annotations.BooleanType;
+use Runtime.ORM.Annotations.DateTimeType;
 use Runtime.ORM.Annotations.ForeignKey;
 use Runtime.ORM.Annotations.Index;
 use Runtime.ORM.Annotations.JsonType;
 use Runtime.ORM.Annotations.Primary;
 use Runtime.ORM.Annotations.StringType;
+use Runtime.ORM.Annotations.TinyIntType;
 use Runtime.ORM.Annotations.Unique;
 use Runtime.ORM.Annotations.Virtual;
 use Runtime.ORM.ConnectionInterface as Connection;
@@ -37,6 +40,11 @@ use Bayrell.TimePlanner.Backend.ORM.Project;
 
 struct Task extends Record
 {
+	static const string STATE_NEW = 0;
+	static const string STATE_PLANNED = 1;
+	static const string STATE_IN_WORK = 2;
+	static const string STATE_COMPLETED = 3;
+	
 	@AutoIncrement{}
 	@BigIntType{}
 	int task_id;
@@ -47,8 +55,27 @@ struct Task extends Record
 	@BigIntType{}
 	int project_id;
 	
-	@StringType{ "length": 255 }
+	@StringType{}
 	string task_name;
+	
+	@TinyIntType{}
+	int state;
+	
+	@StringType{}
+	string user;
+	
+	@DateTimeType{ "nullable": true }
+	DateTime plan_begin;
+	
+	@DateTimeType{ "nullable": true }
+	DateTime plan_end;
+	
+	@DateTimeType{ "nullable": true }
+	DateTime real_begin;
+	
+	@DateTimeType{ "nullable": true }
+	DateTime real_end;
+	
 	
 	
 	/**

@@ -4,9 +4,7 @@
 	[
 		"Admin/AdminInfo",
 		"Admin/AdminProjects",
-		"Admin/AdminProjectsModel",
 		"Tasks/TasksPage",
-		"Tasks/TasksPageModel",
 		"AdminLayout",
 		"DefaultLayout",
 		"MainPage",

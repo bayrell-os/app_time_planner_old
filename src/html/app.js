@@ -177,9 +177,9 @@ if (typeof Bayrell.TimePlanner == 'undefined') Bayrell.TimePlanner = {};
 if (typeof Bayrell.TimePlanner.Admin == 'undefined') Bayrell.TimePlanner.Admin = {};
 Bayrell.TimePlanner.Admin.AdminProjects = function(ctx)
 {
-	Runtime.Web.Component.apply(this, arguments);
+	Runtime.Web.CRUD.CrudPage.apply(this, arguments);
 };
-Bayrell.TimePlanner.Admin.AdminProjects.prototype = Object.create(Runtime.Web.Component.prototype);
+Bayrell.TimePlanner.Admin.AdminProjects.prototype = Object.create(Runtime.Web.CRUD.CrudPage.prototype);
 Bayrell.TimePlanner.Admin.AdminProjects.prototype.constructor = Bayrell.TimePlanner.Admin.AdminProjects;
 Object.assign(Bayrell.TimePlanner.Admin.AdminProjects.prototype,
 {
@@ -188,25 +188,32 @@ Object.assign(Bayrell.TimePlanner.Admin.AdminProjects.prototype,
 		if (o instanceof Bayrell.TimePlanner.Admin.AdminProjects)
 		{
 		}
-		Runtime.Web.Component.prototype.assignObject.call(this,ctx,o);
+		Runtime.Web.CRUD.CrudPage.prototype.assignObject.call(this,ctx,o);
 	},
 	assignValue: function(ctx,k,v)
 	{
-		Runtime.Web.Component.prototype.assignValue.call(this,ctx,k,v);
+		Runtime.Web.CRUD.CrudPage.prototype.assignValue.call(this,ctx,k,v);
 	},
 	takeValue: function(ctx,k,d)
 	{
 		if (d == undefined) d = null;
-		return Runtime.Web.Component.prototype.takeValue.call(this,ctx,k,d);
+		return Runtime.Web.CRUD.CrudPage.prototype.takeValue.call(this,ctx,k,d);
 	},
 	getClassName: function(ctx)
 	{
 		return "Bayrell.TimePlanner.Admin.AdminProjects";
 	},
 });
-Object.assign(Bayrell.TimePlanner.Admin.AdminProjects, Runtime.Web.Component);
+Object.assign(Bayrell.TimePlanner.Admin.AdminProjects, Runtime.Web.CRUD.CrudPage);
 Object.assign(Bayrell.TimePlanner.Admin.AdminProjects,
 {
+	/**
+ * Returns object name
+ */
+	getCrudObjectName: function(ctx)
+	{
+		return "Bayrell.TimePlanner.Admin.Project";
+	},
 	/**
  * Route Action
  * @return RenderContainer
@@ -214,7 +221,7 @@ Object.assign(Bayrell.TimePlanner.Admin.AdminProjects,
 	actionIndex: async function(ctx, container)
 	{
 		/* Create model */
-		var page_model = new Bayrell.TimePlanner.Admin.AdminProjectsModel(ctx, Runtime.Dict.from({"crud":await Runtime.Web.CRUD.CrudPageModel.crudSearch(ctx, Runtime.Dict.from({"object_name":"Bayrell.TimePlanner.Admin.Project","interface_name":"core.crud","method_name":"search"}), container)}));
+		var page_model = await Bayrell.TimePlanner.Admin.CrudPageModel.crudSearch(ctx, Runtime.Dict.from({"object_name":this.getCrudObjectName(ctx),"interface_name":"core.crud","method_name":"search"}), container);
 		/* Set title */
 		container = Runtime.rtl.setAttr(ctx, container, Runtime.Collection.from(["layout", "title"]), "Projects page");
 		container = Runtime.rtl.setAttr(ctx, container, Runtime.Collection.from(["layout", "layout_name"]), "admin");
@@ -223,45 +230,65 @@ Object.assign(Bayrell.TimePlanner.Admin.AdminProjects,
 		container = Runtime.rtl.setAttr(ctx, container, Runtime.Collection.from(["layout", "page_model"]), page_model);
 		return Promise.resolve(Runtime.Collection.from([container]));
 	},
-	css: function(ctx, vars)
+	/**
+ * Returns options
+ */
+	getOptions: function(ctx, layout, model, params, name)
 	{
+		if (name == undefined) name = "";
+		return Runtime.Web.CRUD.CrudPage.getOptions(ctx, layout, model, params, name);
 	},
-	render: function(ctx, layout, model, params, content)
+	/**
+ * Returns crud struct
+ */
+	getStruct: function(ctx, layout, model, params)
 	{
-		return (__control) =>
+		return Runtime.Collection.from([new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"project_id","primary":true})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"number","label":"","class_name":"Runtime.Web.Input.Label","class_settings":Runtime.Dict.from({"render":this.renderNumber.bind(this)})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"project_name","label":"Name","class_name":"Runtime.Web.Input.Input","class_name_table":"Runtime.Web.Input.Label"})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"edit-buttons","label":"","class_name":"Runtime.Web.Input.Label","class_settings":Runtime.Dict.from({"render":this.renderButtons.bind(this)})}))]);
+	},
+	/**
+ * Returns filter fields
+ */
+	getFilterFields: function(ctx, layout, model, params)
+	{
+		return Runtime.Collection.from(["project_name"]);
+	},
+	/**
+ * Returns form fields
+ */
+	getFormFields: function(ctx, layout, model, params)
+	{
+		return Runtime.Collection.from(["project_name"]);
+	},
+	/**
+ * Returns table fields
+ */
+	getTableFields: function(ctx, layout, model, params)
+	{
+		return Runtime.Collection.from(["number","project_name","edit-buttons"]);
+	},
+	/**
+ * Returns messages
+ */
+	getMessages: function(ctx, layout, model, params)
+	{
+		return Runtime.Dict.from({"add":ctx.translate(ctx, "Bayrell.CloudOS", "Add project"),"delete":(ctx, item) => 
 		{
-			var __vnull = null;
-			var __control_childs = [];
-			
-			var struct = Runtime.Collection.from([new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"project_id","primary":true})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"number","label":"","class_name":"Runtime.Web.Input.Label","class_settings":Runtime.Dict.from({"render":(ctx, layout, model, params, content) => 
-			{
-				var table_model = Runtime.rtl.get(ctx, params, "table-model");
-				var index = Runtime.rtl.get(ctx, params, "row-index");
-				if (table_model)
-				{
-					return index + 1;
-				}
-				return "";
-			}})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"project_name","label":"Name","class_name":"Runtime.Web.Input.Input","class_name_table":"Runtime.Web.Input.Label"})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"edit-buttons","label":"","class_name":"Runtime.Web.Input.Label","class_settings":Runtime.Dict.from({"render":(ctx, layout, model, params, content) => 
-			{
-				return Runtime.Collection.from([Runtime.Web.CRUD.CrudPage.buttonEdit(ctx, layout, model, params, content),Runtime.Web.CRUD.CrudPage.buttonDelete(ctx, layout, model, params, content)]);
-			}})}))]);
-			
-			var filter_fields = Runtime.Collection.from(["project_name"]);
-			
-			var form_fields = Runtime.Collection.from(["project_name"]);
-			
-			var table_fields = Runtime.Collection.from(["number","project_name","edit-buttons"]);
-			
-			var messages = Runtime.Dict.from({"add":ctx.translate(ctx, "Bayrell.CloudOS", "Add project"),"delete":(ctx, item) => 
-			{
-				return ctx.translate(ctx, "Runtime.Web.CRUD", "Do you realy want to delete '%name%' ?", Runtime.Dict.from({"name":Runtime.rtl.get(ctx, item, "project_name")}));
-			}});
-			
-			[__vnull, __control_childs] = RenderDriver.e(__control, __control_childs, "component", {"name": "Runtime.Web.CRUD.CrudPage","attrs": {"@name":["Bayrell.TimePlanner.Admin.AdminProjects","crud"],"object_name":"Bayrell.TimePlanner.Admin.Project","struct":struct,"filter_fields":filter_fields,"form_fields":form_fields,"table_fields":table_fields,"messages":messages,"dialog_form":Runtime.Dict.from({})}, "layout": layout});
-			
-			return __control_childs;
-		};
+			return ctx.translate(ctx, "Runtime.Web.CRUD", "Do you realy want to delete '%name%' ?", Runtime.Dict.from({"name":Runtime.rtl.get(ctx, item, "project_name")}));
+		}});
+	},
+	/**
+ * Dialog settings
+ */
+	getDialogSettings: function(ctx, layout, model, params)
+	{
+		return Runtime.Dict.from({});
+	},
+	/**
+ * Form settings
+ */
+	getFormSettings: function(ctx, layout, model, params)
+	{
+		return Runtime.Dict.from({"class_name":"Runtime.Web.CRUD.Form"});
 	},
 	components: function(ctx)
 	{
@@ -278,7 +305,7 @@ Object.assign(Bayrell.TimePlanner.Admin.AdminProjects,
 	},
 	getParentClassName: function()
 	{
-		return "Runtime.Web.Component";
+		return "Runtime.Web.CRUD.CrudPage";
 	},
 	getClassInfo: function(ctx)
 	{
@@ -337,133 +364,6 @@ Runtime.rtl.defClass(Bayrell.TimePlanner.Admin.AdminProjects);
 window["Bayrell.TimePlanner.Admin.AdminProjects"] = Bayrell.TimePlanner.Admin.AdminProjects;
 if (typeof module != "undefined" && typeof module.exports != "undefined") module.exports = Bayrell.TimePlanner.Admin.AdminProjects;
 "use strict;"
-/*!
- *  Bayrell Cloud OS
- *
- *  (c) Copyright 2020 "Ildar Bikmamatov" <support@bayrell.org>
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
-if (typeof Bayrell == 'undefined') Bayrell = {};
-if (typeof Bayrell.TimePlanner == 'undefined') Bayrell.TimePlanner = {};
-if (typeof Bayrell.TimePlanner.Admin == 'undefined') Bayrell.TimePlanner.Admin = {};
-Bayrell.TimePlanner.Admin.AdminProjectsModel = function(ctx)
-{
-	Runtime.BaseStruct.apply(this, arguments);
-};
-Bayrell.TimePlanner.Admin.AdminProjectsModel.prototype = Object.create(Runtime.BaseStruct.prototype);
-Bayrell.TimePlanner.Admin.AdminProjectsModel.prototype.constructor = Bayrell.TimePlanner.Admin.AdminProjectsModel;
-Object.assign(Bayrell.TimePlanner.Admin.AdminProjectsModel.prototype,
-{
-	_init: function(ctx)
-	{
-		var defProp = use('Runtime.rtl').defProp;
-		var a = Object.getOwnPropertyNames(this);
-		this.crud = null;
-		Runtime.BaseStruct.prototype._init.call(this,ctx);
-	},
-	assignObject: function(ctx,o)
-	{
-		if (o instanceof Bayrell.TimePlanner.Admin.AdminProjectsModel)
-		{
-			this.crud = o.crud;
-		}
-		Runtime.BaseStruct.prototype.assignObject.call(this,ctx,o);
-	},
-	assignValue: function(ctx,k,v)
-	{
-		if (k == "crud")this.crud = v;
-		else Runtime.BaseStruct.prototype.assignValue.call(this,ctx,k,v);
-	},
-	takeValue: function(ctx,k,d)
-	{
-		if (d == undefined) d = null;
-		if (k == "crud")return this.crud;
-		return Runtime.BaseStruct.prototype.takeValue.call(this,ctx,k,d);
-	},
-	getClassName: function(ctx)
-	{
-		return "Bayrell.TimePlanner.Admin.AdminProjectsModel";
-	},
-});
-Object.assign(Bayrell.TimePlanner.Admin.AdminProjectsModel, Runtime.BaseStruct);
-Object.assign(Bayrell.TimePlanner.Admin.AdminProjectsModel,
-{
-	/* ======================= Class Init Functions ======================= */
-	getCurrentNamespace: function()
-	{
-		return "Bayrell.TimePlanner.Admin";
-	},
-	getCurrentClassName: function()
-	{
-		return "Bayrell.TimePlanner.Admin.AdminProjectsModel";
-	},
-	getParentClassName: function()
-	{
-		return "Runtime.BaseStruct";
-	},
-	getClassInfo: function(ctx)
-	{
-		var Collection = Runtime.Collection;
-		var Dict = Runtime.Dict;
-		var IntrospectionInfo = Runtime.IntrospectionInfo;
-		return new IntrospectionInfo(ctx, {
-			"kind": IntrospectionInfo.ITEM_CLASS,
-			"class_name": "Bayrell.TimePlanner.Admin.AdminProjectsModel",
-			"name": "Bayrell.TimePlanner.Admin.AdminProjectsModel",
-			"annotations": Collection.from([
-			]),
-		});
-	},
-	getFieldsList: function(ctx, f)
-	{
-		var a = [];
-		if (f==undefined) f=0;
-		if ((f|3)==3)
-		{
-			a.push("crud");
-		}
-		return Runtime.Collection.from(a);
-	},
-	getFieldInfoByName: function(ctx,field_name)
-	{
-		var Collection = Runtime.Collection;
-		var Dict = Runtime.Dict;
-		var IntrospectionInfo = Runtime.IntrospectionInfo;
-		if (field_name == "crud") return new IntrospectionInfo(ctx, {
-			"kind": IntrospectionInfo.ITEM_FIELD,
-			"class_name": "Bayrell.TimePlanner.Admin.AdminProjectsModel",
-			"name": field_name,
-			"annotations": Collection.from([
-			]),
-		});
-		return null;
-	},
-	getMethodsList: function(ctx)
-	{
-		var a = [
-		];
-		return Runtime.Collection.from(a);
-	},
-	getMethodInfoByName: function(ctx,field_name)
-	{
-		return null;
-	},
-});
-Runtime.rtl.defClass(Bayrell.TimePlanner.Admin.AdminProjectsModel);
-window["Bayrell.TimePlanner.Admin.AdminProjectsModel"] = Bayrell.TimePlanner.Admin.AdminProjectsModel;
-if (typeof module != "undefined" && typeof module.exports != "undefined") module.exports = Bayrell.TimePlanner.Admin.AdminProjectsModel;
-"use strict;"
 /*
  *  Bayrell Cloud OS
  *
@@ -486,9 +386,9 @@ if (typeof Bayrell.TimePlanner == 'undefined') Bayrell.TimePlanner = {};
 if (typeof Bayrell.TimePlanner.Tasks == 'undefined') Bayrell.TimePlanner.Tasks = {};
 Bayrell.TimePlanner.Tasks.TasksPage = function(ctx)
 {
-	Runtime.Web.Component.apply(this, arguments);
+	Runtime.Web.CRUD.CrudPage.apply(this, arguments);
 };
-Bayrell.TimePlanner.Tasks.TasksPage.prototype = Object.create(Runtime.Web.Component.prototype);
+Bayrell.TimePlanner.Tasks.TasksPage.prototype = Object.create(Runtime.Web.CRUD.CrudPage.prototype);
 Bayrell.TimePlanner.Tasks.TasksPage.prototype.constructor = Bayrell.TimePlanner.Tasks.TasksPage;
 Object.assign(Bayrell.TimePlanner.Tasks.TasksPage.prototype,
 {
@@ -497,27 +397,34 @@ Object.assign(Bayrell.TimePlanner.Tasks.TasksPage.prototype,
 		if (o instanceof Bayrell.TimePlanner.Tasks.TasksPage)
 		{
 		}
-		Runtime.Web.Component.prototype.assignObject.call(this,ctx,o);
+		Runtime.Web.CRUD.CrudPage.prototype.assignObject.call(this,ctx,o);
 	},
 	assignValue: function(ctx,k,v)
 	{
-		Runtime.Web.Component.prototype.assignValue.call(this,ctx,k,v);
+		Runtime.Web.CRUD.CrudPage.prototype.assignValue.call(this,ctx,k,v);
 	},
 	takeValue: function(ctx,k,d)
 	{
 		if (d == undefined) d = null;
-		return Runtime.Web.Component.prototype.takeValue.call(this,ctx,k,d);
+		return Runtime.Web.CRUD.CrudPage.prototype.takeValue.call(this,ctx,k,d);
 	},
 	getClassName: function(ctx)
 	{
 		return "Bayrell.TimePlanner.Tasks.TasksPage";
 	},
 });
-Object.assign(Bayrell.TimePlanner.Tasks.TasksPage, Runtime.Web.Component);
+Object.assign(Bayrell.TimePlanner.Tasks.TasksPage, Runtime.Web.CRUD.CrudPage);
 Object.assign(Bayrell.TimePlanner.Tasks.TasksPage,
 {
 	css: function(ctx, vars)
 	{
+	},
+	/**
+ * Returns object name
+ */
+	getCrudObjectName: function(ctx)
+	{
+		return "Bayrell.TimePlanner.Task";
 	},
 	/**
  * Route Action
@@ -526,7 +433,7 @@ Object.assign(Bayrell.TimePlanner.Tasks.TasksPage,
 	actionIndex: async function(ctx, container)
 	{
 		/* Create model */
-		var page_model = new Bayrell.TimePlanner.Tasks.TasksPageModel(ctx, Runtime.Dict.from({"crud":await Runtime.Web.CRUD.CrudPageModel.crudSearch(ctx, Runtime.Dict.from({"object_name":"Bayrell.TimePlanner.Task","interface_name":"core.crud","method_name":"search"}), container)}));
+		var page_model = await Runtime.Web.CRUD.CrudPageModel.crudSearch(ctx, Runtime.Dict.from({"object_name":this.getCrudObjectName(ctx),"interface_name":"core.crud","method_name":"search"}), container);
 		/* Set title */
 		container = Runtime.rtl.setAttr(ctx, container, Runtime.Collection.from(["layout", "title"]), "Tasks");
 		container = Runtime.rtl.setAttr(ctx, container, Runtime.Collection.from(["layout", "layout_name"]), "admin");
@@ -535,14 +442,15 @@ Object.assign(Bayrell.TimePlanner.Tasks.TasksPage,
 		container = Runtime.rtl.setAttr(ctx, container, Runtime.Collection.from(["layout", "page_model"]), page_model);
 		return Promise.resolve(Runtime.Collection.from([container]));
 	},
-	render: function(ctx, layout, model, params, content)
+	/**
+ * Returns options
+ */
+	getOptions: function(ctx, layout, model, params, name)
 	{
-		return (__control) =>
+		if (name == undefined) name = "";
+		if (name == "projects")
 		{
-			var __vnull = null;
-			var __control_childs = [];
-			
-			var __v0 = new Runtime.Monad(ctx, model.crud);
+			var __v0 = new Runtime.Monad(ctx, model);
 			__v0 = __v0.attr(ctx, "foreigns");
 			__v0 = __v0.attr(ctx, "projects");
 			__v0 = __v0.attr(ctx, "options");
@@ -551,32 +459,73 @@ Object.assign(Bayrell.TimePlanner.Tasks.TasksPage,
 				return Runtime.Dict.from({"id":Runtime.rtl.get(ctx, item, "project_id"),"value":Runtime.rtl.get(ctx, item, "project_name"),"item":item});
 			}));
 			__v0 = __v0.monad(ctx, Runtime.rtl.m_to(ctx, "Runtime.Collection", Runtime.Collection.from([])));
-			var projects = __v0.value(ctx);
-			
-			var struct = Runtime.Collection.from([new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"task_id","primary":true})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"number","label":"","class_name":"Runtime.Web.Input.Label","class_settings":Runtime.Dict.from({"render":Runtime.Web.CRUD.CrudPage.fieldNumber})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"task_name","label":"Task name","class_name":"Runtime.Web.Input.Input","class_name_table":"Runtime.Web.Input.Label"})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"project_id","label":"Project","class_name":"Runtime.Web.Input.Select","class_name_table":"Runtime.Web.Input.SelectText","class_settings":Runtime.Dict.from({"show_select_value_filter":true,"show_select_value":true,"options":projects})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"edit-buttons","label":"","class_name":"Runtime.Web.Input.Label","class_settings":Runtime.Dict.from({"render":(ctx, layout, model, params, content) => 
-			{
-				return Runtime.Collection.from([Runtime.Web.CRUD.CrudPage.buttonEdit(ctx, layout, model, params, content),Runtime.Web.CRUD.CrudPage.buttonDelete(ctx, layout, model, params, content)]);
-			}})}))]);
-			
-			var filter_fields = Runtime.Collection.from(["project_id","task_name"]);
-			
-			var form_fields = Runtime.Collection.from(["project_id","task_name"]);
-			
-			var table_fields = Runtime.Collection.from(["number","project_id","task_name","edit-buttons"]);
-			
-			var messages = Runtime.Dict.from({"add":ctx.translate(ctx, "Bayrell.CloudOS", "Add task"),"delete":(ctx, item) => 
-			{
-				return ctx.translate(ctx, "Runtime.Web.CRUD", "Do you realy want to delete '%name%' ?", Runtime.Dict.from({"name":Runtime.rtl.get(ctx, item, "task_name")}));
-			}});
-			
-			[__vnull, __control_childs] = RenderDriver.e(__control, __control_childs, "component", {"name": "Runtime.Web.CRUD.CrudPage","attrs": {"@name":["Bayrell.TimePlanner.Tasks.TasksPage","crud"],"object_name":"Bayrell.TimePlanner.Task","struct":struct,"filter_fields":filter_fields,"form_fields":form_fields,"table_fields":table_fields,"messages":messages}, "layout": layout});
-			
-			return __control_childs;
-		};
+			return __v0.value(ctx);
+		}
+		if (name == "states")
+		{
+			return Runtime.Collection.from([Runtime.Dict.from({"id":0,"value":"New"}),Runtime.Dict.from({"id":1,"value":"Planned"}),Runtime.Dict.from({"id":2,"value":"In work"}),Runtime.Dict.from({"id":3,"value":"Completed"})]);
+		}
+		if (name == "users")
+		{
+			return Runtime.Collection.from([Runtime.Dict.from({"id":"admin","value":"Admin"})]);
+		}
+		return Runtime.Web.CRUD.CrudPage.getOptions(ctx, layout, model, params, name);
+	},
+	/**
+ * Returns crud struct
+ */
+	getStruct: function(ctx, layout, model, params)
+	{
+		return Runtime.Collection.from([new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"task_id","primary":true,"label":"","class_name":"Runtime.Web.Input.Label"})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"number","label":"","class_name":"Runtime.Web.Input.Label","class_settings":Runtime.Dict.from({"render":this.renderNumber.bind(this)})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"task_name","label":"Task name","class_name":"Runtime.Web.Input.Input","class_name_table":"Runtime.Web.Input.Label"})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"project_id","label":"Project","class_name":"Runtime.Web.Input.Select","class_name_table":"Runtime.Web.Input.SelectText","class_settings":Runtime.Dict.from({"show_select_value_filter":true,"show_select_value":true,"options":this.getOptions(ctx, layout, model, params, "projects")})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"state","label":"State","class_name":"Runtime.Web.Input.Select","class_name_table":"Runtime.Web.Input.SelectText","class_settings":Runtime.Dict.from({"show_select_value_filter":true,"show_select_value":true,"options":this.getOptions(ctx, layout, model, params, "states")})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"user","label":"User","class_name":"Runtime.Web.Input.Select","class_name_table":"Runtime.Web.Input.SelectText","class_settings":Runtime.Dict.from({"show_select_value_filter":true,"show_select_value":true,"options":this.getOptions(ctx, layout, model, params, "users")})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"plan_begin","label":"Plan begin","class_name":"Runtime.Web.Input.DatePicker","class_name_table":"Runtime.Web.Input.Label","class_settings":Runtime.Dict.from({"render":this.renderDateTime.bind(this)})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"plan_end","label":"Plan end","class_name":"Runtime.Web.Input.DatePicker","class_name_table":"Runtime.Web.Input.Label","class_settings":Runtime.Dict.from({"render":this.renderDateTime.bind(this)})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"real_begin","label":"Real begin","class_name":"Runtime.Web.Input.Label","class_settings":Runtime.Dict.from({"render":this.renderDateTime.bind(this)})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"real_end","label":"Real end","class_name":"Runtime.Web.Input.Label","class_settings":Runtime.Dict.from({"render":this.renderDateTime.bind(this)})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"edit-buttons","label":"","class_name":"Runtime.Web.Input.Label","class_settings":Runtime.Dict.from({"render":this.renderButtons.bind(this)})}))]);
+	},
+	/**
+ * Returns filter fields
+ */
+	getFilterFields: function(ctx, layout, model, params)
+	{
+		return Runtime.Collection.from(["project_id","task_name","state","user"]);
+	},
+	/**
+ * Returns form fields
+ */
+	getFormFields: function(ctx, layout, model, params)
+	{
+		return Runtime.Collection.from(["project_id","task_name","state","user","plan_begin","plan_end"]);
+	},
+	/**
+ * Returns table fields
+ */
+	getTableFields: function(ctx, layout, model, params)
+	{
+		return Runtime.Collection.from(["task_id","project_id","task_name","state","user","plan_begin","plan_end","real_begin","real_end","edit-buttons"]);
+	},
+	/**
+ * Returns messages
+ */
+	getMessages: function(ctx, layout, model, params)
+	{
+		return Runtime.Dict.from({"add":ctx.translate(ctx, "Bayrell.TimePlanner", "Add task"),"delete":(ctx, item) => 
+		{
+			return ctx.translate(ctx, "Runtime.Web.CRUD", "Do you realy want to delete '%name%' ?", Runtime.Dict.from({"name":Runtime.rtl.get(ctx, item, "task_name")}));
+		}});
+	},
+	/**
+ * Dialog settings
+ */
+	getDialogSettings: function(ctx, layout, model, params)
+	{
+		return Runtime.Dict.from({});
+	},
+	/**
+ * Form settings
+ */
+	getFormSettings: function(ctx, layout, model, params)
+	{
+		return Runtime.Dict.from({"class_name":"Runtime.Web.CRUD.Form"});
 	},
 	components: function(ctx)
 	{
-		return Runtime.Collection.from(["Runtime.Web.CRUD.CrudPage","Runtime.Web.Input.Input","Runtime.Web.Input.Label","Runtime.Web.Input.Select","Runtime.Web.Input.SelectText","Runtime.Web.Input.TextArea"]);
+		return Runtime.Collection.from(["Runtime.Web.CRUD.CrudPage","Runtime.Web.Input.Button","Runtime.Web.Input.DatePicker","Runtime.Web.Input.Input","Runtime.Web.Input.Label","Runtime.Web.Input.Select","Runtime.Web.Input.SelectText","Runtime.Web.Input.TextArea"]);
 	},
 	/* ======================= Class Init Functions ======================= */
 	getCurrentNamespace: function()
@@ -589,7 +538,7 @@ Object.assign(Bayrell.TimePlanner.Tasks.TasksPage,
 	},
 	getParentClassName: function()
 	{
-		return "Runtime.Web.Component";
+		return "Runtime.Web.CRUD.CrudPage";
 	},
 	getClassInfo: function(ctx)
 	{
@@ -647,133 +596,6 @@ Object.assign(Bayrell.TimePlanner.Tasks.TasksPage,
 Runtime.rtl.defClass(Bayrell.TimePlanner.Tasks.TasksPage);
 window["Bayrell.TimePlanner.Tasks.TasksPage"] = Bayrell.TimePlanner.Tasks.TasksPage;
 if (typeof module != "undefined" && typeof module.exports != "undefined") module.exports = Bayrell.TimePlanner.Tasks.TasksPage;
-"use strict;"
-/*!
- *  Bayrell Cloud OS
- *
- *  (c) Copyright 2020 "Ildar Bikmamatov" <support@bayrell.org>
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
-if (typeof Bayrell == 'undefined') Bayrell = {};
-if (typeof Bayrell.TimePlanner == 'undefined') Bayrell.TimePlanner = {};
-if (typeof Bayrell.TimePlanner.Tasks == 'undefined') Bayrell.TimePlanner.Tasks = {};
-Bayrell.TimePlanner.Tasks.TasksPageModel = function(ctx)
-{
-	Runtime.BaseStruct.apply(this, arguments);
-};
-Bayrell.TimePlanner.Tasks.TasksPageModel.prototype = Object.create(Runtime.BaseStruct.prototype);
-Bayrell.TimePlanner.Tasks.TasksPageModel.prototype.constructor = Bayrell.TimePlanner.Tasks.TasksPageModel;
-Object.assign(Bayrell.TimePlanner.Tasks.TasksPageModel.prototype,
-{
-	_init: function(ctx)
-	{
-		var defProp = use('Runtime.rtl').defProp;
-		var a = Object.getOwnPropertyNames(this);
-		this.crud = null;
-		Runtime.BaseStruct.prototype._init.call(this,ctx);
-	},
-	assignObject: function(ctx,o)
-	{
-		if (o instanceof Bayrell.TimePlanner.Tasks.TasksPageModel)
-		{
-			this.crud = o.crud;
-		}
-		Runtime.BaseStruct.prototype.assignObject.call(this,ctx,o);
-	},
-	assignValue: function(ctx,k,v)
-	{
-		if (k == "crud")this.crud = v;
-		else Runtime.BaseStruct.prototype.assignValue.call(this,ctx,k,v);
-	},
-	takeValue: function(ctx,k,d)
-	{
-		if (d == undefined) d = null;
-		if (k == "crud")return this.crud;
-		return Runtime.BaseStruct.prototype.takeValue.call(this,ctx,k,d);
-	},
-	getClassName: function(ctx)
-	{
-		return "Bayrell.TimePlanner.Tasks.TasksPageModel";
-	},
-});
-Object.assign(Bayrell.TimePlanner.Tasks.TasksPageModel, Runtime.BaseStruct);
-Object.assign(Bayrell.TimePlanner.Tasks.TasksPageModel,
-{
-	/* ======================= Class Init Functions ======================= */
-	getCurrentNamespace: function()
-	{
-		return "Bayrell.TimePlanner.Tasks";
-	},
-	getCurrentClassName: function()
-	{
-		return "Bayrell.TimePlanner.Tasks.TasksPageModel";
-	},
-	getParentClassName: function()
-	{
-		return "Runtime.BaseStruct";
-	},
-	getClassInfo: function(ctx)
-	{
-		var Collection = Runtime.Collection;
-		var Dict = Runtime.Dict;
-		var IntrospectionInfo = Runtime.IntrospectionInfo;
-		return new IntrospectionInfo(ctx, {
-			"kind": IntrospectionInfo.ITEM_CLASS,
-			"class_name": "Bayrell.TimePlanner.Tasks.TasksPageModel",
-			"name": "Bayrell.TimePlanner.Tasks.TasksPageModel",
-			"annotations": Collection.from([
-			]),
-		});
-	},
-	getFieldsList: function(ctx, f)
-	{
-		var a = [];
-		if (f==undefined) f=0;
-		if ((f|3)==3)
-		{
-			a.push("crud");
-		}
-		return Runtime.Collection.from(a);
-	},
-	getFieldInfoByName: function(ctx,field_name)
-	{
-		var Collection = Runtime.Collection;
-		var Dict = Runtime.Dict;
-		var IntrospectionInfo = Runtime.IntrospectionInfo;
-		if (field_name == "crud") return new IntrospectionInfo(ctx, {
-			"kind": IntrospectionInfo.ITEM_FIELD,
-			"class_name": "Bayrell.TimePlanner.Tasks.TasksPageModel",
-			"name": field_name,
-			"annotations": Collection.from([
-			]),
-		});
-		return null;
-	},
-	getMethodsList: function(ctx)
-	{
-		var a = [
-		];
-		return Runtime.Collection.from(a);
-	},
-	getMethodInfoByName: function(ctx,field_name)
-	{
-		return null;
-	},
-});
-Runtime.rtl.defClass(Bayrell.TimePlanner.Tasks.TasksPageModel);
-window["Bayrell.TimePlanner.Tasks.TasksPageModel"] = Bayrell.TimePlanner.Tasks.TasksPageModel;
-if (typeof module != "undefined" && typeof module.exports != "undefined") module.exports = Bayrell.TimePlanner.Tasks.TasksPageModel;
 "use strict;"
 /*
  *  Bayrell Time Planner
@@ -876,7 +698,7 @@ Object.assign(Bayrell.TimePlanner.AdminLayout,
 {
 	css: function(ctx, vars)
 	{
-		return "*{" + Runtime.rtl.toStr("box-sizing: border-box;") + Runtime.rtl.toStr("}body{") + Runtime.rtl.toStr("margin:0;padding:0;") + Runtime.rtl.toStr("}a {") + Runtime.rtl.toStr(" text-decoration: inherit; color: #0000d0; cursor: pointer; ") + Runtime.rtl.toStr("}a:hover, a:visited:hover {") + Runtime.rtl.toStr(" text-decoration: underline; color: red; ") + Runtime.rtl.toStr("}a:visited {") + Runtime.rtl.toStr(" text-decoration: inherit; color: #0000d0; ") + Runtime.rtl.toStr("}a.link {") + Runtime.rtl.toStr(" text-decoration: none; color: #0000d0; cursor: pointer; ") + Runtime.rtl.toStr("}a.link:hover, a.link:visited:hover {") + Runtime.rtl.toStr(" text-decoration: underline; color: red; ") + Runtime.rtl.toStr("}a.link:visited {") + Runtime.rtl.toStr(" text-decoration: none; color: #0000d0; ") + Runtime.rtl.toStr("}body, html{") + Runtime.rtl.toStr("font-family: 'Ubuntu', sans-serif;font-size: 14px;width: 100%;padding: 0;margin: 0;") + Runtime.rtl.toStr("}td, th{") + Runtime.rtl.toStr("font-family: 'Ubuntu', sans-serif;font-size: 14px;") + Runtime.rtl.toStr("}span.lpad5{") + Runtime.rtl.toStr("display: inline-block;padding-right: 5px;") + Runtime.rtl.toStr("}.layout.h-3a49{") + Runtime.rtl.toStr("height: 100%;") + Runtime.rtl.toStr("}.layout_wrap.h-3a49{") + Runtime.rtl.toStr("position: relative;display: flex;align-items: stretch;min-height: calc(100% - 25px);") + Runtime.rtl.toStr("}.layout_footer.h-3a49{") + Runtime.rtl.toStr("position: relative;width: 100%;height: 24px;border-top: 1px #ccc solid;background-color: white;font-size: 12px;") + Runtime.rtl.toStr("}.layout_footer.h-3a49 .b_in{") + Runtime.rtl.toStr("}.layout_menu_wrap.h-3a49{") + Runtime.rtl.toStr("position: relative;width: 200px;") + Runtime.rtl.toStr("}.layout_content_wrap.h-3a49{") + Runtime.rtl.toStr("position: relative;width: calc(100% - 200px);padding-bottom: 10px;") + Runtime.rtl.toStr("}.layout_site_name.h-3a49, .layout_title_wrap.h-3a49{") + Runtime.rtl.toStr("font-size: 16px;height: 40px;") + Runtime.rtl.toStr("}.layout_site_name.h-3a49, .layout_title_wrap.h-3a49, .layout_page.h-3a49, .layout_content.h-3a49{") + Runtime.rtl.toStr("padding: 10px;") + Runtime.rtl.toStr("}.layout_site_name.h-3a49{") + Runtime.rtl.toStr("border-right: 1px #ccc solid;") + Runtime.rtl.toStr("}.layout_title_wrap.h-3a49{") + Runtime.rtl.toStr("display: flex;align-items: stretch;") + Runtime.rtl.toStr("}.layout_title.h-3a49{") + Runtime.rtl.toStr("width: 350px;") + Runtime.rtl.toStr("}.layout_top_buttons.h-3a49{") + Runtime.rtl.toStr("width: calc(100% - 350px);padding-left: 10px;") + Runtime.rtl.toStr("}.layout_content.h-3a49{") + Runtime.rtl.toStr("position: relative;height: calc(100% - 45px);padding-bottom: 0;padding-right: 0;") + Runtime.rtl.toStr("}.layout_menu_label.h-3a49{") + Runtime.rtl.toStr("font-size: 14px;font-weight: bold;padding: 10px;") + Runtime.rtl.toStr("}.layout_menu.h-3a49{") + Runtime.rtl.toStr("position: relative;height: calc(100% - 40px);overflow-y: auto;border-right: 1px #ccc solid;") + Runtime.rtl.toStr("}.layout_menu_items.h-3a49{") + Runtime.rtl.toStr("}.layout_menu_items.h-3a49 ul, .layout_menu_items.h-3a49 li{") + Runtime.rtl.toStr("padding: 0; margin: 0;list-style: none;") + Runtime.rtl.toStr("}.layout_menu_items.h-3a49 ul{") + Runtime.rtl.toStr("}.layout_menu_items.h-3a49 li{") + Runtime.rtl.toStr("background-color: white;") + Runtime.rtl.toStr("}.layout_menu_items.h-3a49 li:hover{") + Runtime.rtl.toStr("background-color: " + Runtime.rtl.toStr(Runtime.rtl.attr(ctx, vars, ["colors", "default", "hover-background"])) + Runtime.rtl.toStr(";")) + Runtime.rtl.toStr("}.layout_menu_items.h-3a49 li a{") + Runtime.rtl.toStr("display: block;padding: 10px 15px;border-bottom: 1px solid #e7e7e7;") + Runtime.rtl.toStr("}.layout_menu_items.h-3a49 li.active > a, .layout_menu_items.h-3a49 li.active > a:hover{") + Runtime.rtl.toStr("background-color: #337ab7;border-color: #337ab7;color: white;") + Runtime.rtl.toStr("}.layout_menu_logout.h-3a49{") + Runtime.rtl.toStr("text-align: center;padding-top: 100px;") + Runtime.rtl.toStr("}.layout_menu_logout.h-3a49 > div{") + Runtime.rtl.toStr("padding-top: 5px;") + Runtime.rtl.toStr("}");
+		return "*{" + Runtime.rtl.toStr("box-sizing: border-box;") + Runtime.rtl.toStr("}body{") + Runtime.rtl.toStr("margin:0;padding:0;") + Runtime.rtl.toStr("}a {") + Runtime.rtl.toStr(" text-decoration: inherit; color: #0000d0; cursor: pointer; ") + Runtime.rtl.toStr("}a:hover, a:visited:hover {") + Runtime.rtl.toStr(" text-decoration: underline; color: red; ") + Runtime.rtl.toStr("}a:visited {") + Runtime.rtl.toStr(" text-decoration: inherit; color: #0000d0; ") + Runtime.rtl.toStr("}a.link.h-3a49 {") + Runtime.rtl.toStr(" text-decoration: none; color: #0000d0; cursor: pointer; ") + Runtime.rtl.toStr("}a.link.h-3a49:hover, a.link.h-3a49:visited:hover {") + Runtime.rtl.toStr(" text-decoration: underline; color: red; ") + Runtime.rtl.toStr("}a.link.h-3a49:visited {") + Runtime.rtl.toStr(" text-decoration: none; color: #0000d0; ") + Runtime.rtl.toStr("}body, html{") + Runtime.rtl.toStr("font-family: 'Ubuntu', sans-serif;font-size: 14px;width: 100%;padding: 0;margin: 0;") + Runtime.rtl.toStr("}td, th{") + Runtime.rtl.toStr("font-family: 'Ubuntu', sans-serif;font-size: 14px;") + Runtime.rtl.toStr("}span.lpad5.h-3a49{") + Runtime.rtl.toStr("display: inline-block;padding-right: 5px;") + Runtime.rtl.toStr("}.layout.h-3a49{") + Runtime.rtl.toStr("height: 100%;") + Runtime.rtl.toStr("}.layout_wrap.h-3a49{") + Runtime.rtl.toStr("position: relative;display: flex;align-items: stretch;min-height: calc(100% - 25px);") + Runtime.rtl.toStr("}.layout_footer.h-3a49{") + Runtime.rtl.toStr("position: relative;width: 100%;height: 24px;border-top: 1px #ccc solid;background-color: white;font-size: 12px;") + Runtime.rtl.toStr("}.layout_footer.h-3a49 .b_in.h-3a49{") + Runtime.rtl.toStr("}.layout_menu_wrap.h-3a49{") + Runtime.rtl.toStr("position: relative;width: 200px;") + Runtime.rtl.toStr("}.layout_content_wrap.h-3a49{") + Runtime.rtl.toStr("position: relative;width: calc(100% - 200px);padding-bottom: 10px;") + Runtime.rtl.toStr("}.layout_site_name.h-3a49, .layout_title_wrap.h-3a49{") + Runtime.rtl.toStr("font-size: 16px;height: 40px;") + Runtime.rtl.toStr("}.layout_site_name.h-3a49, .layout_title_wrap.h-3a49, .layout_page.h-3a49, .layout_content.h-3a49{") + Runtime.rtl.toStr("padding: 10px;") + Runtime.rtl.toStr("}.layout_site_name.h-3a49{") + Runtime.rtl.toStr("border-right: 1px #ccc solid;") + Runtime.rtl.toStr("}.layout_title_wrap.h-3a49{") + Runtime.rtl.toStr("display: flex;align-items: stretch;") + Runtime.rtl.toStr("}.layout_title.h-3a49{") + Runtime.rtl.toStr("width: 350px;") + Runtime.rtl.toStr("}.layout_top_buttons.h-3a49{") + Runtime.rtl.toStr("width: calc(100% - 350px);padding-left: 10px;") + Runtime.rtl.toStr("}.layout_content.h-3a49{") + Runtime.rtl.toStr("position: relative;height: calc(100% - 45px);padding-bottom: 0;padding-right: 0;") + Runtime.rtl.toStr("}.layout_menu_label.h-3a49{") + Runtime.rtl.toStr("font-size: 14px;font-weight: bold;padding: 10px;") + Runtime.rtl.toStr("}.layout_menu.h-3a49{") + Runtime.rtl.toStr("position: relative;height: calc(100% - 40px);overflow-y: auto;border-right: 1px #ccc solid;") + Runtime.rtl.toStr("}.layout_menu_items.h-3a49{") + Runtime.rtl.toStr("}.layout_menu_items.h-3a49 ul, .layout_menu_items.h-3a49 li{") + Runtime.rtl.toStr("padding: 0; margin: 0;list-style: none;") + Runtime.rtl.toStr("}.layout_menu_items.h-3a49 ul{") + Runtime.rtl.toStr("}.layout_menu_items.h-3a49 li{") + Runtime.rtl.toStr("background-color: white;") + Runtime.rtl.toStr("}.layout_menu_items.h-3a49 li:hover{") + Runtime.rtl.toStr("background-color: " + Runtime.rtl.toStr(Runtime.rtl.attr(ctx, vars, ["colors", "default", "hover-background"])) + Runtime.rtl.toStr(";")) + Runtime.rtl.toStr("}.layout_menu_items.h-3a49 li a{") + Runtime.rtl.toStr("display: block;padding: 10px 15px;border-bottom: 1px solid #e7e7e7;") + Runtime.rtl.toStr("}.layout_menu_items.h-3a49 li.active.h-3a49 > a, .layout_menu_items.h-3a49 li.active.h-3a49 > a:hover{") + Runtime.rtl.toStr("background-color: #337ab7;border-color: #337ab7;color: white;") + Runtime.rtl.toStr("}.layout_menu_logout.h-3a49{") + Runtime.rtl.toStr("text-align: center;padding-top: 100px;") + Runtime.rtl.toStr("}.layout_menu_logout.h-3a49 > div{") + Runtime.rtl.toStr("padding-top: 5px;") + Runtime.rtl.toStr("}");
 	},
 	render: function(ctx, layout, model, params, content)
 	{
@@ -984,6 +806,19 @@ Object.assign(Bayrell.TimePlanner.AdminLayout,
 			
 			/* Text */
 			[__vnull, __v7_childs] = RenderDriver.e(__v7, __v7_childs, "text", {"content": ctx.translate(ctx, "Bayrell.TimePlanner", "Dashboard")});
+			RenderDriver.p(__v7, __v7_childs);
+			RenderDriver.p(__v6, __v6_childs);
+			
+			/* Element 'li' */
+			var __v6; var __v6_childs = [];
+			[__v6, __v5_childs] = RenderDriver.e(__v5, __v5_childs, "element", {"name": "li","attrs": {"class":[((Runtime.rs.start(ctx, Runtime.rtl.attr(ctx, layout, ["route", "name"]), "app.plan")) ? ("active") : ("")), this.getCssHash(ctx)].join(" ")}});
+			
+			/* Element 'a.nolink' */
+			var __v7; var __v7_childs = [];
+			[__v7, __v6_childs] = RenderDriver.e(__v6, __v6_childs, "element", {"name": "a","attrs": {"href":layout.route_prefix + Runtime.rtl.toStr("/plan/"),"class":["nolink", this.getCssHash(ctx)].join(" "),"@elem_name":"nolink"}});
+			
+			/* Text */
+			[__vnull, __v7_childs] = RenderDriver.e(__v7, __v7_childs, "text", {"content": ctx.translate(ctx, "Bayrell.TimePlanner", "Plan")});
 			RenderDriver.p(__v7, __v7_childs);
 			RenderDriver.p(__v6, __v6_childs);
 			
