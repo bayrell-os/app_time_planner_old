@@ -1,5 +1,5 @@
 /*!
- *  Bayrell Cloud OS
+ *  Bayrell Time Planner
  *
  *  (c) Copyright 2020 "Ildar Bikmamatov" <support@bayrell.org>
  *
@@ -58,19 +58,27 @@ static class TaskCrud extends CrudApi
 		{
 			"fields":
 			[
+				"task_id",
 				"project_id",
 				"task_name",
 				"state",
 				"user",
+				"plan_cost",
+				"plan_cost_hours",
 				"plan_begin",
 				"plan_end",
 				"real_begin",
 				"real_end",
 			]
 		},
-		new Required{ "api_name": "task_name" },
+		new ReadOnly{ "api_name": "task_id" },
+		new ReadOnly{ "api_name": "plan_cost_hours" },
+		new ReadOnly{ "api_name": "plan_end" },
 		new ReadOnly{ "api_name": "real_begin" },
 		new ReadOnly{ "api_name": "real_end" },
+		new Required{ "api_name": "task_name" },
+		
+		/* Add projects dictionary */
 		new Dictionary
 		{
 			"class_name": classof Project,
@@ -120,9 +128,15 @@ static class TaskCrud extends CrudApi
 	 */
 	async Dict convertItem(Dict item)
 	{
+		/* Convert item */
+		item = await parent::convertItem(item);
+		
+		/* Add layer_id */
 		int layer_id = this.request.storage["X-LAYER-ID"];
 		item = await parent::convertItem(item);
 		item <= layer_id <= layer_id;
+		
+		/* Return item */
 		return item;
 	}
 	

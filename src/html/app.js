@@ -156,7 +156,7 @@ window["Bayrell.TimePlanner.Admin.AdminInfo"] = Bayrell.TimePlanner.Admin.AdminI
 if (typeof module != "undefined" && typeof module.exports != "undefined") module.exports = Bayrell.TimePlanner.Admin.AdminInfo;
 "use strict;"
 /*
- *  Bayrell Cloud OS
+ *  Bayrell Time Planner
  *
  *  (c) Copyright 2020 "Ildar Bikmamatov" <support@bayrell.org>
  *
@@ -365,7 +365,7 @@ window["Bayrell.TimePlanner.Admin.AdminProjects"] = Bayrell.TimePlanner.Admin.Ad
 if (typeof module != "undefined" && typeof module.exports != "undefined") module.exports = Bayrell.TimePlanner.Admin.AdminProjects;
 "use strict;"
 /*
- *  Bayrell Cloud OS
+ *  Bayrell Time Planner
  *
  *  (c) Copyright 2020 "Ildar Bikmamatov" <support@bayrell.org>
  *

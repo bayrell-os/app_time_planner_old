@@ -32,26 +32,23 @@ use Runtime.ORM.ConnectionInterface as Connection;
 use Runtime.ORM.CursorInterface as Cursor;
 use Runtime.ORM.DriverInterface as ORMDriver;
 use Runtime.ORM.Record;
-use Bayrell.TimePlanner.Backend.ORM.Layer;
+use Bayrell.TimePlanner.Backend.ORM.Label;
+use Bayrell.TimePlanner.Backend.ORM.Task;
 
 
-struct Project extends Record
+struct TaskLabel extends Record
 {
-	@AutoIncrement{}
 	@BigIntType{}
-	int project_id;
+	int task_id;
 	
 	@BigIntType{}
-	int layer_id;
-	
-	@StringType{ "length": 255 }
-	string project_name;
+	int label_id;
 	
 	
 	/**
 	 * Returns table name
 	 */
-	pure string table_name() => "projects";
+	pure string table_name() => "tasks_labels";
 	
 	
 	/**
@@ -61,15 +58,26 @@ struct Project extends Record
 	[
 		new Primary
 		{
-			"keys": ["project_id"],
+			"keys": ["task_id", "label_id"],
 		},
 		new ForeignKey
 		{
-			"name": "layer_id",
-			"class_name": classof Layer,
+			"name": "task_id",
+			"class_name": classof Task,
 			"keys":
 			[
-				{"src": "layer_id", "dest": "layer_id"},
+				{"src": "task_id", "dest": "task_id"},
+			],
+			"delete": Record::RESTRICT,
+			"update": Record::CASCADE,
+		},
+		new ForeignKey
+		{
+			"name": "label_id",
+			"class_name": classof Label,
+			"keys":
+			[
+				{"src": "label_id", "dest": "label_id"},
 			],
 			"delete": Record::RESTRICT,
 			"update": Record::CASCADE,

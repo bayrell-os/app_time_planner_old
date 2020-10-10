@@ -501,9 +501,9 @@ Object.assign(Runtime.rtl,
 	convert: function(ctx, v, t, d)
 	{
 		if (d == undefined) d = null;
-		if (v == null)
+		if (v === null)
 		{
-			v = d;
+			return d;
 		}
 		if (t == "mixed" || t == "primitive" || t == "var" || t == "fn" || t == "callback")
 		{
@@ -524,6 +524,10 @@ Object.assign(Runtime.rtl,
 		else if (t == "float" || t == "double")
 		{
 			return this.toFloat(ctx, v);
+		}
+		else if (this.is_instanceof(ctx, v, t))
+		{
+			return v;
 		}
 		return this.toObject(ctx, v, t, d);
 	},
@@ -3270,7 +3274,7 @@ Object.assign(Runtime.Collection.prototype,
 		if (pos < 0 || pos >= this.length)
 		{
 			var _IndexOutOfRange = use("Runtime.Exceptions.IndexOutOfRange");
-			throw new _IndexOutOfRange(ctx);
+			throw new _IndexOutOfRange(ctx, pos);
 		}
 		var arr = this.cp(ctx);
 		arr[pos] = value;
@@ -6331,8 +6335,17 @@ Object.assign(Runtime.BaseStruct,
 			return ;
 		}
 		var check_types = false;
+		var class_name = this.getCurrentClassName(ctx);
 		/* Enable check types */
 		check_types = true;
+		if (class_name == "Runtime.IntrospectionClass")
+		{
+			check_types = false;
+		}
+		if (class_name == "Runtime.IntrospectionInfo")
+		{
+			check_types = false;
+		}
 		var _Dict = use("Runtime.Dict");
 		var RuntimeUtils = use("Runtime.RuntimeUtils");
 		if (obj instanceof _Dict)
@@ -6481,104 +6494,24 @@ Runtime.DateTime.prototype.constructor = Runtime.DateTime;
 Object.assign(Runtime.DateTime.prototype,
 {
 	/**
-	 * Returns day of week
-	 * @return int
-	 */
-	getDayOfWeek: function(ctx)
-	{
-		var dt = this.getDatetime(obj);
-		return dt.getDay();
-		return null;
-	},
-	/**
 	 * Returns timestamp
 	 * @return int
 	 */
 	getTimestamp: function(ctx)
 	{
-		var dt = this.getDatetime(obj);
+		var dt = this.getObjectData();
 		return dt.getTime();
 		return null;
 	},
 	/**
-	 * Set timestamp
-	 * @param int timestamp
-	 * @return DateTime instance
+	 * Returns day of week
+	 * @return int
 	 */
-	setTimestamp: function(ctx, timestamp)
+	getDayOfWeek: function(ctx)
 	{
+		var dt = this.getObjectData();
+		return dt.getDay();
 		return null;
-	},
-	/**
-	 * Change time zone
-	 * @param string tz
-	 * @return DateTime instance
-	 */
-	changeTimezone: function(ctx, tz)
-	{
-		return obj;
-		return null;
-	},
-	/**
-	 * Return datetime in RFC822
-	 * @return string
-	 */
-	getRFC822: function(ctx)
-	{
-		var y,m,d,h,i,s,dow,dow_s,m_s,tz;
-		
-		y = obj.y % 100;
-		y = (y < 10) ? "0" + y : "" + y;
-		m = (obj.m < 10) ? "0" + obj.m : "" + obj.m;
-		d = (obj.d < 10) ? "0" + obj.d : "" + obj.d;
-		h = (obj.h < 10) ? "0" + obj.h : "" + obj.h;
-		i = (obj.i < 10) ? "0" + obj.i : "" + obj.i;
-		s = (obj.s < 10) ? "0" + obj.s : "" + obj.s;
-		dow = this.getDayOfWeek(obj);
-		
-		dow_s = "";
-		if (dow == 0) dow_s = "Sun";
-		if (dow == 1) dow_s = "Mon";
-		if (dow == 2) dow_s = "Tue";
-		if (dow == 3) dow_s = "Wed";
-		if (dow == 4) dow_s = "Thu";
-		if (dow == 5) dow_s = "Fri";
-		if (dow == 6) dow_s = "Sat";
-		
-		m = obj.m;
-		m_s = "";
-		if (m == 1) m_s = "Jan";
-		if (m == 2) m_s = "Feb";
-		if (m == 3) m_s = "Mar";
-		if (m == 4) m_s = "Apr";
-		if (m == 5) m_s = "May";
-		if (m == 6) m_s = "Jun";
-		if (m == 7) m_s = "Jul";
-		if (m == 8) m_s = "Aug";
-		if (m == 9) m_s = "Sep";
-		if (m == 10) m_s = "Oct";
-		if (m == 11) m_s = "Nov";
-		if (m == 12) m_s = "Dec";
-		
-		tz = this.getTimezoneOffsetString(obj);
-		
-		return dow_s + ", " + d + " " + m_s + " " + y + " " + h + ":" + i + ":" + s + " " + tz;
-		return "";
-	},
-	/**
-	 * Return datetime in ISO8601
-	 * @return string
-	 */
-	getISO8601: function(ctx)
-	{
-		var m = (obj.m < 10) ? "0" + obj.m : "" + obj.m;
-		var d = (obj.d < 10) ? "0" + obj.d : "" + obj.d;
-		var h = (obj.h < 10) ? "0" + obj.h : "" + obj.h;
-		var i = (obj.i < 10) ? "0" + obj.i : "" + obj.i;
-		var s = (obj.s < 10) ? "0" + obj.s : "" + obj.s;
-		var tz = this.getTimezoneOffsetString(obj);
-		return obj.y + "-" + m + "-" + d + "T" + h + ":" + i + ":" + s + tz;
-		return "";
 	},
 	/**
 	 * Return db datetime
@@ -6586,21 +6519,21 @@ Object.assign(Runtime.DateTime.prototype,
 	 */
 	getDBTime: function(ctx)
 	{
-		var m = (obj.m < 10) ? "0" + obj.m : "" + obj.m;
-		var d = (obj.d < 10) ? "0" + obj.d : "" + obj.d;
-		var h = (obj.h < 10) ? "0" + obj.h : "" + obj.h;
-		var i = (obj.i < 10) ? "0" + obj.i : "" + obj.i;
-		var s = (obj.s < 10) ? "0" + obj.s : "" + obj.s;
-		return obj.y + "-" + m + "-" + d + " " + h + ":" + i + ":" + s;
+		var m = (this.m < 10) ? "0" + this.m : "" + this.m;
+		var d = (this.d < 10) ? "0" + this.d : "" + this.d;
+		var h = (this.h < 10) ? "0" + this.h : "" + this.h;
+		var i = (this.i < 10) ? "0" + this.i : "" + this.i;
+		var s = (this.s < 10) ? "0" + this.s : "" + this.s;
+		return this.y + "-" + m + "-" + d + " " + h + ":" + i + ":" + s;
 		return "";
 	},
 	/**
 	 * Return datetime by UTC
 	 * @return string
 	 */
-	getUTC: function(ctx)
+	getDBTimeUTC: function(ctx)
 	{
-		var dt = this.getDatetime(obj);
+		var dt = this.getObjectData();
 		var y = Number(dt.getUTCFullYear());
 		var m = Number(dt.getUTCMonth()) + 1;
 		var d = Number(dt.getUTCDate());
@@ -6614,6 +6547,67 @@ Object.assign(Runtime.DateTime.prototype,
 		s = (s < 10) ? "0" + s : "" + s;
 		return y + "-" + m + "-" + d + " " +
 			h + ":" + i + ":" + s;
+		return "";
+	},
+	/**
+	 * Return datetime in RFC822
+	 * @return string
+	 */
+	getRFC822: function(ctx)
+	{
+		var y = this.y, m = this.m, d = this.d, h = this.h, i = this.i, s = this.s;
+		var dt = new Date(y, m - 1, d, h, i, s);
+		
+		y = (y < 10) ? "0" + y : "" + y;
+		m = (m < 10) ? "0" + m : "" + m;
+		d = (d < 10) ? "0" + d : "" + d;
+		h = (h < 10) ? "0" + h : "" + h;
+		i = (i < 10) ? "0" + i : "" + i;
+		s = (s < 10) ? "0" + s : "" + s;
+		
+		var dow = dt.getDay();
+		var dow_s = "";
+		if (dow == 0) dow_s = "Sun";
+		if (dow == 1) dow_s = "Mon";
+		if (dow == 2) dow_s = "Tue";
+		if (dow == 3) dow_s = "Wed";
+		if (dow == 4) dow_s = "Thu";
+		if (dow == 5) dow_s = "Fri";
+		if (dow == 6) dow_s = "Sat";
+		
+		var m_s = "";
+		if (m == 1) m_s = "Jan";
+		if (m == 2) m_s = "Feb";
+		if (m == 3) m_s = "Mar";
+		if (m == 4) m_s = "Apr";
+		if (m == 5) m_s = "May";
+		if (m == 6) m_s = "Jun";
+		if (m == 7) m_s = "Jul";
+		if (m == 8) m_s = "Aug";
+		if (m == 9) m_s = "Sep";
+		if (m == 10) m_s = "Oct";
+		if (m == 11) m_s = "Nov";
+		if (m == 12) m_s = "Dec";
+		
+		return dow_s + ", " + d + " " + m_s + " " + y + " " + h + ":" + i + ":" + s + " " + this.tz;
+		return "";
+	},
+	/**
+	 * Return datetime in ISO8601
+	 * @return string
+	 */
+	getISO8601: function(ctx)
+	{
+		var y = this.y, m = this.m, d = this.d, h = this.h, i = this.i, s = this.s;
+		m = (m < 10) ? "0" + m : "" + m;
+		d = (d < 10) ? "0" + d : "" + d;
+		h = (h < 10) ? "0" + h : "" + h;
+		i = (i < 10) ? "0" + i : "" + i;
+		s = (s < 10) ? "0" + s : "" + s;
+		var tz = Math.ceil(-this.constructor.getTimezoneOffset(ctx, this.tz) / 60);
+		if (tz < 10 && tz >= 0) tz = "0" + tz;
+		if (tz >= 0) tz = "+" + tz;
+		return this.y + "-" + m + "-" + d + "T" + h + ":" + i + ":" + s + tz;
 		return "";
 	},
 	_init: function(ctx)
@@ -6681,23 +6675,15 @@ Object.assign(Runtime.DateTime,
 	/**
 	 * Create date time from timestamp
 	 */
-	timestamp: function(ctx, time, tz)
+	createDateTime: function(ctx, time, tz)
 	{
+		if (time == undefined) time = -1;
 		if (tz == undefined) tz = "UTC";
-		var dt = new Date(time*1000);
-		return this.fromObject(dt, tz);
+		var dt = null;
+		if (time == -1) dt = new Date();
+		else dt = new Date(time*1000);
+		return this.fromObject(ctx, dt, tz);
 		return null;
-	},
-	/**
-	 * Output dbtime
-	 */
-	dbtime: function(ctx, time, tz)
-	{
-		if (tz == undefined) tz = "UTC";
-		var dt = new Date(time*1000);
-		var obj = this.fromObject(dt, tz);
-		return obj.getDBTime();
-		return "";
 	},
 	/**
 	 * Returns datetime
@@ -6707,9 +6693,7 @@ Object.assign(Runtime.DateTime,
 	now: function(ctx, tz)
 	{
 		if (tz == undefined) tz = "UTC";
-		var dt = new Date();
-		return this.createDatetime(dt, tz);
-		return null;
+		return this.createDateTime(ctx, -1, tz);
 	},
 	/* ======================= Class Init Functions ======================= */
 	getCurrentNamespace: function()
@@ -6839,6 +6823,71 @@ Object.assign(Runtime.DateTime,
 Runtime.rtl.defClass(Runtime.DateTime);
 window["Runtime.DateTime"] = Runtime.DateTime;
 if (typeof module != "undefined" && typeof module.exports != "undefined") module.exports = Runtime.DateTime;
+Runtime.DateTime.getTimezoneOffset = function(ctx, tz)
+{
+	if (tz == "UTC") return 0;
+	if (tz == "GMT") return 0;
+	if (tz == "GMT+1") return -60;
+	if (tz == "GMT+2") return -120;
+	if (tz == "GMT+3") return -180;
+	if (tz == "GMT+4") return -240;
+	if (tz == "GMT+5") return -300;
+	if (tz == "GMT+6") return -360;
+	if (tz == "GMT+7") return -420;
+	if (tz == "GMT+8") return -480;
+	if (tz == "GMT+9") return -540;
+	if (tz == "GMT+10") return -600;
+	if (tz == "GMT+11") return -660;
+	if (tz == "GMT+13") return -780;
+	if (tz == "GMT+14") return -840;
+	if (tz == "GMT-1") return 60;
+	if (tz == "GMT-2") return 120;
+	if (tz == "GMT-3") return 180;
+	if (tz == "GMT-4") return 240;
+	if (tz == "GMT-5") return 300;
+	if (tz == "GMT-6") return 360;
+	if (tz == "GMT-7") return 420;
+	if (tz == "GMT-8") return 480;
+	if (tz == "GMT-9") return 540;
+	if (tz == "GMT-10") return 600;
+	if (tz == "GMT-11") return 660;
+	if (tz == "GMT-12") return 720;
+	return 0;
+}
+
+Runtime.DateTime.shiftOffset = function(ctx, dt, offset)
+{
+	var h = Math.floor(offset / 60);
+	var m = offset % 60;
+	dt.setMinutes(dt.getMinutes() + m);
+	dt.setHours(dt.getHours() + h);
+	return dt;
+}
+
+Runtime.DateTime.prototype.getObjectData = function(ctx)
+{
+	var dt = new Date(this.y, this.m - 1, this.d, this.h, this.i, this.s);
+	var offset = this.constructor.getTimezoneOffset(ctx, this.tz);
+	var offset = offset - dt.getTimezoneOffset();
+	dt = this.constructor.shiftOffset(ctx, dt, offset);
+	return dt;
+}
+
+Runtime.DateTime.fromObject = function(ctx, dt, tz)
+{
+	var Dict = use("Runtime.Dict");
+	var offset = this.getTimezoneOffset(ctx, tz);
+	var offset = offset - dt.getTimezoneOffset();
+	dt = this.shiftOffset(ctx, dt, -offset);
+	var y = Number(dt.getFullYear());
+	var m = Number(dt.getMonth()) + 1;
+	var d = Number(dt.getDate());
+	var h = Number(dt.getHours());
+	var i = Number(dt.getMinutes());
+	var s = Number(dt.getSeconds());
+	var dt = new Runtime.DateTime( ctx, Dict.from({"y":y,"m":m,"d":d,"h":h,"i":i,"s":s,"tz":tz}) );
+	return dt;
+}
 "use strict;"
 /*!
  *  Bayrell Runtime Library
@@ -7314,6 +7363,7 @@ Object.assign(Runtime.IntrospectionClass,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.IntrospectionClass",
 			"t": "Runtime.Collection",
+			"s": ["Runtime.BaseStruct"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -7322,6 +7372,7 @@ Object.assign(Runtime.IntrospectionClass,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.IntrospectionClass",
 			"t": "Runtime.Dict",
+			"s": ["Runtime.Collection"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -7330,6 +7381,7 @@ Object.assign(Runtime.IntrospectionClass,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.IntrospectionClass",
 			"t": "Runtime.Dict",
+			"s": ["Runtime.Collection"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -7338,6 +7390,7 @@ Object.assign(Runtime.IntrospectionClass,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.IntrospectionClass",
 			"t": "Runtime.Collection",
+			"s": ["string"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -7556,6 +7609,7 @@ Object.assign(Runtime.IntrospectionInfo,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.IntrospectionInfo",
 			"t": "Runtime.Collection",
+			"s": ["Runtime.BaseStruct"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -7923,16 +7977,6 @@ Object.assign(Runtime.RuntimeUtils,
 			{
 				return this.ObjectToPrimitive(ctx, value, force_class_name);
 			});
-			/*
-			Vector<var> res = new Vector();
-			for (int i=0; i<obj.count(); i++)
-			{
-				var value = obj.item(i);
-				value = self::ObjectToPrimitive( value, force_class_name );
-				res.push(value);
-			}
-			return res.toCollection();
-			*/
 		}
 		if (obj instanceof Runtime.Dict)
 		{
@@ -7940,26 +7984,6 @@ Object.assign(Runtime.RuntimeUtils,
 			{
 				return this.ObjectToPrimitive(ctx, value, force_class_name);
 			});
-			/*
-			Map<var> res = new Map();
-			Vector<string> keys = obj.keys();
-			
-			for (int i=0; i<keys.count(); i++)
-			{
-				string key = keys.item(i);
-				var value = obj.item(key);
-				value = self::ObjectToPrimitive( value, force_class_name );
-				res.set(key, value);
-			}
-			
-			delete keys;
-			*/
-			/*
-			if (force_class_name)
-			{
-				obj = obj.setIm("__class_name__", classof Dict);
-			}
-			*/
 			return obj.toDict(ctx);
 		}
 		if (obj instanceof Runtime.BaseStruct)
@@ -7973,7 +7997,7 @@ Object.assign(Runtime.RuntimeUtils,
 				var value = Runtime.RuntimeUtils.ObjectToPrimitive(ctx, value, force_class_name);
 				values.set(ctx, variable_name, value);
 			}
-			if (force_class_name)
+			if (force_class_name || obj instanceof Runtime.DateTime)
 			{
 				values.set(ctx, "__class_name__", obj.getClassName(ctx));
 			}
@@ -9287,6 +9311,7 @@ Object.assign(Runtime.Core.Context,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Core.Context",
 			"t": "Runtime.Dict",
+			"s": ["string"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -9295,6 +9320,7 @@ Object.assign(Runtime.Core.Context,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Core.Context",
 			"t": "Runtime.Dict",
+			"s": ["var"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -9303,6 +9329,7 @@ Object.assign(Runtime.Core.Context,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Core.Context",
 			"t": "Runtime.Collection",
+			"s": ["string"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -9311,6 +9338,7 @@ Object.assign(Runtime.Core.Context,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Core.Context",
 			"t": "Runtime.Collection",
+			"s": ["Runtime.BaseStruct"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -9319,6 +9347,7 @@ Object.assign(Runtime.Core.Context,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Core.Context",
 			"t": "Runtime.Collection",
+			"s": ["string"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -9578,6 +9607,7 @@ Object.assign(Runtime.Core.CoreObject,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Core.CoreObject",
 			"t": "Runtime.Vector",
+			"s": ["Runtime.Core.CoreObject"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -11119,6 +11149,7 @@ Object.assign(Runtime.Core.ObjectManager,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Core.ObjectManager",
 			"t": "Runtime.Map",
+			"s": ["Runtime.Core.CoreObject"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -11127,6 +11158,7 @@ Object.assign(Runtime.Core.ObjectManager,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Core.ObjectManager",
 			"t": "Runtime.Map",
+			"s": ["Runtime.Core.CoreObject"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -11135,6 +11167,7 @@ Object.assign(Runtime.Core.ObjectManager,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Core.ObjectManager",
 			"t": "Runtime.Vector",
+			"s": ["Runtime.Core.Message"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -11167,6 +11200,7 @@ Object.assign(Runtime.Core.ObjectManager,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Core.ObjectManager",
 			"t": "Runtime.Vector",
+			"s": ["Runtime.Dict"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -11501,6 +11535,7 @@ Object.assign(Runtime.Core.RemoteCallAnswer,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Core.RemoteCallAnswer",
 			"t": "Runtime.Collection",
+			"s": ["string"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -11525,6 +11560,7 @@ Object.assign(Runtime.Core.RemoteCallAnswer,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Core.RemoteCallAnswer",
 			"t": "Runtime.Dict",
+			"s": ["var"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -11533,6 +11569,7 @@ Object.assign(Runtime.Core.RemoteCallAnswer,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Core.RemoteCallAnswer",
 			"t": "Runtime.Collection",
+			"s": ["string"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -11732,7 +11769,8 @@ Object.assign(Runtime.Core.RemoteCallRequest,
 		if (field_name == "storage") return new IntrospectionInfo(ctx, {
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Core.RemoteCallRequest",
-			"t": "Runtime.Collection",
+			"t": "Runtime.Dict",
+			"s": ["primitive"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -12323,6 +12361,7 @@ Object.assign(Runtime.Web.Component,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.Component",
 			"t": "Runtime.Collection",
+			"s": ["string"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -12996,6 +13035,7 @@ Object.assign(Runtime.Web.FrontendStorageDriver,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.FrontendStorageDriver",
 			"t": "Runtime.Map",
+			"s": ["primitive"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -13004,6 +13044,7 @@ Object.assign(Runtime.Web.FrontendStorageDriver,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.FrontendStorageDriver",
 			"t": "Runtime.Map",
+			"s": ["primitive"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -13012,6 +13053,7 @@ Object.assign(Runtime.Web.FrontendStorageDriver,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.FrontendStorageDriver",
 			"t": "Runtime.Map",
+			"s": ["primitive"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -13430,6 +13472,7 @@ Object.assign(Runtime.Web.LayoutModel,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.LayoutModel",
 			"t": "Runtime.Dict",
+			"s": ["string"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -13502,6 +13545,7 @@ Object.assign(Runtime.Web.LayoutModel,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.LayoutModel",
 			"t": "Runtime.Collection",
+			"s": ["Runtime.Dict"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -13510,6 +13554,7 @@ Object.assign(Runtime.Web.LayoutModel,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.LayoutModel",
 			"t": "Runtime.Dict",
+			"s": ["primitive"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -13518,6 +13563,7 @@ Object.assign(Runtime.Web.LayoutModel,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.LayoutModel",
 			"t": "Runtime.Dict",
+			"s": ["primitive"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -13526,6 +13572,7 @@ Object.assign(Runtime.Web.LayoutModel,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.LayoutModel",
 			"t": "Runtime.Dict",
+			"s": ["primitive"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -13534,6 +13581,7 @@ Object.assign(Runtime.Web.LayoutModel,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.LayoutModel",
 			"t": "Runtime.Collection",
+			"s": ["string"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -13767,6 +13815,7 @@ Object.assign(Runtime.Web.RenderContainer,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.RenderContainer",
 			"t": "Runtime.Dict",
+			"s": ["string"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -13783,6 +13832,7 @@ Object.assign(Runtime.Web.RenderContainer,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.RenderContainer",
 			"t": "Runtime.Dict",
+			"s": ["primitive"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -13791,6 +13841,7 @@ Object.assign(Runtime.Web.RenderContainer,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.RenderContainer",
 			"t": "Runtime.Dict",
+			"s": ["primitive"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -13823,6 +13874,7 @@ Object.assign(Runtime.Web.RenderContainer,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.RenderContainer",
 			"t": "Runtime.Dict",
+			"s": ["primitive"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -13831,6 +13883,7 @@ Object.assign(Runtime.Web.RenderContainer,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.RenderContainer",
 			"t": "Runtime.Dict",
+			"s": ["Runtime.Web.Cookie"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -13839,6 +13892,7 @@ Object.assign(Runtime.Web.RenderContainer,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.RenderContainer",
 			"t": "Runtime.Collection",
+			"s": ["string"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -14752,6 +14806,7 @@ Object.assign(Runtime.Web.RenderController,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.RenderController",
 			"t": "Runtime.Collection",
+			"s": ["string"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -14776,6 +14831,7 @@ Object.assign(Runtime.Web.RenderController,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.RenderController",
 			"t": "Runtime.Map",
+			"s": ["Runtime.Core.CoreObject"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -15539,6 +15595,7 @@ Object.assign(Runtime.Web.RenderDriver,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.RenderDriver",
 			"t": "Runtime.Map",
+			"s": ["bool"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -16557,6 +16614,7 @@ Object.assign(Runtime.Web.Request,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.Request",
 			"t": "Runtime.Dict",
+			"s": ["string"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -16565,6 +16623,7 @@ Object.assign(Runtime.Web.Request,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.Request",
 			"t": "Runtime.Dict",
+			"s": ["var"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -16573,6 +16632,7 @@ Object.assign(Runtime.Web.Request,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.Request",
 			"t": "Runtime.Dict",
+			"s": ["Runtime.Web.Cookie"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -16581,6 +16641,7 @@ Object.assign(Runtime.Web.Request,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.Request",
 			"t": "Runtime.Dict",
+			"s": ["string"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -16589,6 +16650,7 @@ Object.assign(Runtime.Web.Request,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.Request",
 			"t": "Runtime.Dict",
+			"s": ["string"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -16757,6 +16819,7 @@ Object.assign(Runtime.Web.Response,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.Response",
 			"t": "Runtime.Collection",
+			"s": ["string"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -17007,6 +17070,7 @@ Object.assign(Runtime.Web.Route,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.Route",
 			"t": "Runtime.Collection",
+			"s": ["string"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -17421,6 +17485,7 @@ Object.assign(Runtime.Web.RouteController,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.RouteController",
 			"t": "Runtime.Collection",
+			"s": ["Runtime.Web.Route"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -17852,6 +17917,7 @@ Object.assign(Runtime.Web.SeoModel,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.SeoModel",
 			"t": "Runtime.Collection",
+			"s": ["string"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -17860,6 +17926,7 @@ Object.assign(Runtime.Web.SeoModel,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.SeoModel",
 			"t": "Runtime.Collection",
+			"s": ["string"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -17868,6 +17935,7 @@ Object.assign(Runtime.Web.SeoModel,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.SeoModel",
 			"t": "Runtime.Collection",
+			"s": ["string"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -17892,6 +17960,7 @@ Object.assign(Runtime.Web.SeoModel,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.SeoModel",
 			"t": "Runtime.Collection",
+			"s": ["Runtime.Dict"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),

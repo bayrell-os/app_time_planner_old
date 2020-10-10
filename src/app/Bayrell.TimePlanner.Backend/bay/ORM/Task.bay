@@ -1,5 +1,5 @@
 /*!
- *  Bayrell Cloud OS
+ *  Bayrell Time Planner
  *
  *  (c) Copyright 2020 "Ildar Bikmamatov" <support@bayrell.org>
  *
@@ -35,7 +35,9 @@ use Runtime.ORM.ConnectionInterface as Connection;
 use Runtime.ORM.CursorInterface as Cursor;
 use Runtime.ORM.DriverInterface as ORMDriver;
 use Runtime.ORM.Record;
+use Bayrell.TimePlanner.Backend.ORM.Layer;
 use Bayrell.TimePlanner.Backend.ORM.Project;
+use Bayrell.TimePlanner.Backend.ORM.TaskPlanCost;
 
 
 struct Task extends Record
@@ -55,6 +57,9 @@ struct Task extends Record
 	@BigIntType{}
 	int project_id;
 	
+	@BigIntType{}
+	int category_id;
+	
 	@StringType{}
 	string task_name;
 	
@@ -62,7 +67,13 @@ struct Task extends Record
 	int state;
 	
 	@StringType{}
-	string user;
+	string user_owner;
+	
+	@JsonType{ "nullable": true }
+	TaskPlanCost plan_cost;
+	
+	@BigIntType{}
+	int plan_cost_hours;
 	
 	@DateTimeType{ "nullable": true }
 	DateTime plan_begin;
@@ -76,6 +87,8 @@ struct Task extends Record
 	@DateTimeType{ "nullable": true }
 	DateTime real_end;
 	
+	@BigIntType{}
+	int real_hours;
 	
 	
 	/**
@@ -103,6 +116,17 @@ struct Task extends Record
 			],
 			"delete": Record::RESTRICT,
 			"update": Record::CASCADE,
-		},		
+		},
+		new ForeignKey
+		{
+			"name": "layer_id",
+			"class_name": classof Layer,
+			"keys":
+			[
+				{"src": "layer_id", "dest": "layer_id"},
+			],
+			"delete": Record::RESTRICT,
+			"update": Record::CASCADE,
+		},
 	];
 }

@@ -35,23 +35,24 @@ use Runtime.ORM.Record;
 use Bayrell.TimePlanner.Backend.ORM.Layer;
 
 
-struct Project extends Record
+struct Label extends Record
 {
 	@AutoIncrement{}
 	@BigIntType{}
-	int project_id;
+	int label_id;
 	
 	@BigIntType{}
 	int layer_id;
 	
-	@StringType{ "length": 255 }
-	string project_name;
+	@StringType{}
+	string name;
 	
 	
 	/**
 	 * Returns table name
 	 */
-	pure string table_name() => "projects";
+	pure string table_name() => "labels";
+	
 	
 	
 	/**
@@ -61,7 +62,7 @@ struct Project extends Record
 	[
 		new Primary
 		{
-			"keys": ["project_id"],
+			"keys": ["label_id"],
 		},
 		new ForeignKey
 		{
