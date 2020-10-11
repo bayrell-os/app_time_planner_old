@@ -6499,7 +6499,7 @@ Object.assign(Runtime.DateTime.prototype,
 	 */
 	getTimestamp: function(ctx)
 	{
-		var dt = this.getObjectData();
+		var dt = this.getObjectData(ctx);
 		return dt.getTime();
 		return null;
 	},
@@ -6509,7 +6509,7 @@ Object.assign(Runtime.DateTime.prototype,
 	 */
 	getDayOfWeek: function(ctx)
 	{
-		var dt = this.getObjectData();
+		var dt = this.getObjectData(ctx);
 		return dt.getDay();
 		return null;
 	},
@@ -6517,15 +6517,38 @@ Object.assign(Runtime.DateTime.prototype,
 	 * Return db datetime
 	 * @return string
 	 */
-	getDBTime: function(ctx)
+	getDBTime: function(ctx, tz)
 	{
-		var m = (this.m < 10) ? "0" + this.m : "" + this.m;
-		var d = (this.d < 10) ? "0" + this.d : "" + this.d;
-		var h = (this.h < 10) ? "0" + this.h : "" + this.h;
-		var i = (this.i < 10) ? "0" + this.i : "" + this.i;
-		var s = (this.s < 10) ? "0" + this.s : "" + this.s;
-		return this.y + "-" + m + "-" + d + " " + h + ":" + i + ":" + s;
+		if (tz == undefined) tz = "UTC";
+		var dt = this.getObjectData(ctx);
+		var offset = this.constructor.getTimezoneOffset(ctx, tz);
+		var offset = offset - dt.getTimezoneOffset();
+		dt = this.constructor.shiftOffset(ctx, dt, -offset);
+		
+		var y = Number(dt.getFullYear());
+		var m = Number(dt.getMonth()) + 1;
+		var d = Number(dt.getDate());
+		var h = Number(dt.getHours());
+		var i = Number(dt.getMinutes());
+		var s = Number(dt.getSeconds());
+		
+		var m = (m < 10) ? "0" + m : "" + m;
+		var d = (d < 10) ? "0" + d : "" + d;
+		var h = (h < 10) ? "0" + h : "" + h;
+		var i = (i < 10) ? "0" + i : "" + i;
+		var s = (s < 10) ? "0" + s : "" + s;
+		return y + "-" + m + "-" + d + " " + h + ":" + i + ":" + s;
 		return "";
+	},
+	/**
+	 * Return date
+	 * @return string
+	 */
+	getDate: function(ctx, tz)
+	{
+		if (tz == undefined) tz = "UTC";
+		var value = this.getDBTime(ctx, tz);
+		return Runtime.rs.substr(ctx, value, 0, 10);
 	},
 	/**
 	 * Return datetime by UTC
@@ -6533,21 +6556,7 @@ Object.assign(Runtime.DateTime.prototype,
 	 */
 	getDBTimeUTC: function(ctx)
 	{
-		var dt = this.getObjectData();
-		var y = Number(dt.getUTCFullYear());
-		var m = Number(dt.getUTCMonth()) + 1;
-		var d = Number(dt.getUTCDate());
-		var h = Number(dt.getUTCHours());
-		var i = Number(dt.getUTCMinutes());
-		var s = Number(dt.getUTCSeconds());
-		m = (m < 10) ? "0" + m : "" + m;
-		d = (d < 10) ? "0" + d : "" + d;
-		h = (h < 10) ? "0" + h : "" + h;
-		i = (i < 10) ? "0" + i : "" + i;
-		s = (s < 10) ? "0" + s : "" + s;
-		return y + "-" + m + "-" + d + " " +
-			h + ":" + i + ":" + s;
-		return "";
+		return this.constructor.getDBTime(ctx, "UTC");
 	},
 	/**
 	 * Return datetime in RFC822
@@ -7986,6 +7995,10 @@ Object.assign(Runtime.RuntimeUtils,
 			});
 			return obj.toDict(ctx);
 		}
+		if (obj instanceof Runtime.DateTime)
+		{
+			return obj;
+		}
 		if (obj instanceof Runtime.BaseStruct)
 		{
 			var values = new Runtime.Map(ctx);
@@ -7997,7 +8010,7 @@ Object.assign(Runtime.RuntimeUtils,
 				var value = Runtime.RuntimeUtils.ObjectToPrimitive(ctx, value, force_class_name);
 				values.set(ctx, variable_name, value);
 			}
-			if (force_class_name || obj instanceof Runtime.DateTime)
+			if (force_class_name)
 			{
 				values.set(ctx, "__class_name__", obj.getClassName(ctx));
 			}
@@ -8088,19 +8101,27 @@ Object.assign(Runtime.RuntimeUtils,
 		var _rtl = use("Runtime.rtl");
 		var _Utils = use("Runtime.RuntimeUtils");
 		var _Collection = use("Runtime.Collection");
+		var _DateTime = use("Runtime.DateTime");
 		var _Dict = use("Runtime.Dict");
 		
 		if (value === null)
 			return null;
 		
-		if (Array.isArray(value)){
+		if (Array.isArray(value))
+		{
 			var new_value = _Collection.from(value);
 			new_value = new_value.map(ctx, (ctx, val)=>{
 				return _Utils.NativeToPrimitive(ctx, val);
 			});
 			return new_value;
 		}
-		if (typeof value == 'object'){
+		if (typeof value == 'object')
+		{
+			if (value["__class_name__"] == "Runtime.DateTime")
+			{
+				var new_value = _DateTime.from(value);
+				return new_value;
+			}
 			var new_value = _Dict.from(value);
 			new_value = new_value.map(ctx, (ctx, val, key)=>{
 				return _Utils.NativeToPrimitive(ctx, val);
@@ -8120,10 +8141,16 @@ Object.assign(Runtime.RuntimeUtils,
 		var _rtl = use("Runtime.rtl");
 		var _Utils = use("Runtime.RuntimeUtils");
 		var _Collection = use("Runtime.Collection");
+		var _DateTime = use("Runtime.DateTime");
 		var _Dict = use("Runtime.Dict");
 		
 		if (value === null)
 			return null;
+		
+		if (value instanceof _DateTime)
+		{
+			value = value.toDict(ctx).setIm(ctx, "__class_name__", "Runtime.DateTime");
+		}
 		
 		if (value instanceof _Collection)
 		{
@@ -13233,6 +13260,7 @@ Object.assign(Runtime.Web.LayoutModel.prototype,
 		this.title = "";
 		this.description = "";
 		this.favicon = "";
+		this.tz = "UTC";
 		this.breadcrumbs = null;
 		this.data = new Runtime.Dict(ctx);
 		this.keep_data = new Runtime.Dict(ctx);
@@ -13262,6 +13290,7 @@ Object.assign(Runtime.Web.LayoutModel.prototype,
 			this.title = o.title;
 			this.description = o.description;
 			this.favicon = o.favicon;
+			this.tz = o.tz;
 			this.breadcrumbs = o.breadcrumbs;
 			this.data = o.data;
 			this.keep_data = o.keep_data;
@@ -13290,6 +13319,7 @@ Object.assign(Runtime.Web.LayoutModel.prototype,
 		else if (k == "title")this.title = v;
 		else if (k == "description")this.description = v;
 		else if (k == "favicon")this.favicon = v;
+		else if (k == "tz")this.tz = v;
 		else if (k == "breadcrumbs")this.breadcrumbs = v;
 		else if (k == "data")this.data = v;
 		else if (k == "keep_data")this.keep_data = v;
@@ -13318,6 +13348,7 @@ Object.assign(Runtime.Web.LayoutModel.prototype,
 		else if (k == "title")return this.title;
 		else if (k == "description")return this.description;
 		else if (k == "favicon")return this.favicon;
+		else if (k == "tz")return this.tz;
 		else if (k == "breadcrumbs")return this.breadcrumbs;
 		else if (k == "data")return this.data;
 		else if (k == "keep_data")return this.keep_data;
@@ -13383,6 +13414,7 @@ Object.assign(Runtime.Web.LayoutModel,
 			a.push("title");
 			a.push("description");
 			a.push("favicon");
+			a.push("tz");
 			a.push("breadcrumbs");
 			a.push("data");
 			a.push("keep_data");
@@ -13534,6 +13566,14 @@ Object.assign(Runtime.Web.LayoutModel,
 			]),
 		});
 		if (field_name == "favicon") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Runtime.Web.LayoutModel",
+			"t": "string",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "tz") return new IntrospectionInfo(ctx, {
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.LayoutModel",
 			"t": "string",

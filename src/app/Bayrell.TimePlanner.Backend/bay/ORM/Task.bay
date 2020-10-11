@@ -67,7 +67,7 @@ struct Task extends Record
 	int state;
 	
 	@StringType{}
-	string user_owner;
+	string user;
 	
 	@JsonType{ "nullable": true }
 	TaskPlanCost plan_cost;
@@ -75,16 +75,16 @@ struct Task extends Record
 	@BigIntType{}
 	int plan_cost_hours;
 	
-	@DateTimeType{ "nullable": true }
+	@DateTimeType{ "nullable": true, "comment": "DateTime by UTC" }
 	DateTime plan_begin;
 	
-	@DateTimeType{ "nullable": true }
+	@DateTimeType{ "nullable": true, "comment": "DateTime by UTC" }
 	DateTime plan_end;
 	
-	@DateTimeType{ "nullable": true }
+	@DateTimeType{ "nullable": true, "comment": "DateTime by UTC" }
 	DateTime real_begin;
 	
-	@DateTimeType{ "nullable": true }
+	@DateTimeType{ "nullable": true, "comment": "DateTime by UTC" }
 	DateTime real_end;
 	
 	@BigIntType{}

@@ -157,7 +157,6 @@ Object.assign(Runtime.Web.Auth.AuthToken.prototype,
 		this.login = "";
 		this.session_key = "";
 		this.token_str = "";
-		this.tz = "UTC";
 		Runtime.BaseStruct.prototype._init.call(this,ctx);
 	},
 	assignObject: function(ctx,o)
@@ -170,7 +169,6 @@ Object.assign(Runtime.Web.Auth.AuthToken.prototype,
 			this.login = o.login;
 			this.session_key = o.session_key;
 			this.token_str = o.token_str;
-			this.tz = o.tz;
 		}
 		Runtime.BaseStruct.prototype.assignObject.call(this,ctx,o);
 	},
@@ -182,7 +180,6 @@ Object.assign(Runtime.Web.Auth.AuthToken.prototype,
 		else if (k == "login")this.login = v;
 		else if (k == "session_key")this.session_key = v;
 		else if (k == "token_str")this.token_str = v;
-		else if (k == "tz")this.tz = v;
 		else Runtime.BaseStruct.prototype.assignValue.call(this,ctx,k,v);
 	},
 	takeValue: function(ctx,k,d)
@@ -194,7 +191,6 @@ Object.assign(Runtime.Web.Auth.AuthToken.prototype,
 		else if (k == "login")return this.login;
 		else if (k == "session_key")return this.session_key;
 		else if (k == "token_str")return this.token_str;
-		else if (k == "tz")return this.tz;
 		return Runtime.BaseStruct.prototype.takeValue.call(this,ctx,k,d);
 	},
 	getClassName: function(ctx)
@@ -243,7 +239,6 @@ Object.assign(Runtime.Web.Auth.AuthToken,
 			a.push("login");
 			a.push("session_key");
 			a.push("token_str");
-			a.push("tz");
 		}
 		return Runtime.Collection.from(a);
 	},
@@ -293,14 +288,6 @@ Object.assign(Runtime.Web.Auth.AuthToken,
 			]),
 		});
 		if (field_name == "token_str") return new IntrospectionInfo(ctx, {
-			"kind": IntrospectionInfo.ITEM_FIELD,
-			"class_name": "Runtime.Web.Auth.AuthToken",
-			"t": "string",
-			"name": field_name,
-			"annotations": Collection.from([
-			]),
-		});
-		if (field_name == "tz") return new IntrospectionInfo(ctx, {
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.Auth.AuthToken",
 			"t": "string",
@@ -2302,6 +2289,16 @@ Runtime.Web.Input.DatePicker.prototype = Object.create(Runtime.Web.Component.pro
 Runtime.Web.Input.DatePicker.prototype.constructor = Runtime.Web.Input.DatePicker;
 Object.assign(Runtime.Web.Input.DatePicker.prototype,
 {
+	/**
+ * On change
+ */
+	onChange: function(ctx, msg)
+	{
+		var value = msg.data.value;
+		var new_value = new Runtime.DateTime(ctx, Runtime.Dict.from({"y":Runtime.rs.substr(ctx, value, 0, 4),"m":Runtime.rs.substr(ctx, value, 5, 2),"d":Runtime.rs.substr(ctx, value, 8, 2),"tz":this.controller.layout.tz}));
+		msg.data = msg.data.copy(ctx, Runtime.Dict.from({"value":new_value}));
+		this.signal(ctx, msg.data);
+	},
 	assignObject: function(ctx,o)
 	{
 		if (o instanceof Runtime.Web.Input.DatePicker)
@@ -2328,6 +2325,7 @@ Object.assign(Runtime.Web.Input.DatePicker,
 {
 	css: function(ctx, vars)
 	{
+		return ".input.h-ced0{" + Runtime.rtl.toStr("width: 100%;padding: 6px 12px;background-color: " + Runtime.rtl.toStr(Runtime.rtl.attr(ctx, vars, ["colors", "default", "background"])) + Runtime.rtl.toStr(";border: 1px ") + Runtime.rtl.toStr(Runtime.rtl.attr(ctx, vars, ["colors", "default", "border"])) + Runtime.rtl.toStr(" solid;outline: transparent;")) + Runtime.rtl.toStr("}");
 	},
 	render: function(ctx, layout, model, params, content)
 	{
@@ -2336,8 +2334,24 @@ Object.assign(Runtime.Web.Input.DatePicker,
 			var __vnull = null;
 			var __control_childs = [];
 			
-			/* Text */
-			[__vnull, __control_childs] = RenderDriver.e(__control, __control_childs, "text", {"content": model});
+			var text = "";
+			
+			var value = (params != null) ? (params.get(ctx, "value", "")) : ("");
+			
+			var name = (params != null) ? (params.get(ctx, "name", "")) : ("");
+			
+			var type = (params != null) ? (params.get(ctx, "type", "input")) : ("");
+			
+			var tag = (params != null) ? (params.get(ctx, "@tag", "")) : ("");
+			
+			value = (value != null) ? (value) : (model);
+			
+			if (value != null)
+			{
+				text = value.getDate(ctx, layout.tz);
+			}
+			
+			[__vnull, __control_childs] = RenderDriver.e(__control, __control_childs, "element", {"name": "input","attrs": {"@tag":tag,"@event:Runtime.Web.Events.ChangeEvent":["Runtime.Web.Input.DatePicker","onChange"],"name":name,"type":type,"value":text,"class":["input", this.getCssHash(ctx)].join(" "),"@elem_name":"input"}});
 			
 			return __control_childs;
 		};
@@ -2468,11 +2482,20 @@ Object.assign(Runtime.Web.Input.Input,
 			
 			var value = (params != null) ? (params.get(ctx, "value", "")) : ("");
 			
+			var def_value = (params != null) ? (params.get(ctx, "default", "")) : ("");
+			
 			var name = (params != null) ? (params.get(ctx, "name", "")) : ("");
 			
 			var type = (params != null) ? (params.get(ctx, "type", "input")) : ("");
 			
 			var tag = (params != null) ? (params.get(ctx, "@tag", "")) : ("");
+			
+			value = (value != null) ? (value) : (model);
+			
+			if (Runtime.rtl.isEmpty(ctx, value))
+			{
+				value = def_value;
+			}
 			
 			[__vnull, __control_childs] = RenderDriver.e(__control, __control_childs, "element", {"name": "input","attrs": {"@tag":tag,"@event:Runtime.Web.Events.ChangeEvent":["Runtime.Web.Input.Input","onChange"],"name":name,"type":type,"value":((model != null) ? (model) : (value)),"class":["input", this.getCssHash(ctx)].join(" "),"@elem_name":"input"}});
 			
@@ -2595,8 +2618,19 @@ Object.assign(Runtime.Web.Input.Label,
 			var __vnull = null;
 			var __control_childs = [];
 			
+			var value = (params != null) ? (params.get(ctx, "value", "")) : ("");
+			
+			var def_value = (params != null) ? (params.get(ctx, "default", "")) : ("");
+			
+			value = (value != null) ? (value) : (model);
+			
+			if (Runtime.rtl.isEmpty(ctx, value))
+			{
+				value = def_value;
+			}
+			
 			/* Text */
-			[__vnull, __control_childs] = RenderDriver.e(__control, __control_childs, "text", {"content": model});
+			[__vnull, __control_childs] = RenderDriver.e(__control, __control_childs, "text", {"content": value});
 			
 			return __control_childs;
 		};
@@ -2727,9 +2761,25 @@ Object.assign(Runtime.Web.Input.Select,
 			
 			var name = (params != null) ? (params.get(ctx, "name", "")) : ("");
 			
+			var value = (params != null) ? (params.get(ctx, "value", "")) : ("");
+			
+			var def_value = (params != null) ? (params.get(ctx, "default", "")) : ("");
+			
+			value = (value != null) ? (value) : (model);
+			
+			if (Runtime.rtl.isEmpty(ctx, value))
+			{
+				value = def_value;
+			}
+			
+			if (Runtime.rtl.isEmpty(ctx, value))
+			{
+				value = "";
+			}
+			
 			/* Element 'select.select' */
 			var __v0; var __v0_childs = [];
-			[__v0, __control_childs] = RenderDriver.e(__control, __control_childs, "element", {"name": "select","attrs": {"@event:Runtime.Web.Events.ChangeEvent":["Runtime.Web.Input.Select","onChange"],"name":name,"value":((Runtime.rtl.isEmpty(ctx, model)) ? ("") : (model)),"class":["select", this.getCssHash(ctx)].join(" "),"@elem_name":"select"}});
+			[__v0, __control_childs] = RenderDriver.e(__control, __control_childs, "element", {"name": "select","attrs": {"@event:Runtime.Web.Events.ChangeEvent":["Runtime.Web.Input.Select","onChange"],"name":name,"value":value,"class":["select", this.getCssHash(ctx)].join(" "),"@elem_name":"select"}});
 			
 			var options = Runtime.rtl.get(ctx, params, "options");
 			
@@ -2739,7 +2789,7 @@ Object.assign(Runtime.Web.Input.Select,
 				
 				if (Runtime.rtl.get(ctx, params, "show_select_value") == true)
 				{
-					if (model === "" || model === null)
+					if (value === "" || value === null)
 					{
 						selected = Runtime.Dict.from({"selected":"selected"});
 					}
@@ -2759,7 +2809,7 @@ Object.assign(Runtime.Web.Input.Select,
 					
 					selected = Runtime.Dict.from({});
 					
-					if (Runtime.rtl.get(ctx, item, "id") == model && model !== "" && model !== null)
+					if (Runtime.rtl.get(ctx, item, "id") == value && value !== "" && value !== null)
 					{
 						selected = Runtime.Dict.from({"selected":"selected"});
 					}
@@ -3701,7 +3751,7 @@ Object.assign(Runtime.Web.CRUD.Form.prototype,
 		var params = msg.sender.params;
 		var field_name = Runtime.rtl.get(ctx, params, "name");
 		var value = msg.data.value;
-		var model_path = Runtime.rtl.get(ctx, params, "model-path");
+		var model_path = Runtime.rtl.get(ctx, params, "crud_model_path");
 		var event = new Runtime.Web.CRUD.FormEvent(ctx, Runtime.Dict.from({"event":Runtime.Web.CRUD.FormEvent.ACTION_CHANGE,"item":model.item,"field_name":field_name,"old_value":Runtime.rtl.attr(ctx, model, model_path, null),"value":value}));
 		this.update(ctx, "setAttr", model_path, value);
 		await this.signal(ctx, event);
@@ -3858,18 +3908,37 @@ Object.assign(Runtime.Web.CRUD.Form,
 				
 				var model_path = this.getBindPath(ctx, field);
 				
-				/* Patch class settings */
+				/* Class settings */
 				var __v0 = new Runtime.Monad(ctx, Runtime.rtl.get(ctx, field, "class_settings"));
 				__v0 = __v0.monad(ctx, Runtime.rtl.m_to(ctx, "Runtime.Dict", Runtime.Dict.from({})));
 				var class_settings = __v0.value(ctx);
 				
 				class_settings = class_settings.setIm(ctx, "name", field_name).setIm(ctx, "crud_class_name", class_name).setIm(ctx, "crud_kind", "form").setIm(ctx, "crud_field_name", field_name).setIm(ctx, "crud_field_info", field).setIm(ctx, "crud_struct", struct).setIm(ctx, "crud_row_data", Runtime.rtl.get(ctx, model, "item")).setIm(ctx, "crud_model_path", model_path).setIm(ctx, "crud_model", model);
 				
+				/* Calculate new value */
+				var calc = Runtime.rtl.get(ctx, class_settings, "calc");
+				
+				var value = Runtime.rtl.attr(ctx, model, model_path);
+				
+				if (Runtime.rtl.exists(ctx, calc))
+				{
+					value = calc(ctx, layout, value, class_settings);
+				}
+				
+				class_settings = class_settings.setIm(ctx, "value", value);
+				
 				class_settings = this.patchSettings(ctx, layout, field, class_settings, model, params);
+				
+				var can_render = Runtime.rtl.get(ctx, class_settings, "can_render");
 				
 				var render = Runtime.rtl.get(ctx, class_settings, "render");
 				
-				var canRender = Runtime.rtl.get(ctx, class_settings, "canRender");
+				var render_form = Runtime.rtl.get(ctx, class_settings, "render_form");
+				
+				if (!Runtime.rtl.isEmpty(ctx, render_form))
+				{
+					render = render_form;
+				}
 				
 				/* Element 'div.form_row' */
 				var __v0; var __v0_childs = [];
@@ -3890,10 +3959,10 @@ Object.assign(Runtime.Web.CRUD.Form,
 				var __v1; var __v1_childs = [];
 				[__v1, __v0_childs] = RenderDriver.e(__v0, __v0_childs, "element", {"name": "div","attrs": {"class":["form_value", this.getCssHash(ctx)].join(" "),"@elem_name":"form_value"}});
 				
-				if (Runtime.rtl.exists(ctx, render) && (!Runtime.rtl.exists(ctx, canRender) || Runtime.rtl.exists(ctx, canRender) && canRender(ctx, layout, model, class_settings)))
+				if (Runtime.rtl.exists(ctx, render) && (!Runtime.rtl.exists(ctx, can_render) || Runtime.rtl.exists(ctx, can_render) && can_render(ctx, layout, model, class_settings)))
 				{
 					/* Text */
-					[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "text", {"content": render(ctx, layout, model, class_settings)});
+					[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "text", {"content": render(ctx, layout, Runtime.rtl.attr(ctx, model, model_path), class_settings)});
 				}
 				else
 				{
@@ -3905,7 +3974,7 @@ Object.assign(Runtime.Web.CRUD.Form,
 				RenderDriver.p(__v1, __v1_childs);
 				
 				/* Text */
-				[__vnull, __v0_childs] = RenderDriver.e(__v0, __v0_childs, "text", {"content": this.renderFieldError(ctx, model, field_name)});
+				[__vnull, __v0_childs] = RenderDriver.e(__v0, __v0_childs, "text", {"content": this.renderFieldError(ctx, layout, model, field_name)});
 				RenderDriver.p(__v0, __v0_childs);
 			}
 			
@@ -3933,7 +4002,7 @@ Object.assign(Runtime.Web.CRUD.Form,
 			return __control_childs;
 		};
 	},
-	renderFieldError: function(ctx, model, field_name)
+	renderFieldError: function(ctx, layout, model, field_name)
 	{
 		return (__control) =>
 		{
@@ -4512,7 +4581,7 @@ Object.assign(Runtime.Web.CRUD.FormModel.prototype,
 		this.message = "";
 		this.success_message = "";
 		this.error_message = "";
-		this.params = Runtime.Dict.from({});
+		this.data = Runtime.Dict.from({});
 		Runtime.BaseStruct.prototype._init.call(this,ctx);
 	},
 	assignObject: function(ctx,o)
@@ -4525,7 +4594,7 @@ Object.assign(Runtime.Web.CRUD.FormModel.prototype,
 			this.message = o.message;
 			this.success_message = o.success_message;
 			this.error_message = o.error_message;
-			this.params = o.params;
+			this.data = o.data;
 		}
 		Runtime.BaseStruct.prototype.assignObject.call(this,ctx,o);
 	},
@@ -4537,7 +4606,7 @@ Object.assign(Runtime.Web.CRUD.FormModel.prototype,
 		else if (k == "message")this.message = v;
 		else if (k == "success_message")this.success_message = v;
 		else if (k == "error_message")this.error_message = v;
-		else if (k == "params")this.params = v;
+		else if (k == "data")this.data = v;
 		else Runtime.BaseStruct.prototype.assignValue.call(this,ctx,k,v);
 	},
 	takeValue: function(ctx,k,d)
@@ -4549,7 +4618,7 @@ Object.assign(Runtime.Web.CRUD.FormModel.prototype,
 		else if (k == "message")return this.message;
 		else if (k == "success_message")return this.success_message;
 		else if (k == "error_message")return this.error_message;
-		else if (k == "params")return this.params;
+		else if (k == "data")return this.data;
 		return Runtime.BaseStruct.prototype.takeValue.call(this,ctx,k,d);
 	},
 	getClassName: function(ctx)
@@ -4659,7 +4728,7 @@ Object.assign(Runtime.Web.CRUD.FormModel,
 			a.push("message");
 			a.push("success_message");
 			a.push("error_message");
-			a.push("params");
+			a.push("data");
 		}
 		return Runtime.Collection.from(a);
 	},
@@ -4716,7 +4785,7 @@ Object.assign(Runtime.Web.CRUD.FormModel,
 			"annotations": Collection.from([
 			]),
 		});
-		if (field_name == "params") return new IntrospectionInfo(ctx, {
+		if (field_name == "data") return new IntrospectionInfo(ctx, {
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.CRUD.FormModel",
 			"t": "Runtime.Dict",
@@ -5202,33 +5271,41 @@ Object.assign(Runtime.Web.CRUD.Table,
 					class_name = class_name_table;
 				}
 				
-				/* Patch class settings */
+				/* Class settings */
 				var __v0 = new Runtime.Monad(ctx, Runtime.rtl.get(ctx, field, "class_settings"));
 				__v0 = __v0.monad(ctx, Runtime.rtl.m_to(ctx, "Runtime.Dict", Runtime.Dict.from({})));
 				var class_settings = __v0.value(ctx);
 				
 				class_settings = class_settings.setIm(ctx, "name", field_name).setIm(ctx, "crud_class_name", class_name).setIm(ctx, "crud_kind", "table").setIm(ctx, "crud_struct", struct).setIm(ctx, "crud_field_name", field_name).setIm(ctx, "crud_field_info", field).setIm(ctx, "crud_row_index", index).setIm(ctx, "crud_row_data", row).setIm(ctx, "crud_model", model);
 				
-				class_settings = this.patchSettings(ctx, layout, field, class_settings, model, params);
-				
+				/* Calculate new value */
 				var calc = Runtime.rtl.get(ctx, class_settings, "calc");
 				
-				var render = Runtime.rtl.get(ctx, class_settings, "render");
-				
-				var canRender = Runtime.rtl.get(ctx, class_settings, "canRender");
-				
-				/* Calculate new value */
 				var value = Runtime.rtl.attr(ctx, model, ["rows", index, field_name]);
 				
 				if (Runtime.rtl.exists(ctx, calc))
 				{
 					value = calc(ctx, layout, value, class_settings);
-					
-					class_settings = class_settings.setIm(ctx, "value", value);
+				}
+				
+				class_settings = class_settings.setIm(ctx, "value", value);
+				
+				/* Patch settings */
+				class_settings = this.patchSettings(ctx, layout, field, class_settings, model, params);
+				
+				var can_render = Runtime.rtl.get(ctx, class_settings, "can_render");
+				
+				var render = Runtime.rtl.get(ctx, class_settings, "render");
+				
+				var render_table = Runtime.rtl.get(ctx, class_settings, "render_table");
+				
+				if (!Runtime.rtl.isEmpty(ctx, render_table))
+				{
+					render = render_table;
 				}
 				
 				/* Render value */
-				if (Runtime.rtl.exists(ctx, render) && (!Runtime.rtl.exists(ctx, canRender) || Runtime.rtl.exists(ctx, canRender) && canRender(ctx, layout, model, class_settings)))
+				if (Runtime.rtl.exists(ctx, render) && (!Runtime.rtl.exists(ctx, can_render) || Runtime.rtl.exists(ctx, can_render) && can_render(ctx, layout, model, class_settings)))
 				{
 					/* Text */
 					[__vnull, __control_childs] = RenderDriver.e(__control, __control_childs, "text", {"content": render(ctx, layout, value, class_settings)});
@@ -5708,7 +5785,7 @@ Object.assign(Runtime.Web.CRUD.CrudFilter,
 			return __control_childs;
 		};
 	},
-	renderFieldError: function(ctx, model, field_name)
+	renderFieldError: function(ctx, layout, model, field_name)
 	{
 		return ;
 	},
@@ -5866,7 +5943,8 @@ Object.assign(Runtime.Web.CRUD.CrudPage.prototype,
 		var pk = Runtime.rtl.get(ctx, msg.sender.params, "data-pk");
 		var item = this.table.call(ctx, "getFirstItem", pk);
 		var message = "";
-		var f = Runtime.rtl.attr(ctx, this.params, ["messages", "delete"]);
+		var messages = this.constructor.getMessages(ctx, this.constructor.layout, this.model(ctx), this.params);
+		var f = Runtime.rtl.get(ctx, messages, "delete");
 		if (Runtime.rtl.exists(ctx, f))
 		{
 			if (Runtime.rtl.isFn(ctx, f))
@@ -5959,7 +6037,7 @@ Object.assign(Runtime.Web.CRUD.CrudPage.prototype,
 	{
 		var old_item = this.form_edit.model(ctx, "old_item");
 		var item = this.form_edit.model(ctx, "item");
-		var pk = this.constructor.getPrimaryKey(ctx, Runtime.rtl.get(ctx, this.params, "struct"), old_item);
+		var pk = this.constructor.getPrimaryKey(ctx, this.constructor.getStruct(ctx, this.constructor.layout, this.model(ctx), this.params), old_item);
 		this.form_edit.update(ctx, "setWaitMessage");
 		/* Send api */
 		var answer = await Runtime.Web.RenderDriver.remoteBusCall(ctx, Runtime.Dict.from({"object_name":this.constructor.getCrudObjectName(ctx),"interface_name":"core.crud","method_name":"update","data":Runtime.Dict.from({"pk":pk,"item":item})}));
@@ -5979,7 +6057,7 @@ Object.assign(Runtime.Web.CRUD.CrudPage.prototype,
 	onItemDelete: async function(ctx, item)
 	{
 		this.dialog_delete.update(ctx, "setWaitMessage");
-		var pk = this.constructor.getPrimaryKey(ctx, Runtime.rtl.get(ctx, this.params, "struct"), item);
+		var pk = this.constructor.getPrimaryKey(ctx, this.constructor.getStruct(ctx), item);
 		/* Send api */
 		var answer = await Runtime.Web.RenderDriver.remoteBusCall(ctx, Runtime.Dict.from({"object_name":this.constructor.getCrudObjectName(ctx),"interface_name":"core.crud","method_name":"delete","data":Runtime.Dict.from({"pk":pk})}));
 		if (answer.isSuccess(ctx))
@@ -6202,6 +6280,30 @@ Object.assign(Runtime.Web.CRUD.CrudPage,
 			return __control_childs;
 		};
 	},
+	renderDate: function(ctx, layout, model, params)
+	{
+		return (__control) =>
+		{
+			var __vnull = null;
+			var __control_childs = [];
+			
+			var __v0 = new Runtime.Monad(ctx, Runtime.rtl.get(ctx, params, "crud_kind"));
+			__v0 = __v0.monad(ctx, Runtime.rtl.m_to(ctx, "string", ""));
+			var crud_kind = __v0.value(ctx);
+			
+			var __v0 = new Runtime.Monad(ctx, Runtime.rtl.get(ctx, params, "crud_class_name"));
+			__v0 = __v0.monad(ctx, Runtime.rtl.m_to(ctx, "string", ""));
+			var class_name = __v0.value(ctx);
+			
+			if (crud_kind == "table")
+			{
+				/* Text */
+				[__vnull, __control_childs] = RenderDriver.e(__control, __control_childs, "text", {"content": (model != null) ? (model.getDate(ctx, layout.tz)) : ("")});
+			}
+			
+			return __control_childs;
+		};
+	},
 	renderDateTime: function(ctx, layout, model, params)
 	{
 		return (__control) =>
@@ -6209,8 +6311,19 @@ Object.assign(Runtime.Web.CRUD.CrudPage,
 			var __vnull = null;
 			var __control_childs = [];
 			
-			/* Text */
-			[__vnull, __control_childs] = RenderDriver.e(__control, __control_childs, "text", {"content": model});
+			var __v0 = new Runtime.Monad(ctx, Runtime.rtl.get(ctx, params, "crud_kind"));
+			__v0 = __v0.monad(ctx, Runtime.rtl.m_to(ctx, "string", ""));
+			var crud_kind = __v0.value(ctx);
+			
+			var __v0 = new Runtime.Monad(ctx, Runtime.rtl.get(ctx, params, "crud_class_name"));
+			__v0 = __v0.monad(ctx, Runtime.rtl.m_to(ctx, "string", ""));
+			var class_name = __v0.value(ctx);
+			
+			if (crud_kind == "table")
+			{
+				/* Text */
+				[__vnull, __control_childs] = RenderDriver.e(__control, __control_childs, "text", {"content": (model != null) ? (model.getDate(ctx, layout.tz)) : ("")});
+			}
 			
 			return __control_childs;
 		};

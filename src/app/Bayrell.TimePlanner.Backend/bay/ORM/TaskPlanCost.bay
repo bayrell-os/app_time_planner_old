@@ -27,6 +27,33 @@ struct TaskPlanCost extends BaseStruct
 	static const string KIND_WORK_HOURS = "work_hours";
 	static const string KIND_CALENDAR_DAYS = "calendar_days";
 	static const string KIND_WORK_DAYS = "work_days";
-	string kind = "";
+	string kind = "work_hours";
 	int value = 0;
+	
+	
+	/**
+	 * Returns hours
+	 */
+	int getHours()
+	{
+		if (this.kind == "hours") return this.value * 60;
+		if (this.kind == "work_hours") return rtl::ceil(this.value / 8) * 8 * 60;
+		if (this.kind == "work_days") return this.value * 8 * 60;
+		if (this.kind == "calendar_days") return this.value * 24 * 60;
+		return 0;
+	}
+	
+	
+	
+	/**
+	 * Returns work hours
+	 */
+	int getWorkHours()
+	{
+		if (this.kind == "hours") return this.value * 60;
+		if (this.kind == "work_hours") return this.value * 60;
+		if (this.kind == "work_days") return this.value * 8 * 60;
+		if (this.kind == "calendar_days") return this.value * 24 * 60;
+		return 0;
+	}
 }

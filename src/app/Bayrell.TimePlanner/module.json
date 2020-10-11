@@ -4,6 +4,7 @@
 	[
 		"Admin/AdminInfo",
 		"Admin/AdminProjects",
+		"Tasks/TaskForm",
 		"Tasks/TasksPage",
 		"AdminLayout",
 		"DefaultLayout",

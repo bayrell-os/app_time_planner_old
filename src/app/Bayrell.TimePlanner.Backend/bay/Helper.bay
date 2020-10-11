@@ -58,6 +58,7 @@ static class Helper
 		}
 		
 		/* Set auth token */
+		container <= layout <= tz <= "GMT+6";
 		container <= layout <= keep_data <= { classof AuthToken } <= token;
 		container <= backend_storage <= { classof AuthToken } <= token;
 		

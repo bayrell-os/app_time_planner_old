@@ -42,6 +42,7 @@
 <use name="Runtime.Web.Input.SelectText" component="true" />
 <use name="Runtime.Web.Input.TextArea" component="true" />
 <use name="Runtime.Web.Table.TableModel" />
+<use name="Bayrell.TimePlanner.Tasks.TaskForm" component="true" />
 
 
 <style>
@@ -113,10 +114,10 @@ pure Collection getOptions(LayoutModel layout, CrudPageModel model, Dict params,
 	if (name == "states")
 		return
 		[
-			{ "id": 0, "value": "New" },
-			{ "id": 1, "value": "Planned" },
-			{ "id": 2, "value": "In work" },
-			{ "id": 3, "value": "Completed" },
+			{ "id": 1, "value": "New" },
+			{ "id": 2, "value": "Planned" },
+			{ "id": 3, "value": "In work" },
+			{ "id": 4, "value": "Completed" },
 		];
 		
 	if (name == "users")
@@ -149,7 +150,7 @@ pure Collection<FieldInfo> getStruct(LayoutModel layout, CrudPageModel model, Di
 		"class_name": classof Label,
 		"class_settings":
 		{
-			"render": method static::renderNumber,
+			"render_table": method static::renderNumber,
 		},
 	},
 	new FieldInfo
@@ -206,7 +207,7 @@ pure Collection<FieldInfo> getStruct(LayoutModel layout, CrudPageModel model, Di
 		"class_name_table": classof Label,
 		"class_settings":
 		{
-			"render": method static::renderDateTime,
+			"render_table": method static::renderDate,
 		}
 	},
 	new FieldInfo
@@ -217,7 +218,17 @@ pure Collection<FieldInfo> getStruct(LayoutModel layout, CrudPageModel model, Di
 		"class_name_table": classof Label,
 		"class_settings":
 		{
-			"render": method static::renderDateTime,
+			"render_table": method static::renderDate,
+		}
+	},
+	new FieldInfo
+	{
+		"api_name": "plan_cost_hours",
+		"label": "Plan hours",
+		"class_name": classof Label,
+		"class_settings":
+		{
+			"calc": string (LayoutModel layout, var value, Dict params) => rtl::ceil(value / 60),
 		}
 	},
 	new FieldInfo
@@ -227,7 +238,7 @@ pure Collection<FieldInfo> getStruct(LayoutModel layout, CrudPageModel model, Di
 		"class_name": classof Label,
 		"class_settings":
 		{
-			"render": method static::renderDateTime,
+			"render_table": method static::renderDateTime,
 		}
 	},
 	new FieldInfo
@@ -237,7 +248,7 @@ pure Collection<FieldInfo> getStruct(LayoutModel layout, CrudPageModel model, Di
 		"class_name": classof Label,
 		"class_settings":
 		{
-			"render": method static::renderDateTime,
+			"render_table": method static::renderDateTime,
 		}
 	},
 	new FieldInfo
@@ -247,7 +258,7 @@ pure Collection<FieldInfo> getStruct(LayoutModel layout, CrudPageModel model, Di
 		"class_name": classof Label,
 		"class_settings":
 		{
-			"render": method static::renderButtons,
+			"render_table": method static::renderButtons,
 		},
 	},
 ];
@@ -293,6 +304,7 @@ pure Collection<string> getTableFields(LayoutModel layout, CrudPageModel model, 
 	"state",
 	"user",
 	"plan_begin",
+	"plan_cost_hours",
 	"plan_end",
 	"real_begin",
 	"real_end",
@@ -327,7 +339,7 @@ pure Dict getDialogSettings(LayoutModel layout, CrudPageModel model, Dict params
  */
 pure Dict getFormSettings(LayoutModel layout, CrudPageModel model, Dict params) =>
 {
-	"class_name": classof Form,
+	"class_name": classof TaskForm,
 };
 
 

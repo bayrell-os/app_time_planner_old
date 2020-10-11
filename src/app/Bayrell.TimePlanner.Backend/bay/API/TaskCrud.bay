@@ -20,6 +20,7 @@ namespace Bayrell.TimePlanner.Backend.API;
 
 use Runtime.rtl;
 use Runtime.lib;
+use Runtime.DateTime;
 use Runtime.Core.ApiException;
 use Runtime.Core.RemoteCallAnswer;
 use Runtime.Core.RemoteCallRequest;
@@ -27,6 +28,7 @@ use Runtime.Web.Backend.ApiList;
 use Runtime.Web.Backend.ApiMethod;
 use Runtime.Web.Backend.ApiMiddleware;
 use Runtime.Web.ORM.QueryBuilder;
+use Runtime.Web.ORM.Record;
 use Runtime.Web.CRUD.CrudApi;
 use Runtime.Web.CRUD.Rules.AllowFields;
 use Runtime.Web.CRUD.Rules.Dictionary;
@@ -124,19 +126,30 @@ static class TaskCrud extends CrudApi
 	
 	
 	/**
-	 * Convert item before save to database
+	 * Patch item before query
 	 */
-	async Dict convertItem(Dict item)
+	async Task patchItem(Task item)
 	{
-		/* Convert item */
-		item = await parent::convertItem(item);
+		/* Patch item */
+		item = await parent::patchItem(item);
 		
 		/* Add layer_id */
 		int layer_id = this.request.storage["X-LAYER-ID"];
-		item = await parent::convertItem(item);
 		item <= layer_id <= layer_id;
 		
-		/* Return item */
+		/* Calc plan end */
+		if (item.plan_begin != null and item.plan_cost != null)
+		{
+			int work_hours = item.plan_cost.getWorkHours();
+			DateTime plan_end = DateTime::createDateTime
+			(
+				item.plan_begin.getTimestamp() + item.plan_cost.getHours() * 60,
+				item.plan_begin.tz
+			);
+			item <= plan_end <= plan_end;
+			item <= plan_cost_hours <= work_hours;
+		}
+		
 		return item;
 	}
 	
