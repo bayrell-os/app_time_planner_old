@@ -38,19 +38,28 @@
 			"websocket": true
 		},
 		{
-			"dest": "html_sys/app.js",
+			"dest": "html_admin_layout/app.js",
 			"lang": "es6",
 			"modules":
 			[
-				"Bayrell.TimePlanner.Admin"
+				"Bayrell.TimePlanner.AdminLayout"
+			],
+			"websocket": true
+		},
+		{
+			"dest": "html_admin_service/app.js",
+			"lang": "es6",
+			"modules":
+			[
+				"Bayrell.TimePlanner.AdminService"
 			],
 			"websocket": true
 		}
 	],
 	"modules":
 	[
+		"admin/",
 		"app/",
-		"app_sys/",
 		"lib/"
 	],
 	"plugins":

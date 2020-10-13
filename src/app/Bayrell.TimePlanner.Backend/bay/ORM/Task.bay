@@ -54,8 +54,11 @@ struct Task extends Record
 	@BigIntType{}
 	int layer_id;
 	
-	@BigIntType{}
+	@BigIntType{ "nullable": true }
 	int project_id;
+	
+	@BigIntType{ "nullable": true }
+	int parent_task_id;
 	
 	@BigIntType{}
 	int category_id;
@@ -126,6 +129,17 @@ struct Task extends Record
 				{"src": "layer_id", "dest": "layer_id"},
 			],
 			"delete": Record::RESTRICT,
+			"update": Record::CASCADE,
+		},
+		new ForeignKey
+		{
+			"name": "parent_task_id",
+			"class_name": classof Task,
+			"keys":
+			[
+				{"src": "parent_task_id", "dest": "task_id"},
+			],
+			"delete": Record::SET_NULL,
 			"update": Record::CASCADE,
 		},
 	];

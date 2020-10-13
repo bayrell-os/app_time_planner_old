@@ -31,12 +31,14 @@ use Runtime.Web.ORM.QueryBuilder;
 use Runtime.Web.ORM.Record;
 use Runtime.Web.CRUD.CrudApi;
 use Runtime.Web.CRUD.Rules.AllowFields;
+use Runtime.Web.CRUD.Rules.DefaultValue;
 use Runtime.Web.CRUD.Rules.Dictionary;
 use Runtime.Web.CRUD.Rules.ReadOnly;
 use Runtime.Web.CRUD.Rules.Required;
 use Runtime.Web.CRUD.Rules.Rule;
 use Bayrell.TimePlanner.Backend.ORM.Project;
 use Bayrell.TimePlanner.Backend.ORM.Task;
+use Bayrell.TimePlanner.Backend.ORM.TaskPlanCost;
 
 
 @ApiList{ "object_name": "Bayrell.TimePlanner.Task", "interface_name": "core.crud" }
@@ -61,6 +63,7 @@ static class TaskCrud extends CrudApi
 			"fields":
 			[
 				"task_id",
+				"parent_task_id",
 				"project_id",
 				"task_name",
 				"state",
@@ -79,6 +82,8 @@ static class TaskCrud extends CrudApi
 		new ReadOnly{ "api_name": "real_begin" },
 		new ReadOnly{ "api_name": "real_end" },
 		new Required{ "api_name": "task_name" },
+		new DefaultValue{ "api_name": "state", "value": 1 },
+		new DefaultValue{ "plan_cost": "state", "value": new TaskPlanCost{} },
 		
 		/* Add projects dictionary */
 		new Dictionary
@@ -87,7 +92,7 @@ static class TaskCrud extends CrudApi
 			"field_name": "projects",
 			"buildSearchQuery": QueryBuilder (QueryBuilder q)
 			{
-				int layer_id = this.request.storage["X-LAYER-ID"];
+				int layer_id = @.env("X-LAYER-ID");
 				q = q.prependFilter(["layer_id", "=", layer_id]);
 				return q;
 			},
@@ -118,7 +123,7 @@ static class TaskCrud extends CrudApi
 	 */
 	Collection<list> extendSearchFilter(Collection<list> filter)
 	{
-		int layer_id = this.request.storage["X-LAYER-ID"];
+		int layer_id = @.env("X-LAYER-ID");
 		filter = filter.prependIm(["layer_id", "=", layer_id]);
 		return filter;
 	}
@@ -134,7 +139,7 @@ static class TaskCrud extends CrudApi
 		item = await parent::patchItem(item);
 		
 		/* Add layer_id */
-		int layer_id = this.request.storage["X-LAYER-ID"];
+		int layer_id = @.env("X-LAYER-ID");
 		item <= layer_id <= layer_id;
 		
 		/* Calc plan end */
@@ -209,6 +214,17 @@ static class TaskCrud extends CrudApi
 	static async list searchAction(RemoteCallRequest request, RemoteCallAnswer answer)
 	{
 		return await parent::searchAction(request, answer);
+	}
+	
+	
+	
+	/**
+	 * Get item api
+	 */
+	@ApiMethod{ "method_name": "getItem" }
+	static async list getItemAction(RemoteCallRequest request, RemoteCallAnswer answer)
+	{
+		return await parent::getItemAction(request, answer);
 	}
 	
 	

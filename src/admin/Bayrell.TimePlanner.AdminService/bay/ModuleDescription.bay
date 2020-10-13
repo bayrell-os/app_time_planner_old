@@ -16,7 +16,7 @@
  *  limitations under the License.
  */
 
-namespace Bayrell.TimePlanner;
+namespace Bayrell.TimePlanner.Admin;
 
 use Runtime.Core.Context;
 use Runtime.Core.Driver;
@@ -31,8 +31,7 @@ use Runtime.Web.RenderDriver;
 use Runtime.Web.Route;
 use Runtime.Web.RouteController;
 use Runtime.Web.RouteList;
-use Bayrell.TimePlanner.Routes;
-use Bayrell.TimePlanner.Backend.ORM.Layer;
+use Bayrell.TimePlanner.Admin.Routes;
 
 
 static class ModuleDescription
@@ -43,7 +42,7 @@ static class ModuleDescription
 	 * Returns module name
 	 * @return string
 	 */
-	pure string getModuleName() => "Bayrell.TimePlanner";
+	pure string getModuleName() => "Bayrell.TimePlanner.Admin";
 	
 	
 	
@@ -64,15 +63,12 @@ static class ModuleDescription
 		'Runtime': '>=0.3',
 		'Runtime.Web': '*',
 		'Runtime.Web.Auth': '*',
-		'Runtime.Web.CRUD': '*',
 		
 		/* Backend */
 		#ifdef BACKEND then
 		'Runtime.Web.Backend': '*',
-		'Bayrell.TimePlanner.Backend': '*',
 		#endif
 	};
-	
 	
 	
 	/**
@@ -98,14 +94,14 @@ static class ModuleDescription
 		{
 			"name": RenderDriver::LAYOUT_CHAIN,
 			"pos": 10,
-			"value": "Bayrell.TimePlanner.Routes::layoutChain",
+			"value": "Bayrell.TimePlanner.Admin.Routes::layoutChain",
 		},
 		
 		/* Render Chain. Page not found */
 		new LambdaChain
 		{
 			"name": RenderDriver::RENDER_CHAIN,
-			"value": "Bayrell.TimePlanner.Routes::Page404",
+			"value": "Bayrell.TimePlanner.Admin.Routes::Page404",
 			"pos": RenderDriver::RENDER_CHAIN_CALL_PAGE_NOT_FOUND,
 			"is_async": true,
 		},
@@ -113,15 +109,15 @@ static class ModuleDescription
 		/* Render Chain. Route after */
 		new LambdaChain
 		{
-			"name": RenderDriver::TITLE_CHAIN,
-			"value": "Bayrell.TimePlanner.Routes::titleChain",
+			"name": RenderDriver::RENDER_CHAIN,
+			"value": "Bayrell.TimePlanner.Admin.Routes::renderChainRouteAfter",
+			"pos": RenderDriver::RENDER_CHAIN_CALL_ROUTE_AFTER,
+			"is_async": true,
 		},
 		
 		/* Register routes */
-		new RouteList{ "name": "Bayrell.TimePlanner.Admin.AdminInfo" },
-		new RouteList{ "name": "Bayrell.TimePlanner.Admin.AdminProjects" },
-		new RouteList{ "name": "Bayrell.TimePlanner.Tasks.TasksPage" },
-		new RouteList{ "name": "Bayrell.TimePlanner.MainPage" },
+		new Entity{ "name": classof Routes },
+		new RouteList{ "name": "Bayrell.TimePlanner.Admin.MainPage" },
 		
 		
 		#ifdef BACKEND then
@@ -130,7 +126,7 @@ static class ModuleDescription
 		new LambdaChain
 		{
 			"name": RenderDriver::RENDER_CHAIN,
-			"value": "Bayrell.TimePlanner.Routes::renderChainPatternDefault",
+			"value": "Bayrell.TimePlanner.Admin.Routes::renderChainPatternDefault",
 			"pos": RenderDriver::RENDER_CHAIN_RESPONSE_BEFORE,
 		},
 		
@@ -166,7 +162,7 @@ static class ModuleDescription
 			{
 				"AUTH_PRIVATE_KEY": env.get("AUTH_PRIVATE_KEY", ""),
 				"AUTH_PUBLIC_KEY": env.get("AUTH_PUBLIC_KEY", ""),
-				"COOKIE_NAME": env.get("COOKIE_NAME", "auth_token"),
+				"COOKIE_NAME": env.get("CLOUD_OS_COOKIE_NAME", "cloud_os_token"),
 				"COOKIE_EXPIRE": 7 * 24 * 60 * 60,
 			},
 			
@@ -187,7 +183,6 @@ static class ModuleDescription
 					"username": env.get("MYSQL_USERNAME", ""),
 					"password": env.get("MYSQL_PASSWORD", ""),
 					"db": env.get("MYSQL_DB", ""),
-					"prefix": env.get("MYSQL_PREFIX", ""),
 				},
 			},
 			
@@ -220,40 +215,7 @@ static class ModuleDescription
 	 */
 	static async Context appStart(Context c)
 	{
-		c = await c::start(c);
-		
-		
-		#ifdef BACKEND then
-		
-		/* Find layer id */
-		string layer_id = @.env("X-LAYER-ID", "");
-		if (layer_id == "")
-		{
-			string layer_uid = @.env("X-LAYER-UID", "");
-			if (layer_uid != "")
-			{
-				/* Find item */
-				Layer item = Layer::select()
-					|> .filter([
-						["layer_uid", "=", layer_uid]
-					])
-					|> await .one()
-				;
-				if (item == null)
-				{
-					item = Layer::save
-					{
-						"layer_uid": layer_uid,
-					}
-				}
-				c <= enviroments <= "X-LAYER-ID" <= item["layer_id"];
-			}
-		}
-		
-		#endif
-		
-		
-		return c;
+		return await c::start(c);
 	}
 	
 	
@@ -271,6 +233,6 @@ static class ModuleDescription
 	}
 	
 	
-	#endif
+	#endif	
 	
 }

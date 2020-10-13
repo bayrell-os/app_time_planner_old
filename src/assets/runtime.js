@@ -358,6 +358,10 @@ Object.assign(Runtime.rtl,
 	attr: function(ctx, item, path, def_val)
 	{
 		if (def_val == undefined) def_val = null;
+		if (path == null)
+		{
+			return def_val;
+		}
 		var Collection = use("Runtime.Collection");
 		var Dict = use("Runtime.Dict");
 		var BaseStruct = use("Runtime.BaseStruct");
@@ -394,6 +398,10 @@ Object.assign(Runtime.rtl,
 	 */
 	setAttr: function(ctx, item, attrs, new_value)
 	{
+		if (attrs == null)
+		{
+			return item;
+		}
 		var Collection = use("Runtime.Collection");
 		if (typeof attrs == "string") attrs = Collection.from([attrs]);
 		else if (Array.isArray(attrs) && attrs.count == undefined) attrs = Collection.from(attrs);
@@ -8784,16 +8792,6 @@ Object.assign(Runtime.Core.Context.prototype,
 		var driver = this.getDriver(ctx, "default:external_bus");
 		await driver.sendMessage(ctx, msg);
 	},
-	/**
-	 * Remote call
-	 * @param Dict items
-	 * @return RemoteCallAnswer
-	 */
-	remoteBusCall: async function(ctx, items)
-	{
-		var driver = this.getDriver(ctx, "default:external_bus");
-		return Promise.resolve(await driver.remoteCall(ctx, items));
-	},
 	/* ---------------------- Chain --------------------- */
 	/**
 	 * Apply Lambda Chain
@@ -11657,6 +11655,7 @@ Object.assign(Runtime.Core.RemoteCallRequest.prototype,
 	{
 		var defProp = use('Runtime.rtl').defProp;
 		var a = Object.getOwnPropertyNames(this);
+		this.uri = "";
 		this.app_name = "self";
 		this.object_name = "";
 		this.interface_name = "default";
@@ -11669,6 +11668,7 @@ Object.assign(Runtime.Core.RemoteCallRequest.prototype,
 	{
 		if (o instanceof Runtime.Core.RemoteCallRequest)
 		{
+			this.uri = o.uri;
 			this.app_name = o.app_name;
 			this.object_name = o.object_name;
 			this.interface_name = o.interface_name;
@@ -11680,7 +11680,8 @@ Object.assign(Runtime.Core.RemoteCallRequest.prototype,
 	},
 	assignValue: function(ctx,k,v)
 	{
-		if (k == "app_name")this.app_name = v;
+		if (k == "uri")this.uri = v;
+		else if (k == "app_name")this.app_name = v;
 		else if (k == "object_name")this.object_name = v;
 		else if (k == "interface_name")this.interface_name = v;
 		else if (k == "method_name")this.method_name = v;
@@ -11691,7 +11692,8 @@ Object.assign(Runtime.Core.RemoteCallRequest.prototype,
 	takeValue: function(ctx,k,d)
 	{
 		if (d == undefined) d = null;
-		if (k == "app_name")return this.app_name;
+		if (k == "uri")return this.uri;
+		else if (k == "app_name")return this.app_name;
 		else if (k == "object_name")return this.object_name;
 		else if (k == "interface_name")return this.interface_name;
 		else if (k == "method_name")return this.method_name;
@@ -11739,6 +11741,7 @@ Object.assign(Runtime.Core.RemoteCallRequest,
 		if (f==undefined) f=0;
 		if ((f|3)==3)
 		{
+			a.push("uri");
 			a.push("app_name");
 			a.push("object_name");
 			a.push("interface_name");
@@ -11753,6 +11756,14 @@ Object.assign(Runtime.Core.RemoteCallRequest,
 		var Collection = Runtime.Collection;
 		var Dict = Runtime.Dict;
 		var IntrospectionInfo = Runtime.IntrospectionInfo;
+		if (field_name == "uri") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Runtime.Core.RemoteCallRequest",
+			"t": "string",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
 		if (field_name == "app_name") return new IntrospectionInfo(ctx, {
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Core.RemoteCallRequest",
@@ -12102,13 +12113,6 @@ Object.assign(Runtime.Web.Component.prototype,
 		var msg = new Runtime.Core.Message(ctx, event, this.getObjectName(ctx));
 		msg.sender = this;
 		await ctx.object_manager.handleMessage(ctx, msg);
-	},
-	/**
-	 * Remote bus call
-	 */
-	remoteBusCall: async function(ctx, items)
-	{
-		return Promise.resolve(await Runtime.Web.RenderDriver.remoteBusCall(ctx, items));
 	},
 	/**
 	 * Change params
@@ -13687,6 +13691,18 @@ Object.assign(Runtime.Web.RenderContainer.prototype,
 	{
 		return this.layout != null && this.layout.page_class != "";
 	},
+	/**
+	 * Remote bus call
+	 * @param Dict items
+	 * @return RemoteCallAnswer
+	 */
+	externalBusCall: async function(ctx, items)
+	{
+		/* Set storage */
+		items = items.copy(ctx, Runtime.Dict.from({"storage":this.api_storage}));
+		/* Send request */
+		return Promise.resolve(await Runtime.Web.RenderDriver.externalBusCall(ctx, items));
+	},
 	_init: function(ctx)
 	{
 		var defProp = use('Runtime.rtl').defProp;
@@ -13701,6 +13717,7 @@ Object.assign(Runtime.Web.RenderContainer.prototype,
 		this.pattern_name = "default";
 		this.pattern_class = "";
 		this.frontend_controller_name = "";
+		this.api_storage = new Runtime.Dict(ctx);
 		this.backend_storage = new Runtime.Dict(ctx);
 		this.new_cookies = Runtime.Dict.from({});
 		this.new_headers = Runtime.Collection.from([]);
@@ -13721,6 +13738,7 @@ Object.assign(Runtime.Web.RenderContainer.prototype,
 			this.pattern_name = o.pattern_name;
 			this.pattern_class = o.pattern_class;
 			this.frontend_controller_name = o.frontend_controller_name;
+			this.api_storage = o.api_storage;
 			this.backend_storage = o.backend_storage;
 			this.new_cookies = o.new_cookies;
 			this.new_headers = o.new_headers;
@@ -13740,6 +13758,7 @@ Object.assign(Runtime.Web.RenderContainer.prototype,
 		else if (k == "pattern_name")this.pattern_name = v;
 		else if (k == "pattern_class")this.pattern_class = v;
 		else if (k == "frontend_controller_name")this.frontend_controller_name = v;
+		else if (k == "api_storage")this.api_storage = v;
 		else if (k == "backend_storage")this.backend_storage = v;
 		else if (k == "new_cookies")this.new_cookies = v;
 		else if (k == "new_headers")this.new_headers = v;
@@ -13759,6 +13778,7 @@ Object.assign(Runtime.Web.RenderContainer.prototype,
 		else if (k == "pattern_name")return this.pattern_name;
 		else if (k == "pattern_class")return this.pattern_class;
 		else if (k == "frontend_controller_name")return this.frontend_controller_name;
+		else if (k == "api_storage")return this.api_storage;
 		else if (k == "backend_storage")return this.backend_storage;
 		else if (k == "new_cookies")return this.new_cookies;
 		else if (k == "new_headers")return this.new_headers;
@@ -13815,6 +13835,7 @@ Object.assign(Runtime.Web.RenderContainer,
 			a.push("pattern_name");
 			a.push("pattern_class");
 			a.push("frontend_controller_name");
+			a.push("api_storage");
 			a.push("backend_storage");
 			a.push("new_cookies");
 			a.push("new_headers");
@@ -13906,6 +13927,15 @@ Object.assign(Runtime.Web.RenderContainer,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.RenderContainer",
 			"t": "string",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "api_storage") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Runtime.Web.RenderContainer",
+			"t": "Runtime.Dict",
+			"s": ["primitive"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -14336,6 +14366,15 @@ Object.assign(Runtime.Web.RenderController.prototype,
 			var obj = this.updated_components[i];
 			var component = obj.get(ctx, "component");
 			this.saveComponent(ctx, component);
+		}
+		
+		/* Call update components */
+		for (var i=0; i<this.updated_components.count(); i++)
+		{
+			var obj = this.updated_components[i];
+			var component = obj.get(ctx, "component");
+			var created = obj.get(ctx, "created");
+			component.updateComponent(ctx, created);
 		}
 		this.old_css = this.new_css;
 	},
@@ -15025,6 +15064,8 @@ Object.assign(Runtime.Web.RenderDriver,
 	LAYOUT_CHAIN: "Runtime.Web.Layout",
 	PATTERN_CHAIN: "Runtime.Web.Pattern",
 	RENDER_CHAIN: "Runtime.Web.Render",
+	TITLE_CHAIN: "Runtime.Web.Title",
+	API_EXTERNAL_BUS_CHAIN: "Runtime.Web.Api.ExternalBus",
 	API_EXTERNAL_BUS_PREPARE_CHAIN: "Runtime.Web.Api.ExternalBusPrepare",
 	RENDER_CHAIN_START: 500,
 	RENDER_CHAIN_CREATE_LAYOUT_MODEL: 950,
@@ -15260,6 +15301,16 @@ Object.assign(Runtime.Web.RenderDriver,
 		return __memorize_value;
 	},
 	/**
+	 * Returns title
+	 */
+	chainTitle: function(ctx, layout, title)
+	{
+		var __v0 = new Runtime.Monad(ctx, ctx.chain(ctx, this.TITLE_CHAIN, Runtime.Collection.from([layout,title])));
+		__v0 = __v0.attr(ctx, 1);
+		title = __v0.value(ctx);
+		return title;
+	},
+	/**
 	 * Layout chain
 	 */
 	chainLayout: function(ctx, layout)
@@ -15438,17 +15489,14 @@ Object.assign(Runtime.Web.RenderDriver,
 	 * @param Dict items
 	 * @return RemoteCallAnswer
 	 */
-	remoteBusCall: async function(ctx, items, container)
+	externalBusCall: async function(ctx, items)
 	{
-		if (container == undefined) container = null;
 		/* Set default params */
 		items = items.copy(ctx, Runtime.Dict.from({"app_name":items.get(ctx, "app_name", "self"),"interface_name":items.get(ctx, "interface_name", "default")}));
 		/* Change api request */
 		var request = new Runtime.Core.RemoteCallRequest(ctx, items);
-		var res = await ctx.chainAsync(ctx, Runtime.Web.RenderDriver.API_EXTERNAL_BUS_PREPARE_CHAIN, Runtime.Collection.from([request,container]));
+		var res = await ctx.chainAsync(ctx, Runtime.Web.RenderDriver.API_EXTERNAL_BUS_CHAIN, Runtime.Collection.from([request]));
 		request = Runtime.rtl.get(ctx, res, 0);
-		/* Restore request */
-		request = request.copy(ctx, Runtime.Dict.from({"uri":items.get(ctx, "uri", ""),"app_name":items.get(ctx, "app_name", "self"),"object_name":items.get(ctx, "object_name", ""),"interface_name":items.get(ctx, "interface_name", "default"),"method_name":items.get(ctx, "method_name", "")}));
 		/* Send request */
 		var bus = ctx.getDriver(ctx, "default:external_bus");
 		var answer = await bus.remoteBusCall(ctx, request);
@@ -15512,6 +15560,22 @@ Object.assign(Runtime.Web.RenderDriver,
 			]),
 		});
 		if (field_name == "RENDER_CHAIN") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Runtime.Web.RenderDriver",
+			"t": "string",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "TITLE_CHAIN") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Runtime.Web.RenderDriver",
+			"t": "string",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "API_EXTERNAL_BUS_CHAIN") return new IntrospectionInfo(ctx, {
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.RenderDriver",
 			"t": "string",
@@ -15970,7 +16034,6 @@ Object.assign(Runtime.Web.RenderDriver,
 			
 			controller.updateComponent(ctx, component, created);
 			controller.bindEvents(ctx, new_control, component, attrs, created);
-			component.updateComponent(ctx, created);
 		}
 		
 		else if (type == 'element')
@@ -16136,13 +16199,32 @@ Object.assign(Runtime.Web.RenderDriver,
 	
 	
 	/**
+	 * Find objects by path
+	 */
+	findObjects: function (path_id)
+	{
+		var arr = [];
+		var ctx = globalContext;
+		var keys = ctx.object_manager.objects.keys(ctx);
+		for (var i=0; i<keys.count(); i++)
+		{
+			var key = keys[i];
+			var object = ctx.object_manager.objects.get(ctx, key);
+			if (object.path_id != undefined && object.path_id.indexOf(path_id) == 0) arr.push(object);
+		}
+		return Runtime.Collection.from(arr);
+	},
+	
+	
+	
+	/**
 	 * Returns object
 	 */
 	getObject: function (path_id)
 	{
 		var ctx = globalContext;
 		return ctx.object_manager.objects.get(ctx, path_id);
-	}
+	},
 	
 });
 "use strict;"
@@ -17020,6 +17102,18 @@ Object.assign(Runtime.Web.Route,
 		Runtime.rtl._memorizeSave("Runtime.Web.Route.getParams", arguments, __memorize_value);
 		return __memorize_value;
 	},
+	/**
+	 * Replace url
+	 */
+	replace: function(ctx, url, params)
+	{
+		if (params == undefined) params = null;
+		url = (params == null) ? (url) : (params.reduce(ctx, (ctx, message, value, key) => 
+		{
+			return Runtime.rs.replace(ctx, "{" + Runtime.rtl.toStr(key) + Runtime.rtl.toStr("}"), value, message);
+		}, url));
+		return url;
+	},
 	/* ======================= Class Init Functions ======================= */
 	getCurrentNamespace: function()
 	{
@@ -17379,8 +17473,8 @@ Object.assign(Runtime.Web.RouteController,
 		ctx = Runtime.RuntimeUtils.getContext();
 		var controller = ctx.getDriver(ctx, "Runtime.Web.RouteController");
 		var elem = e.target;
-		
-		if (elem.tagName == "A")
+		while (elem !== null && elem.nodeName !== "A") elem = elem.parentNode;
+		if (elem !== null && elem.tagName == "A")
 		{
 			var target = elem.getAttribute("target");
 			var href = elem.getAttribute("href");

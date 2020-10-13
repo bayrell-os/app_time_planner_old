@@ -69,14 +69,12 @@ static class Routes
 	
 	
 	/**
-	 * Render chain. Route after
+	 * Title chain
 	 */
-	pure RenderContainer renderChainRouteAfter(RenderContainer container)
+	pure RenderContainer titleChain(LayoutModel layout, string title)
 	{
-		/* Change title */
-		container <= layout <= title <= container.layout.title ~ " | BAYRELL Time Planner";
-		
-		return [ container ];
+		title = title ~ " | BAYRELL Time Planner";
+		return [ layout, title ];
 	}
 	
 	

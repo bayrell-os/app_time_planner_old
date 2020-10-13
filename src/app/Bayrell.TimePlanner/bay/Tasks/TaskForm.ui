@@ -74,6 +74,18 @@
 
 <script type="frontend">
 
+/**
+ * Update component
+ */
+public void updateComponent(bool created)
+{
+	var plan_cost = this.model(["item", "plan_cost"]);
+	if (plan_cost == null)
+	{
+		this.updateModel("setAttr", ["item", "plan_cost"], { "value": 0, "kind": "work_hours" });
+	}
+}
+
 </script>
 
 

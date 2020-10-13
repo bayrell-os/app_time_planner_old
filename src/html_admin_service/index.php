@@ -17,10 +17,10 @@ $env = include ROOT_PATH . "/env.php";
 /* Run app */
 $loader = ( new Loader() )
 	->addIncludePath( ROOT_PATH . "/app" )
-	->addIncludePath( ROOT_PATH . "/app_sys" )
+	->addIncludePath( ROOT_PATH . "/admin" )
 	->addIncludePath( ROOT_PATH . "/lib" )
 	->setEnv($env)
-	->setMainModule("Bayrell.TimePlanner.Admin")
+	->setMainModule("Bayrell.TimePlanner.AdminService")
 	->setEntryPoint("Runtime.Web.Backend.CGI")
 	->run();
 

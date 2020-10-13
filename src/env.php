@@ -3,6 +3,11 @@
 global $ENV;
 
 $env = getenv();
+
+/* Set empty layer id */
+$env["X-LAYER-ID"] = "";
+
+/* Merge enviroments */
 if (isset($ENV) && gettype($ENV) == "array")
 {
 	$env = array_merge($env, $ENV);

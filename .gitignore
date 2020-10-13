@@ -8,5 +8,7 @@
 /src/app/[^\\]*/php
 /src/compiler.new
 /src/html/assets
+/src/html_admin_layout/assets
+/src/html_admin_service/assets
 /src/html_sys/assets
 /src/web/assets

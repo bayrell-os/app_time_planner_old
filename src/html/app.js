@@ -236,7 +236,7 @@ Object.assign(Bayrell.TimePlanner.Admin.AdminProjects,
 	getOptions: function(ctx, layout, model, params, name)
 	{
 		if (name == undefined) name = "";
-		return Runtime.Web.CRUD.CrudPage.getOptions(ctx, layout, model, params, name);
+		return Runtime.Web.CRUD.CrudPage.getOptions.bind(this)(ctx, layout, model, params, name);
 	},
 	/**
  * Returns crud struct
@@ -392,6 +392,17 @@ Bayrell.TimePlanner.Tasks.TaskForm.prototype = Object.create(Runtime.Web.CRUD.Fo
 Bayrell.TimePlanner.Tasks.TaskForm.prototype.constructor = Bayrell.TimePlanner.Tasks.TaskForm;
 Object.assign(Bayrell.TimePlanner.Tasks.TaskForm.prototype,
 {
+	/**
+ * Update component
+ */
+	updateComponent: function(ctx, created)
+	{
+		var plan_cost = this.model(ctx, Runtime.Collection.from(["item","plan_cost"]));
+		if (plan_cost == null)
+		{
+			this.updateModel(ctx, "setAttr", Runtime.Collection.from(["item","plan_cost"]), Runtime.Dict.from({"value":0,"kind":"work_hours"}));
+		}
+	},
 	assignObject: function(ctx,o)
 	{
 		if (o instanceof Bayrell.TimePlanner.Tasks.TaskForm)
@@ -556,6 +567,19 @@ Bayrell.TimePlanner.Tasks.TasksPage.prototype = Object.create(Runtime.Web.CRUD.C
 Bayrell.TimePlanner.Tasks.TasksPage.prototype.constructor = Bayrell.TimePlanner.Tasks.TasksPage;
 Object.assign(Bayrell.TimePlanner.Tasks.TasksPage.prototype,
 {
+	/**
+ * On show add dialog
+ */
+	onAddSubTask: async function(ctx, msg)
+	{
+		var project_id = this.model(ctx, Runtime.Collection.from(["item","project_id"]));
+		var parent_task_id = this.model(ctx, Runtime.Collection.from(["item","task_id"]));
+		this.dialog_add.update(ctx, "show");
+		this.form_add.update(ctx, "clear");
+		this.form_add.update(ctx, "setAttr", Runtime.Collection.from(["item","project_id"]), project_id);
+		this.form_add.update(ctx, "setAttr", Runtime.Collection.from(["item","parent_task_id"]), parent_task_id);
+		this.form_add.update(ctx, "setKind", "table");
+	},
 	assignObject: function(ctx,o)
 	{
 		if (o instanceof Bayrell.TimePlanner.Tasks.TasksPage)
@@ -580,9 +604,6 @@ Object.assign(Bayrell.TimePlanner.Tasks.TasksPage.prototype,
 Object.assign(Bayrell.TimePlanner.Tasks.TasksPage, Runtime.Web.CRUD.CrudPage);
 Object.assign(Bayrell.TimePlanner.Tasks.TasksPage,
 {
-	css: function(ctx, vars)
-	{
-	},
 	/**
  * Returns object name
  */
@@ -597,9 +618,36 @@ Object.assign(Bayrell.TimePlanner.Tasks.TasksPage,
 	actionIndex: async function(ctx, container)
 	{
 		/* Create model */
-		var page_model = await Runtime.Web.CRUD.CrudPageModel.crudSearch(ctx, Runtime.Dict.from({"object_name":this.getCrudObjectName(ctx),"interface_name":"core.crud","method_name":"search"}), container);
+		var page_model = await Bayrell.TimePlanner.Tasks.TasksPageModel.crudSearch(ctx, this.getCrudObjectName(ctx), container);
 		/* Set title */
 		container = Runtime.rtl.setAttr(ctx, container, Runtime.Collection.from(["layout", "title"]), "Tasks");
+		container = Runtime.rtl.setAttr(ctx, container, Runtime.Collection.from(["layout", "layout_name"]), "admin");
+		/* Set model */
+		container = Runtime.rtl.setAttr(ctx, container, Runtime.Collection.from(["layout", "page_class"]), "Bayrell.TimePlanner.Tasks.TasksPage");
+		container = Runtime.rtl.setAttr(ctx, container, Runtime.Collection.from(["layout", "page_model"]), page_model);
+		return Promise.resolve(Runtime.Collection.from([container]));
+	},
+	/**
+ * Route Action
+ * @return RenderContainer
+ */
+	actionView: async function(ctx, container)
+	{
+		var task_id = Runtime.rtl.get(ctx, container.layout.route_params, "task_id");
+		/* Create model */
+		var pk = Runtime.Dict.from({"task_id":task_id});
+		var page_model = await Bayrell.TimePlanner.Tasks.TasksPageModel.crudView(ctx, this.getCrudObjectName(ctx), pk, container);
+		/* Get subtasks */
+		var answer = await container.externalBusCall(ctx, Runtime.Dict.from({"object_name":this.getCrudObjectName(ctx),"interface_name":"core.crud","method_name":"search","data":Runtime.Dict.from({"filter":Runtime.Collection.from([Runtime.Collection.from(["parent_task_id","=",task_id])]),"limit":1000})}));
+		/* Throw exception */
+		if (!answer.isSuccess(ctx))
+		{
+			throw new Runtime.Exceptions.RuntimeException(ctx, answer.error_message, answer.error_code)
+		}
+		/* Add subtasks to model */
+		page_model = Runtime.rtl.setAttr(ctx, page_model, Runtime.Collection.from(["table", "rows"]), Runtime.rtl.get(ctx, answer.response, "items"));
+		/* Set title */
+		container = Runtime.rtl.setAttr(ctx, container, Runtime.Collection.from(["layout", "title"]), "Task #" + Runtime.rtl.toStr(Runtime.rtl.get(ctx, Runtime.rtl.get(ctx, page_model, "item"), "task_id")) + Runtime.rtl.toStr(" ") + Runtime.rtl.toStr(Runtime.rtl.get(ctx, Runtime.rtl.get(ctx, page_model, "item"), "task_name")));
 		container = Runtime.rtl.setAttr(ctx, container, Runtime.Collection.from(["layout", "layout_name"]), "admin");
 		/* Set model */
 		container = Runtime.rtl.setAttr(ctx, container, Runtime.Collection.from(["layout", "page_class"]), "Bayrell.TimePlanner.Tasks.TasksPage");
@@ -633,17 +681,23 @@ Object.assign(Bayrell.TimePlanner.Tasks.TasksPage,
 		{
 			return Runtime.Collection.from([Runtime.Dict.from({"id":"admin","value":"Admin"})]);
 		}
-		return Runtime.Web.CRUD.CrudPage.getOptions(ctx, layout, model, params, name);
+		return Runtime.Web.CRUD.CrudPage.getOptions.bind(this)(ctx, layout, model, params, name);
 	},
 	/**
  * Returns crud struct
  */
 	getStruct: function(ctx, layout, model, params)
 	{
-		return Runtime.Collection.from([new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"task_id","primary":true,"label":"","class_name":"Runtime.Web.Input.Label"})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"number","label":"","class_name":"Runtime.Web.Input.Label","class_settings":Runtime.Dict.from({"render_table":this.renderNumber.bind(this)})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"task_name","label":"Task name","class_name":"Runtime.Web.Input.Input","class_name_table":"Runtime.Web.Input.Label"})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"project_id","label":"Project","class_name":"Runtime.Web.Input.Select","class_name_table":"Runtime.Web.Input.SelectText","class_settings":Runtime.Dict.from({"show_select_value_filter":true,"show_select_value":true,"options":this.getOptions(ctx, layout, model, params, "projects")})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"state","label":"State","class_name":"Runtime.Web.Input.Select","class_name_table":"Runtime.Web.Input.SelectText","class_settings":Runtime.Dict.from({"show_select_value_filter":true,"show_select_value":true,"options":this.getOptions(ctx, layout, model, params, "states")})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"user","label":"User","class_name":"Runtime.Web.Input.Select","class_name_table":"Runtime.Web.Input.SelectText","class_settings":Runtime.Dict.from({"show_select_value_filter":true,"show_select_value":true,"options":this.getOptions(ctx, layout, model, params, "users")})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"plan_begin","label":"Plan begin","class_name":"Runtime.Web.Input.DatePicker","class_name_table":"Runtime.Web.Input.Label","class_settings":Runtime.Dict.from({"render_table":this.renderDate.bind(this)})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"plan_end","label":"Plan end","class_name":"Runtime.Web.Input.DatePicker","class_name_table":"Runtime.Web.Input.Label","class_settings":Runtime.Dict.from({"render_table":this.renderDate.bind(this)})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"plan_cost_hours","label":"Plan hours","class_name":"Runtime.Web.Input.Label","class_settings":Runtime.Dict.from({"calc":(ctx, layout, value, params) => 
+		return Runtime.Collection.from([new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"task_id","primary":true,"label":"","class_name":"Runtime.Web.Input.Label","calc":(ctx, layout, value, settings) => 
+		{
+			return "#" + Runtime.rtl.toStr(value);
+		},"info":Runtime.Dict.from({"view":Runtime.Dict.from({"label":"Task number"})})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"number","label":"","class_name":"Runtime.Web.Input.Label","class_settings":Runtime.Dict.from({}),"render":this.renderNumber.bind(this)})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"task_name","label":"Task name","class_name":"Runtime.Web.Input.Input","info":Runtime.Dict.from({"table":Runtime.Dict.from({"class_name":"Runtime.Web.Input.Label"}),"view":Runtime.Dict.from({"class_name":"Runtime.Web.Input.Label"})})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"project_id","label":"Project","class_name":"Runtime.Web.Input.Select","class_settings":Runtime.Dict.from({"show_select_value_filter":true,"show_select_value":true,"options":this.getOptions(ctx, layout, model, params, "projects")}),"info":Runtime.Dict.from({"table":Runtime.Dict.from({"class_name":"Runtime.Web.Input.SelectText"}),"view":Runtime.Dict.from({"class_name":"Runtime.Web.Input.SelectText"})})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"state","label":"State","class_name":"Runtime.Web.Input.Select","class_settings":Runtime.Dict.from({"show_select_value_filter":true,"show_select_value":true,"options":this.getOptions(ctx, layout, model, params, "states")}),"info":Runtime.Dict.from({"table":Runtime.Dict.from({"class_name":"Runtime.Web.Input.SelectText"}),"view":Runtime.Dict.from({"class_name":"Runtime.Web.Input.SelectText"})})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"user","label":"User","class_name":"Runtime.Web.Input.Select","class_settings":Runtime.Dict.from({"show_select_value_filter":true,"show_select_value":true,"options":this.getOptions(ctx, layout, model, params, "users")}),"info":Runtime.Dict.from({"table":Runtime.Dict.from({"class_name":"Runtime.Web.Input.SelectText"}),"view":Runtime.Dict.from({"class_name":"Runtime.Web.Input.SelectText"})})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"plan_begin","label":"Plan begin","class_name":"Runtime.Web.Input.DatePicker","info":Runtime.Dict.from({"table":Runtime.Dict.from({"class_name":"Runtime.Web.Input.Label","render":this.renderDate.bind(this)}),"view":Runtime.Dict.from({"class_name":"Runtime.Web.Input.Label","render":this.renderDate.bind(this)})})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"plan_end","label":"Plan end","class_name":"Runtime.Web.Input.DatePicker","info":Runtime.Dict.from({"table":Runtime.Dict.from({"class_name":"Runtime.Web.Input.Label","render":this.renderDate.bind(this)}),"view":Runtime.Dict.from({"class_name":"Runtime.Web.Input.Label","render":this.renderDate.bind(this)})})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"plan_cost_hours","label":"Plan hours","class_name":"Runtime.Web.Input.Label","calc":(ctx, layout, value, settings) => 
 		{
 			return Runtime.rtl.ceil(ctx, value / 60);
-		}})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"real_begin","label":"Real begin","class_name":"Runtime.Web.Input.Label","class_settings":Runtime.Dict.from({"render_table":this.renderDateTime.bind(this)})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"real_end","label":"Real end","class_name":"Runtime.Web.Input.Label","class_settings":Runtime.Dict.from({"render_table":this.renderDateTime.bind(this)})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"edit-buttons","label":"","class_name":"Runtime.Web.Input.Label","class_settings":Runtime.Dict.from({"render_table":this.renderButtons.bind(this)})}))]);
+		}})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"real_begin","label":"Real begin","class_name":"Runtime.Web.Input.Label","info":Runtime.Dict.from({"table":Runtime.Dict.from({"class_name":"Runtime.Web.Input.Label","render":this.renderDateTime.bind(this)}),"view":Runtime.Dict.from({"class_name":"Runtime.Web.Input.Label","render":this.renderDateTime.bind(this)})})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"real_end","label":"Real end","class_name":"Runtime.Web.Input.Label","info":Runtime.Dict.from({"table":Runtime.Dict.from({"class_name":"Runtime.Web.Input.Label","render":this.renderDateTime.bind(this)}),"view":Runtime.Dict.from({"class_name":"Runtime.Web.Input.Label","render":this.renderDateTime.bind(this)})})})),new Runtime.Web.CRUD.FieldInfo(ctx, Runtime.Dict.from({"api_name":"edit-buttons","label":"","class_name":"Runtime.Web.Input.Label","render":(ctx, layout, value, settings) => 
+		{
+			return Runtime.Collection.from([this.renderButton(ctx, layout, settings, "view", Runtime.Dict.from({"url":"/tasks/{task_id}/"})),this.renderButton(ctx, layout, settings, "edit"),this.renderButton(ctx, layout, settings, "delete")]);
+		}}))]);
 	},
 	/**
  * Returns filter fields
@@ -665,6 +719,13 @@ Object.assign(Bayrell.TimePlanner.Tasks.TasksPage,
 	getTableFields: function(ctx, layout, model, params)
 	{
 		return Runtime.Collection.from(["task_id","project_id","task_name","state","user","plan_begin","plan_cost_hours","plan_end","real_begin","real_end","edit-buttons"]);
+	},
+	/**
+ * Returns view fields
+ */
+	getViewFields: function(ctx, layout, model, params)
+	{
+		return Runtime.Collection.from(["task_id","project_id","task_name","state","user","plan_begin","plan_cost_hours","plan_end","real_begin","real_end"]);
 	},
 	/**
  * Returns messages
@@ -690,9 +751,97 @@ Object.assign(Bayrell.TimePlanner.Tasks.TasksPage,
 	{
 		return Runtime.Dict.from({"class_name":"Bayrell.TimePlanner.Tasks.TaskForm"});
 	},
+	css: function(ctx, vars)
+	{
+		return ".view_left.h-adff, .view_right.h-adff{" + Runtime.rtl.toStr("display: inline-block;vertical-align: top;width: 50%;") + Runtime.rtl.toStr("}.view_subtasks.h-adff{") + Runtime.rtl.toStr("padding-top: 20px;") + Runtime.rtl.toStr("}.view_subtasks_label.h-adff span, .view_subtasks_label.h-adff .button.h-de49{") + Runtime.rtl.toStr("margin-left: 10px;") + Runtime.rtl.toStr("}.view_subtasks_label.h-adff span{") + Runtime.rtl.toStr("margin-left: 0px;font-weight: bold;") + Runtime.rtl.toStr("}");
+	},
+	renderView: function(ctx, layout, model, params)
+	{
+		return (__control) =>
+		{
+			var __vnull = null;
+			var __control_childs = [];
+			
+			var struct = this.getStruct(ctx, layout, model, params);
+			
+			var form_fields = this.getFormFields(ctx, layout, model, params);
+			
+			var table_fields = this.getTableFields(ctx, layout, model, params);
+			
+			table_fields = Runtime.Collection.from(["task_id","project_id","task_name","state","user","plan_cost_hours","edit-buttons"]);
+			
+			/* Element 'div.view_left' */
+			var __v0; var __v0_childs = [];
+			[__v0, __control_childs] = RenderDriver.e(__control, __control_childs, "element", {"name": "div","attrs": {"class":["view_left", this.getCssHash(ctx)].join(" "),"@elem_name":"view_left"}});
+			
+			/* Text */
+			[__vnull, __v0_childs] = RenderDriver.e(__v0, __v0_childs, "text", {"content": Runtime.Web.CRUD.CrudPage.renderView.bind(this)(ctx, layout, model, params)});
+			
+			/* Element 'div.view_subtasks' */
+			var __v1; var __v1_childs = [];
+			[__v1, __v0_childs] = RenderDriver.e(__v0, __v0_childs, "element", {"name": "div","attrs": {"class":["view_subtasks", this.getCssHash(ctx)].join(" "),"@elem_name":"view_subtasks"}});
+			
+			/* Element 'div.view_subtasks_label' */
+			var __v2; var __v2_childs = [];
+			[__v2, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "element", {"name": "div","attrs": {"class":["view_subtasks_label", this.getCssHash(ctx)].join(" "),"@elem_name":"view_subtasks_label"}});
+			
+			/* Element 'span' */
+			var __v3; var __v3_childs = [];
+			[__v3, __v2_childs] = RenderDriver.e(__v2, __v2_childs, "element", {"name": "span","attrs": {}});
+			
+			/* Text */
+			[__vnull, __v3_childs] = RenderDriver.e(__v3, __v3_childs, "text", {"content": "Subtasks"});
+			RenderDriver.p(__v3, __v3_childs);
+			
+			/* Component 'Button' */
+			[__vnull, __v2_childs] = RenderDriver.e(__v2, __v2_childs, "component", {"name": "Runtime.Web.Input.Button","attrs": {"type":"small primary","@event:Runtime.Web.Events.MouseClickEvent":["Bayrell.TimePlanner.Tasks.TasksPage","onAddSubTask"],"@key":"edit"}, "layout": layout, "content": (__control) =>
+			{
+				var __vnull = null;
+				var __control_childs = [];
+				
+				/* Text */
+				[__vnull, __control_childs] = RenderDriver.e(__control, __control_childs, "text", {"content": ctx.translate(ctx, "Bayrell.TimePlanner", "Add subtask")});
+				
+				return __control_childs;
+			}});
+			RenderDriver.p(__v2, __v2_childs);
+			
+			/* Element 'div.view_subtasks_items' */
+			var __v2; var __v2_childs = [];
+			[__v2, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "element", {"name": "div","attrs": {"class":["view_subtasks_items", this.getCssHash(ctx)].join(" "),"@elem_name":"view_subtasks_items"}});
+			
+			[__vnull, __v2_childs] = RenderDriver.e(__v2, __v2_childs, "component", {"name": "Runtime.Web.CRUD.Table","attrs": {"@name":["Bayrell.TimePlanner.Tasks.TasksPage","table"],"struct":struct,"fields":table_fields}, "layout": layout});
+			RenderDriver.p(__v2, __v2_childs);
+			RenderDriver.p(__v1, __v1_childs);
+			RenderDriver.p(__v0, __v0_childs);
+			
+			/* Element 'div.view_right' */
+			var __v0; var __v0_childs = [];
+			[__v0, __control_childs] = RenderDriver.e(__control, __control_childs, "element", {"name": "div","attrs": {"class":["view_right", this.getCssHash(ctx)].join(" "),"@elem_name":"view_right"}});
+			
+			/* Element 'b' */
+			var __v1; var __v1_childs = [];
+			[__v1, __v0_childs] = RenderDriver.e(__v0, __v0_childs, "element", {"name": "b","attrs": {}});
+			
+			/* Text */
+			[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "text", {"content": "Comments"});
+			RenderDriver.p(__v1, __v1_childs);
+			
+			/* Element 'div' */
+			var __v1; var __v1_childs = [];
+			[__v1, __v0_childs] = RenderDriver.e(__v0, __v0_childs, "element", {"name": "div","attrs": {"style":"padding-top: 20px;"}});
+			
+			/* Text */
+			[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "text", {"content": "In develop ..."});
+			RenderDriver.p(__v1, __v1_childs);
+			RenderDriver.p(__v0, __v0_childs);
+			
+			return __control_childs;
+		};
+	},
 	components: function(ctx)
 	{
-		return Runtime.Collection.from(["Runtime.Web.CRUD.CrudPage","Runtime.Web.Input.Button","Runtime.Web.Input.DatePicker","Runtime.Web.Input.Input","Runtime.Web.Input.Label","Runtime.Web.Input.Select","Runtime.Web.Input.SelectText","Runtime.Web.Input.TextArea","Bayrell.TimePlanner.Tasks.TaskForm"]);
+		return Runtime.Collection.from(["Runtime.Web.CRUD.CrudPage","Runtime.Web.CRUD.Pagination","Runtime.Web.CRUD.Table","Runtime.Web.Input.Button","Runtime.Web.Input.DatePicker","Runtime.Web.Input.Input","Runtime.Web.Input.Label","Runtime.Web.Input.Select","Runtime.Web.Input.SelectText","Runtime.Web.Input.TextArea","Runtime.Web.Dialog.Dialog","Bayrell.TimePlanner.Tasks.TaskForm"]);
 	},
 	/* ======================= Class Init Functions ======================= */
 	getCurrentNamespace: function()
@@ -737,6 +886,7 @@ Object.assign(Bayrell.TimePlanner.Tasks.TasksPage,
 	{
 		var a = [
 			"actionIndex",
+			"actionView",
 		];
 		return Runtime.Collection.from(a);
 	},
@@ -757,12 +907,194 @@ Object.assign(Bayrell.TimePlanner.Tasks.TasksPage,
 				]),
 			});
 		}
+		if (field_name == "actionView")
+		{
+			var Collection = Runtime.Collection;
+			var Dict = Runtime.Dict;
+			var IntrospectionInfo = Runtime.IntrospectionInfo;
+			return new IntrospectionInfo(ctx, {
+				"kind": IntrospectionInfo.ITEM_METHOD,
+				"class_name": "Bayrell.TimePlanner.Tasks.TasksPage",
+				"name": "actionView",
+				"annotations": Collection.from([
+					new Runtime.Web.Route(ctx, Runtime.Dict.from({"uri":"/tasks/{task_id}/","name":"app.tasks.view"})),
+					new Runtime.Web.RouteMiddleware(ctx, Runtime.Dict.from({"value":"Runtime.Web.Auth.AuthFrontend::checkAuthMiddleware"})),
+				]),
+			});
+		}
 		return null;
 	},
 });
 Runtime.rtl.defClass(Bayrell.TimePlanner.Tasks.TasksPage);
 window["Bayrell.TimePlanner.Tasks.TasksPage"] = Bayrell.TimePlanner.Tasks.TasksPage;
 if (typeof module != "undefined" && typeof module.exports != "undefined") module.exports = Bayrell.TimePlanner.Tasks.TasksPage;
+"use strict;"
+/*!
+ *  Bayrell Time Planner
+ *
+ *  (c) Copyright 2016-2020 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+if (typeof Bayrell == 'undefined') Bayrell = {};
+if (typeof Bayrell.TimePlanner == 'undefined') Bayrell.TimePlanner = {};
+if (typeof Bayrell.TimePlanner.Tasks == 'undefined') Bayrell.TimePlanner.Tasks = {};
+Bayrell.TimePlanner.Tasks.TasksPageModel = function(ctx)
+{
+	Runtime.Web.CRUD.CrudPageModel.apply(this, arguments);
+};
+Bayrell.TimePlanner.Tasks.TasksPageModel.prototype = Object.create(Runtime.Web.CRUD.CrudPageModel.prototype);
+Bayrell.TimePlanner.Tasks.TasksPageModel.prototype.constructor = Bayrell.TimePlanner.Tasks.TasksPageModel;
+Object.assign(Bayrell.TimePlanner.Tasks.TasksPageModel.prototype,
+{
+	_init: function(ctx)
+	{
+		var defProp = use('Runtime.rtl').defProp;
+		var a = Object.getOwnPropertyNames(this);
+		this.subtask_form_add = new Runtime.Web.CRUD.FormModel(ctx);
+		this.subtask_form_edit = new Runtime.Web.CRUD.FormModel(ctx);
+		this.subtask_dialog_add = new Runtime.Web.Dialog.DialogModel(ctx);
+		this.subtask_dialog_edit = new Runtime.Web.Dialog.DialogModel(ctx);
+		Runtime.Web.CRUD.CrudPageModel.prototype._init.call(this,ctx);
+	},
+	assignObject: function(ctx,o)
+	{
+		if (o instanceof Bayrell.TimePlanner.Tasks.TasksPageModel)
+		{
+			this.subtask_form_add = o.subtask_form_add;
+			this.subtask_form_edit = o.subtask_form_edit;
+			this.subtask_dialog_add = o.subtask_dialog_add;
+			this.subtask_dialog_edit = o.subtask_dialog_edit;
+		}
+		Runtime.Web.CRUD.CrudPageModel.prototype.assignObject.call(this,ctx,o);
+	},
+	assignValue: function(ctx,k,v)
+	{
+		if (k == "subtask_form_add")this.subtask_form_add = v;
+		else if (k == "subtask_form_edit")this.subtask_form_edit = v;
+		else if (k == "subtask_dialog_add")this.subtask_dialog_add = v;
+		else if (k == "subtask_dialog_edit")this.subtask_dialog_edit = v;
+		else Runtime.Web.CRUD.CrudPageModel.prototype.assignValue.call(this,ctx,k,v);
+	},
+	takeValue: function(ctx,k,d)
+	{
+		if (d == undefined) d = null;
+		if (k == "subtask_form_add")return this.subtask_form_add;
+		else if (k == "subtask_form_edit")return this.subtask_form_edit;
+		else if (k == "subtask_dialog_add")return this.subtask_dialog_add;
+		else if (k == "subtask_dialog_edit")return this.subtask_dialog_edit;
+		return Runtime.Web.CRUD.CrudPageModel.prototype.takeValue.call(this,ctx,k,d);
+	},
+	getClassName: function(ctx)
+	{
+		return "Bayrell.TimePlanner.Tasks.TasksPageModel";
+	},
+});
+Object.assign(Bayrell.TimePlanner.Tasks.TasksPageModel, Runtime.Web.CRUD.CrudPageModel);
+Object.assign(Bayrell.TimePlanner.Tasks.TasksPageModel,
+{
+	/* ======================= Class Init Functions ======================= */
+	getCurrentNamespace: function()
+	{
+		return "Bayrell.TimePlanner.Tasks";
+	},
+	getCurrentClassName: function()
+	{
+		return "Bayrell.TimePlanner.Tasks.TasksPageModel";
+	},
+	getParentClassName: function()
+	{
+		return "Runtime.Web.CRUD.CrudPageModel";
+	},
+	getClassInfo: function(ctx)
+	{
+		var Collection = Runtime.Collection;
+		var Dict = Runtime.Dict;
+		var IntrospectionInfo = Runtime.IntrospectionInfo;
+		return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_CLASS,
+			"class_name": "Bayrell.TimePlanner.Tasks.TasksPageModel",
+			"name": "Bayrell.TimePlanner.Tasks.TasksPageModel",
+			"annotations": Collection.from([
+			]),
+		});
+	},
+	getFieldsList: function(ctx, f)
+	{
+		var a = [];
+		if (f==undefined) f=0;
+		if ((f|3)==3)
+		{
+			a.push("subtask_form_add");
+			a.push("subtask_form_edit");
+			a.push("subtask_dialog_add");
+			a.push("subtask_dialog_edit");
+		}
+		return Runtime.Collection.from(a);
+	},
+	getFieldInfoByName: function(ctx,field_name)
+	{
+		var Collection = Runtime.Collection;
+		var Dict = Runtime.Dict;
+		var IntrospectionInfo = Runtime.IntrospectionInfo;
+		if (field_name == "subtask_form_add") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.TimePlanner.Tasks.TasksPageModel",
+			"t": "Runtime.Web.CRUD.FormModel",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "subtask_form_edit") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.TimePlanner.Tasks.TasksPageModel",
+			"t": "Runtime.Web.CRUD.FormModel",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "subtask_dialog_add") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.TimePlanner.Tasks.TasksPageModel",
+			"t": "Runtime.Web.Dialog.DialogModel",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "subtask_dialog_edit") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.TimePlanner.Tasks.TasksPageModel",
+			"t": "Runtime.Web.Dialog.DialogModel",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		return null;
+	},
+	getMethodsList: function(ctx)
+	{
+		var a = [
+		];
+		return Runtime.Collection.from(a);
+	},
+	getMethodInfoByName: function(ctx,field_name)
+	{
+		return null;
+	},
+});
+Runtime.rtl.defClass(Bayrell.TimePlanner.Tasks.TasksPageModel);
+window["Bayrell.TimePlanner.Tasks.TasksPageModel"] = Bayrell.TimePlanner.Tasks.TasksPageModel;
+if (typeof module != "undefined" && typeof module.exports != "undefined") module.exports = Bayrell.TimePlanner.Tasks.TasksPageModel;
 "use strict;"
 /*
  *  Bayrell Time Planner
@@ -1758,7 +2090,7 @@ Object.assign(Bayrell.TimePlanner.Pattern.prototype,
 Object.assign(Bayrell.TimePlanner.Pattern, Runtime.Web.Component);
 Object.assign(Bayrell.TimePlanner.Pattern,
 {
-	render: function(ctx, layout, model, params, content)
+	render: function(ctx, container, layout, params, content)
 	{
 		return (__control) =>
 		{
@@ -1778,19 +2110,19 @@ Object.assign(Bayrell.TimePlanner.Pattern,
 			[__v2, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "element", {"name": "title","attrs": {}});
 			
 			/* Text */
-			[__vnull, __v2_childs] = RenderDriver.e(__v2, __v2_childs, "text", {"content": model.title});
+			[__vnull, __v2_childs] = RenderDriver.e(__v2, __v2_childs, "text", {"content": Runtime.Web.RenderDriver.chainTitle(ctx, layout, layout.title)});
 			RenderDriver.p(__v2, __v2_childs);
 			
 			[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "element", {"name": "link","attrs": {"rel":"shortcut icon","href":"data:image/x-icon;,","type":"image/x-icon"}});
 			
-			[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "element", {"name": "link","attrs": {"rel":"stylesheet","href":model.route_prefix + Runtime.rtl.toStr("/core.css?_=") + Runtime.rtl.toStr(model.f_inc)}});
+			[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "element", {"name": "link","attrs": {"rel":"stylesheet","href":layout.route_prefix + Runtime.rtl.toStr("/core.css?_=") + Runtime.rtl.toStr(layout.f_inc)}});
 			
 			/* Element 'style' */
 			var __v2; var __v2_childs = [];
 			[__v2, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "element", {"name": "style","attrs": {"id":"root_style"}});
 			
 			/* Raw */
-			[__vnull, __v2_childs] = RenderDriver.e(__v2, __v2_childs, "raw", {"content": Runtime.rs.spaceless(ctx, Runtime.Web.RenderDriver.getLayoutCSS(ctx, model))});
+			[__vnull, __v2_childs] = RenderDriver.e(__v2, __v2_childs, "raw", {"content": Runtime.rs.spaceless(ctx, Runtime.Web.RenderDriver.getLayoutCSS(ctx, layout))});
 			RenderDriver.p(__v2, __v2_childs);
 			RenderDriver.p(__v1, __v1_childs);
 			
@@ -1798,7 +2130,7 @@ Object.assign(Bayrell.TimePlanner.Pattern,
 			var __v1; var __v1_childs = [];
 			[__v1, __v0_childs] = RenderDriver.e(__v0, __v0_childs, "element", {"name": "body","attrs": {}});
 			
-			var model_encoded = Runtime.rs.base64_encode_url(ctx, Runtime.rtl.json_encode(ctx, model));
+			var model_encoded = Runtime.rs.base64_encode_url(ctx, Runtime.rtl.json_encode(ctx, layout));
 			
 			var frontend_storage = Runtime.rs.base64_encode_url(ctx, Runtime.rtl.json_encode(ctx, layout.frontend_storage));
 			
@@ -1814,11 +2146,11 @@ Object.assign(Bayrell.TimePlanner.Pattern,
 			
 			[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "element", {"name": "input","attrs": {"id":"frontend_storage","type":"hidden","value":frontend_storage}});
 			
-			[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "element", {"name": "script","attrs": {"src":model.route_prefix + Runtime.rtl.toStr("/assets/runtime.js?_=") + Runtime.rtl.toStr(model.f_inc)}});
+			[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "element", {"name": "script","attrs": {"src":layout.route_prefix + Runtime.rtl.toStr("/assets/runtime.js?_=") + Runtime.rtl.toStr(layout.f_inc)}});
 			
-			[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "element", {"name": "script","attrs": {"src":model.route_prefix + Runtime.rtl.toStr("/assets/components.js?_=") + Runtime.rtl.toStr(model.f_inc)}});
+			[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "element", {"name": "script","attrs": {"src":layout.route_prefix + Runtime.rtl.toStr("/assets/components.js?_=") + Runtime.rtl.toStr(layout.f_inc)}});
 			
-			[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "element", {"name": "script","attrs": {"src":model.route_prefix + Runtime.rtl.toStr("/app.js?_=") + Runtime.rtl.toStr(model.f_inc)}});
+			[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "element", {"name": "script","attrs": {"src":layout.route_prefix + Runtime.rtl.toStr("/app.js?_=") + Runtime.rtl.toStr(layout.f_inc)}});
 			
 			/* Element 'script' */
 			var __v2; var __v2_childs = [];
@@ -1834,7 +2166,7 @@ Object.assign(Bayrell.TimePlanner.Pattern,
 			[__vnull, __v2_childs] = RenderDriver.e(__v2, __v2_childs, "text", {"content": ", "});
 			
 			/* Text */
-			[__vnull, __v2_childs] = RenderDriver.e(__v2, __v2_childs, "text", {"content": this.json_encode(ctx, layout.frontend_env)});
+			[__vnull, __v2_childs] = RenderDriver.e(__v2, __v2_childs, "text", {"content": this.json_encode(ctx, container.frontend_env)});
 			
 			/* Text */
 			[__vnull, __v2_childs] = RenderDriver.e(__v2, __v2_childs, "text", {"content": ");"});
@@ -1970,13 +2302,12 @@ Object.assign(Bayrell.TimePlanner.Routes,
 		return Runtime.Collection.from([container]);
 	},
 	/**
-	 * Render chain. Route after
+	 * Title chain
 	 */
-	renderChainRouteAfter: function(ctx, container)
+	titleChain: function(ctx, layout, title)
 	{
-		/* Change title */
-		container = Runtime.rtl.setAttr(ctx, container, Runtime.Collection.from(["layout", "title"]), container.layout.title + Runtime.rtl.toStr(" | BAYRELL Time Planner"));
-		return Runtime.Collection.from([container]);
+		title = title + Runtime.rtl.toStr(" | BAYRELL Time Planner");
+		return Runtime.Collection.from([layout,title]);
 	},
 	/**
 	 * Render chain
@@ -2135,7 +2466,7 @@ Object.assign(Bayrell.TimePlanner.ModuleDescription,
 	 */
 	entities: function(ctx)
 	{
-		return Runtime.Collection.from([new Runtime.Core.Driver(ctx, Runtime.Dict.from({"name":"root-controller","value":"Runtime.Web.RenderController","params":Runtime.Dict.from({"selector":"#root","main_controller":true,"window":"RootController"})})),new Runtime.Core.LambdaChain(ctx, Runtime.Dict.from({"name":Runtime.Web.RenderDriver.LAYOUT_CHAIN,"pos":10,"value":"Bayrell.TimePlanner.Routes::layoutChain"})),new Runtime.Core.LambdaChain(ctx, Runtime.Dict.from({"name":Runtime.Web.RenderDriver.RENDER_CHAIN,"value":"Bayrell.TimePlanner.Routes::Page404","pos":Runtime.Web.RenderDriver.RENDER_CHAIN_CALL_PAGE_NOT_FOUND,"is_async":true})),new Runtime.Core.LambdaChain(ctx, Runtime.Dict.from({"name":Runtime.Web.RenderDriver.RENDER_CHAIN,"value":"Bayrell.TimePlanner.Routes::renderChainRouteAfter","pos":Runtime.Web.RenderDriver.RENDER_CHAIN_CALL_ROUTE_AFTER,"is_async":true})),new Runtime.Web.RouteList(ctx, Runtime.Dict.from({"name":"Bayrell.TimePlanner.Admin.AdminInfo"})),new Runtime.Web.RouteList(ctx, Runtime.Dict.from({"name":"Bayrell.TimePlanner.Admin.AdminProjects"})),new Runtime.Web.RouteList(ctx, Runtime.Dict.from({"name":"Bayrell.TimePlanner.Tasks.TasksPage"})),new Runtime.Web.RouteList(ctx, Runtime.Dict.from({"name":"Bayrell.TimePlanner.MainPage"}))]);
+		return Runtime.Collection.from([new Runtime.Core.Driver(ctx, Runtime.Dict.from({"name":"root-controller","value":"Runtime.Web.RenderController","params":Runtime.Dict.from({"selector":"#root","main_controller":true,"window":"RootController"})})),new Runtime.Core.LambdaChain(ctx, Runtime.Dict.from({"name":Runtime.Web.RenderDriver.LAYOUT_CHAIN,"pos":10,"value":"Bayrell.TimePlanner.Routes::layoutChain"})),new Runtime.Core.LambdaChain(ctx, Runtime.Dict.from({"name":Runtime.Web.RenderDriver.RENDER_CHAIN,"value":"Bayrell.TimePlanner.Routes::Page404","pos":Runtime.Web.RenderDriver.RENDER_CHAIN_CALL_PAGE_NOT_FOUND,"is_async":true})),new Runtime.Core.LambdaChain(ctx, Runtime.Dict.from({"name":Runtime.Web.RenderDriver.TITLE_CHAIN,"value":"Bayrell.TimePlanner.Routes::titleChain"})),new Runtime.Web.RouteList(ctx, Runtime.Dict.from({"name":"Bayrell.TimePlanner.Admin.AdminInfo"})),new Runtime.Web.RouteList(ctx, Runtime.Dict.from({"name":"Bayrell.TimePlanner.Admin.AdminProjects"})),new Runtime.Web.RouteList(ctx, Runtime.Dict.from({"name":"Bayrell.TimePlanner.Tasks.TasksPage"})),new Runtime.Web.RouteList(ctx, Runtime.Dict.from({"name":"Bayrell.TimePlanner.MainPage"}))]);
 	},
 	/**
 	 * Returns context settings
@@ -2157,7 +2488,8 @@ Object.assign(Bayrell.TimePlanner.ModuleDescription,
 	 */
 	appStart: async function(ctx, c)
 	{
-		return Promise.resolve(await c.constructor.start(ctx, c));
+		c = await c.constructor.start(ctx, c);
+		return Promise.resolve(c);
 	},
 	/**
 	 * Run app

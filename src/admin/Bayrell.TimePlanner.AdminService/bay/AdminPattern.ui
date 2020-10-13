@@ -17,32 +17,32 @@
 -->
 
 <class version="1.0"
-	name="Bayrell.TimePlanner.Pattern" extends="Runtime.Web.Component" 
+	name="Bayrell.TimePlanner.Admin.AdminPattern" extends="Runtime.Web.Component" 
 	module="Runtime.Web.Backend" model="Runtime.Web.LayoutModel"
 >
 
 <use name="Runtime.Web.RenderDriver" />
 
-<template name="render" args="RenderContainer container, LayoutModel layout, Dict params, var content">
+<template name="render" args="RenderContainer container, LayoutModel model, Dict params, var content">
 <html>
 <head>
-<title>{ RenderDriver::chainTitle(layout, layout.title) }</title>
+<title>{ model.title }</title>
 <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon" />
-<link rel='stylesheet' href={ layout.route_prefix ~ "/core.css?_=" ~ layout.f_inc } />
-<style id='root_style'>@raw{ rs::spaceless( RenderDriver::getLayoutCSS(layout) ) }</style>
+<link rel='stylesheet' href={ model.route_prefix ~ "/core.css?_=" ~ model.f_inc } />
+<style id='root_style'>@raw{ rs::spaceless( RenderDriver::getLayoutCSS(model) ) }</style>
 </head>
 <body>
 
-%var string model_encoded = rs::base64_encode_url(rtl::json_encode(layout));
-%var string frontend_storage = rs::base64_encode_url(rtl::json_encode(layout.frontend_storage));
+%var string model_encoded = rs::base64_encode_url(rtl::json_encode(model));
+%var string frontend_storage = rs::base64_encode_url(rtl::json_encode(container.frontend_storage));
 
 <div id='root'>{ content }</div>
 <input id='root_model' type='hidden' value={ model_encoded } />
 <input id='frontend_storage' type='hidden' value={ frontend_storage } />
 
-<script src={ layout.route_prefix ~ "/assets/runtime.js?_=" ~ layout.f_inc }></script>
-<script src={ layout.route_prefix ~ "/assets/components.js?_=" ~ layout.f_inc }></script>
-<script src={ layout.route_prefix ~ "/app.js?_=" ~ layout.f_inc }></script>
+<script src={ model.route_prefix ~ "/assets/runtime.js?_=" ~ model.f_inc }></script>
+<script src={ model.route_prefix ~ "/assets/components.js?_=" ~ model.f_inc }></script>
+<script src={ model.route_prefix ~ "/app.js?_=" ~ model.f_inc }></script>
 
 <script>
 runWebApp(@json{ @.main_module }, @json{ container.frontend_env });

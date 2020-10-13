@@ -60,46 +60,9 @@ static class Helper
 		/* Set auth token */
 		container <= layout <= tz <= "GMT+6";
 		container <= layout <= keep_data <= { classof AuthToken } <= token;
-		container <= backend_storage <= { classof AuthToken } <= token;
-		
-		/* Find layer id */
-		string uid = @.env("X-LAYER-UID", "");
-		
-		/* Find item */
-		Layer item = Layer::select()
-			|> .filter([
-				["layer_uid", "=", uid]
-			])
-			|> await .one()
-		;
-		if (item == null)
-		{
-			item = Layer::save
-			{
-				"layer_uid": uid,
-			}
-		}
-		
-		container <= backend_storage <= "X-LAYER-ID" <= item["layer_id"];
-		container <= backend_storage <= "X-LAYER-UID" <= uid;
+		container <= api_storage <= { classof AuthToken } <= token;
 		
 		return [ container ];
-	}
-	
-	
-	
-	/**
-	 * Api routes storage chain
-	 */
-	static async list apiExternalBusPrepareChain(RemoteCallRequest request, RenderContainer container = null)
-	{
-		/* Add layer id */
-		if (container != null)
-		{
-			request <= storage <= "X-LAYER-ID" <= container["backend_storage", "X-LAYER-ID"];
-			request <= storage <= "X-LAYER-UID" <= container["backend_storage", "X-LAYER-UID"];
-		}
-		return [ request, container ];
 	}
 	
 	

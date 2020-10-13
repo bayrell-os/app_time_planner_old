@@ -6,6 +6,7 @@
 		"Admin/AdminProjects",
 		"Tasks/TaskForm",
 		"Tasks/TasksPage",
+		"Tasks/TasksPageModel",
 		"AdminLayout",
 		"DefaultLayout",
 		"MainPage",

@@ -79,7 +79,7 @@ static class AdminProjectCrud extends CrudApi
 	 */
 	Collection<list> extendSearchFilter(Collection<list> filter)
 	{
-		int layer_id = this.request.storage["X-LAYER-ID"];
+		int layer_id = @.env("X-LAYER-ID");
 		filter = filter.prependIm(["layer_id", "=", layer_id]);
 		return filter;
 	}
@@ -91,7 +91,7 @@ static class AdminProjectCrud extends CrudApi
 	 */
 	async Dict convertItem(Dict item)
 	{
-		int layer_id = this.request.storage["X-LAYER-ID"];
+		int layer_id = @.env("X-LAYER-ID");
 		item = await parent::convertItem(item);
 		item <= layer_id <= layer_id;
 		return item;
