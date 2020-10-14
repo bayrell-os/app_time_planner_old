@@ -37,3 +37,9 @@
 [submodule "src/lib/jQuery"]
 	path = src/lib/jQuery
 	url = https://github.com/bayrell/jQuery
+[submodule "src/lib/Runtime.Components.jQuery"]
+	path = src/lib/Runtime.Components.jQuery
+	url = https://github.com/bayrell/Runtime.Components.jQuery
+[submodule "src/lib/Runtime.Components.AirDatepicker"]
+	path = src/lib/Runtime.Components.AirDatepicker
+	url = https://github.com/bayrell/Runtime.Components.AirDatepicker

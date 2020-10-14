@@ -75,9 +75,9 @@
 <script type="frontend">
 
 /**
- * Update component
+ * Render component
  */
-public void updateComponent(bool created)
+public void onRender(bool created)
 {
 	var plan_cost = this.model(["item", "plan_cost"]);
 	if (plan_cost == null)

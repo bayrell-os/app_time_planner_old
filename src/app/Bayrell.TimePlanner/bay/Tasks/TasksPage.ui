@@ -32,6 +32,7 @@
 <use name="Runtime.Web.RouteList" />
 <use name="Runtime.Web.RouteMiddleware" />
 <use name="Runtime.Web.Events.MouseClickEvent" />
+<use name="Runtime.Components.AirDatepicker.DatePicker" component="true" />
 <use name="Runtime.Web.CRUD.CrudPageModel" />
 <use name="Runtime.Web.CRUD.FieldInfo" />
 <use name="Runtime.Web.CRUD.Form" />
@@ -41,7 +42,6 @@
 <use name="Runtime.Web.CRUD.Table" component="true" />
 <use name="Runtime.Web.CRUD.TableModel" />
 <use name="Runtime.Web.Input.Button" component="true" />
-<use name="Runtime.Web.Input.DatePicker" component="true" />
 <use name="Runtime.Web.Input.Input" component="true" />
 <use name="Runtime.Web.Input.Label" component="true" />
 <use name="Runtime.Web.Input.Select" component="true" />
@@ -222,6 +222,13 @@ pure Collection<FieldInfo> getStruct(LayoutModel layout, CrudPageModel model, Di
 			"table":
 			{
 				"class_name": classof Label,
+				"render": html (LayoutModel layout, var value, Dict settings)
+				{
+					Dict item = settings["crud_item"];
+					return <a href={ layout.route_prefix ~ Route::replace("/tasks/{task_id}/", { "task_id": item["task_id"] }) }>
+						{ value }
+					</a>;
+				}
 			},
 			"view":
 			{
@@ -386,9 +393,15 @@ pure Collection<FieldInfo> getStruct(LayoutModel layout, CrudPageModel model, Di
 		"api_name": "edit-buttons",
 		"label": "",
 		"class_name": classof Label,
+		"info":
+		{
+			"table":
+			{
+				"width": "120px",
+			},
+		},
 		"render": html (LayoutModel layout, var value, Dict settings) =>
 		[
-			static::renderButton(layout, settings, "view", { "url": "/tasks/{task_id}/" }),
 			static::renderButton(layout, settings, "edit"),
 			static::renderButton(layout, settings, "delete"),
 		],
@@ -498,11 +511,6 @@ pure Dict getFormSettings(LayoutModel layout, CrudPageModel model, Dict params) 
 
 
 <style>
-.view_left, .view_right{
-	display: inline-block;
-	vertical-align: top;
-	width: 50%;
-}
 .view_subtasks{
 	padding-top: 20px;
 }
@@ -513,6 +521,9 @@ pure Dict getFormSettings(LayoutModel layout, CrudPageModel model, Dict params) 
 	margin-left: 0px;
 	font-weight: bold;
 }
+.view_comments{
+	padding-top: 20px;
+}
 </style>
 
 
@@ -521,7 +532,7 @@ pure Dict getFormSettings(LayoutModel layout, CrudPageModel model, Dict params) 
 	%var Collection<FieldInfo> struct = static::getStruct(layout, model, params);
 	%var Collection<string> form_fields = static::getFormFields(layout, model, params);
 	%var Collection<string> table_fields = static::getTableFields(layout, model, params);
-	
+	<!--
 	%var table_fields =
 	[
 		"task_id",
@@ -532,26 +543,23 @@ pure Dict getFormSettings(LayoutModel layout, CrudPageModel model, Dict params) 
 		"plan_cost_hours",
 		"edit-buttons"
 	];
+	-->
+	%render parent::renderView(layout, model, params);
 	
-	<div class='view_left'>
-		%render parent::renderView(layout, model, params);
-		
-		<div class='view_subtasks'>
-			<div class='view_subtasks_label'>
-				<span>Subtasks</span>
-				<Button type='small primary' @event:MouseClickEvent="onAddSubTask" @key="edit"
-				>
-					{ _("Bayrell.TimePlanner", "Add subtask") }
-				</Button>
-			</div>
-			<div class='view_subtasks_items'>
-				<Table @name="table" struct={ struct } fields={ table_fields } />
-			</div>
+	<div class='view_subtasks'>
+		<div class='view_subtasks_label'>
+			<span>Subtasks</span>
+			<Button type='small primary' @event:MouseClickEvent="onAddSubTask" @key="edit"
+			>
+				{ _("Bayrell.TimePlanner", "Add subtask") }
+			</Button>
 		</div>
-		
+		<div class='view_subtasks_items'>
+			<Table @name="table" struct={ struct } fields={ table_fields } />
+		</div>
 	</div>
 	
-	<div class='view_right'>
+	<div class='view_comments'>
 		<b>Comments</b>
 		<div style='padding-top: 20px;'>
 			In develop ...

@@ -5,17 +5,18 @@
 	"bundles":
 	[
 		{
+			"name": "runtime",
 			"dest": "assets/runtime.js",
 			"lang": "es6",
 			"modules":
 			[
 				"Runtime",
 				"Runtime.Core",
-				"Runtime.Web",
-				"@jQuery/jquery-3.5.1.min.js"
+				"Runtime.Web"
 			]
 		},
 		{
+			"name": "components",
 			"dest": "assets/components.js",
 			"lang": "es6",
 			"modules":
@@ -25,10 +26,23 @@
 				"Runtime.Web.Form",
 				"Runtime.Web.Input",
 				"Runtime.Web.Table",
-				"Runtime.Web.CRUD"
+				"Runtime.Web.CRUD",
+				"Runtime.Components.jQuery",
+				"Runtime.Components.AirDatepicker"
 			]
 		},
 		{
+			"name": "core.css",
+			"dest": "assets/core.css",
+			"lang": "css",
+			"modules":
+			[
+				"Runtime.Web",
+				"Runtime.Components.AirDatepicker"
+			]
+		},
+		{
+			"name": "app",
 			"dest": "html/app.js",
 			"lang": "es6",
 			"modules":
@@ -38,6 +52,7 @@
 			"websocket": true
 		},
 		{
+			"name": "html_admin_layout",
 			"dest": "html_admin_layout/app.js",
 			"lang": "es6",
 			"modules":
@@ -47,6 +62,7 @@
 			"websocket": true
 		},
 		{
+			"name": "html_admin_service",
 			"dest": "html_admin_service/app.js",
 			"lang": "es6",
 			"modules":
