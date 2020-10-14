@@ -34,9 +34,6 @@
 [submodule "src/lib/Runtime.Web.Input"]
 	path = src/lib/Runtime.Web.Input
 	url = https://github.com/bayrell/Runtime.Web.Input
-[submodule "src/lib/jQuery"]
-	path = src/lib/jQuery
-	url = https://github.com/bayrell/jQuery
 [submodule "src/lib/Runtime.Components.jQuery"]
 	path = src/lib/Runtime.Components.jQuery
 	url = https://github.com/bayrell/Runtime.Components.jQuery
