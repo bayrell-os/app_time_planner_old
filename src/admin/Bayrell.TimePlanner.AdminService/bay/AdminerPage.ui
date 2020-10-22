@@ -17,8 +17,8 @@
 -->
 
 <class version="1.0"
-	name="Bayrell.TimePlanner.Admin.AdminerPage" extends="Runtime.Web.Component" 
-	module="Bayrell.TimePlanner.Admin" model="Runtime.Dict"
+	name="Bayrell.TimePlanner.AdminService.AdminerPage" extends="Runtime.Web.Component" 
+	module="Bayrell.TimePlanner.AdminService" model="Runtime.Dict"
 >
 
 

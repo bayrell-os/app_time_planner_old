@@ -52,16 +52,6 @@
 			"websocket": true
 		},
 		{
-			"name": "html_admin_layout",
-			"dest": "html_admin_layout/app.js",
-			"lang": "es6",
-			"modules":
-			[
-				"Bayrell.TimePlanner.AdminLayout"
-			],
-			"websocket": true
-		},
-		{
 			"name": "html_admin_service",
 			"dest": "html_admin_service/app.js",
 			"lang": "es6",

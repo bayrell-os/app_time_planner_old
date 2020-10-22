@@ -17,7 +17,7 @@
 -->
 
 <class version="1.0"
-	name="Bayrell.TimePlanner.Admin.AdminPattern" extends="Runtime.Web.Component" 
+	name="Bayrell.TimePlanner.AdminService.AdminPattern" extends="Runtime.Web.Component" 
 	module="Runtime.Web.Backend" model="Runtime.Web.LayoutModel"
 >
 
@@ -28,7 +28,7 @@
 <head>
 <title>{ model.title }</title>
 <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon" />
-<link rel='stylesheet' href={ model.route_prefix ~ "/core.css?_=" ~ model.f_inc } />
+<link rel='stylesheet' href={ model.route_prefix ~ "/assets/core.css?_=" ~ model.f_inc } />
 <style id='root_style'>@raw{ rs::spaceless( RenderDriver::getLayoutCSS(model) ) }</style>
 </head>
 <body>

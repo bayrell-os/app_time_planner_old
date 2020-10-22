@@ -1,17 +1,6 @@
 <?php
 
-global $ENV;
-
 $env = getenv();
-
-/* Set empty layer id */
-$env["X-LAYER-ID"] = "";
-
-/* Merge enviroments */
-if (isset($ENV) && gettype($ENV) == "array")
-{
-	$env = array_merge($env, $ENV);
-}
 
 /* App mode */
 if (!isset($env["APP_MODE"])) $env["APP_MODE"] = "dev";
@@ -26,8 +15,10 @@ if (!isset($env["X-ROUTE-PREFIX"]))
 if (!isset($env["X-LAYER-UID"])) 
 	$env["X-LAYER-UID"] = isset($_SERVER["HTTP_X_LAYER_UID"]) ? $_SERVER["HTTP_X_LAYER_UID"] : "";
 
+if (!isset($env["X-SPACE-UID"])) 
+	$env["X-SPACE-ID"] = isset($_SERVER["HTTP_X_SPACE_ID"]) ? $_SERVER["HTTP_X_SPACE_ID"] : "";
+
 /* Set auth params */
-if (!isset($env["AUTH_PRIVATE_KEY"])) $env["AUTH_PRIVATE_KEY"] = file_get_contents("/run/secrets/AUTH_PRIVATE_KEY");
 if (!isset($env["AUTH_PUBLIC_KEY"])) $env["AUTH_PUBLIC_KEY"] = file_get_contents("/run/secrets/AUTH_PUBLIC_KEY");
 
 return $env;

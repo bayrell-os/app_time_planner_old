@@ -16,7 +16,7 @@
  *  limitations under the License.
  */
 
-namespace Bayrell.TimePlanner.Admin;
+namespace Bayrell.TimePlanner.AdminService;
 
 use Runtime.Core.Context;
 use Runtime.Core.Driver;
@@ -31,7 +31,7 @@ use Runtime.Web.RenderDriver;
 use Runtime.Web.Route;
 use Runtime.Web.RouteController;
 use Runtime.Web.RouteList;
-use Bayrell.TimePlanner.Admin.Routes;
+use Bayrell.TimePlanner.AdminService.Routes;
 
 
 static class ModuleDescription
@@ -42,7 +42,7 @@ static class ModuleDescription
 	 * Returns module name
 	 * @return string
 	 */
-	pure string getModuleName() => "Bayrell.TimePlanner.Admin";
+	pure string getModuleName() => "Bayrell.TimePlanner.AdminService";
 	
 	
 	
@@ -94,14 +94,14 @@ static class ModuleDescription
 		{
 			"name": RenderDriver::LAYOUT_CHAIN,
 			"pos": 10,
-			"value": "Bayrell.TimePlanner.Admin.Routes::layoutChain",
+			"value": "Bayrell.TimePlanner.AdminService.Routes::layoutChain",
 		},
 		
 		/* Render Chain. Page not found */
 		new LambdaChain
 		{
 			"name": RenderDriver::RENDER_CHAIN,
-			"value": "Bayrell.TimePlanner.Admin.Routes::Page404",
+			"value": "Bayrell.TimePlanner.AdminService.Routes::Page404",
 			"pos": RenderDriver::RENDER_CHAIN_CALL_PAGE_NOT_FOUND,
 			"is_async": true,
 		},
@@ -110,14 +110,14 @@ static class ModuleDescription
 		new LambdaChain
 		{
 			"name": RenderDriver::RENDER_CHAIN,
-			"value": "Bayrell.TimePlanner.Admin.Routes::renderChainRouteAfter",
+			"value": "Bayrell.TimePlanner.AdminService.Routes::renderChainRouteAfter",
 			"pos": RenderDriver::RENDER_CHAIN_CALL_ROUTE_AFTER,
 			"is_async": true,
 		},
 		
 		/* Register routes */
 		new Entity{ "name": classof Routes },
-		new RouteList{ "name": "Bayrell.TimePlanner.Admin.MainPage" },
+		new RouteList{ "name": "Bayrell.TimePlanner.AdminService.MainPage" },
 		
 		
 		#ifdef BACKEND then
@@ -126,7 +126,7 @@ static class ModuleDescription
 		new LambdaChain
 		{
 			"name": RenderDriver::RENDER_CHAIN,
-			"value": "Bayrell.TimePlanner.Admin.Routes::renderChainPatternDefault",
+			"value": "Bayrell.TimePlanner.AdminService.Routes::renderChainPatternDefault",
 			"pos": RenderDriver::RENDER_CHAIN_RESPONSE_BEFORE,
 		},
 		

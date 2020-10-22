@@ -18,14 +18,14 @@
 */
 if (typeof Bayrell == 'undefined') Bayrell = {};
 if (typeof Bayrell.TimePlanner == 'undefined') Bayrell.TimePlanner = {};
-if (typeof Bayrell.TimePlanner.Admin == 'undefined') Bayrell.TimePlanner.Admin = {};
-Bayrell.TimePlanner.Admin.AdminerPage = function(ctx)
+if (typeof Bayrell.TimePlanner.AdminService == 'undefined') Bayrell.TimePlanner.AdminService = {};
+Bayrell.TimePlanner.AdminService.AdminerPage = function(ctx)
 {
 	Runtime.Web.Component.apply(this, arguments);
 };
-Bayrell.TimePlanner.Admin.AdminerPage.prototype = Object.create(Runtime.Web.Component.prototype);
-Bayrell.TimePlanner.Admin.AdminerPage.prototype.constructor = Bayrell.TimePlanner.Admin.AdminerPage;
-Object.assign(Bayrell.TimePlanner.Admin.AdminerPage.prototype,
+Bayrell.TimePlanner.AdminService.AdminerPage.prototype = Object.create(Runtime.Web.Component.prototype);
+Bayrell.TimePlanner.AdminService.AdminerPage.prototype.constructor = Bayrell.TimePlanner.AdminService.AdminerPage;
+Object.assign(Bayrell.TimePlanner.AdminService.AdminerPage.prototype,
 {
 	/**
  * On component created
@@ -36,7 +36,7 @@ Object.assign(Bayrell.TimePlanner.Admin.AdminerPage.prototype,
 	},
 	assignObject: function(ctx,o)
 	{
-		if (o instanceof Bayrell.TimePlanner.Admin.AdminerPage)
+		if (o instanceof Bayrell.TimePlanner.AdminService.AdminerPage)
 		{
 		}
 		Runtime.Web.Component.prototype.assignObject.call(this,ctx,o);
@@ -52,11 +52,11 @@ Object.assign(Bayrell.TimePlanner.Admin.AdminerPage.prototype,
 	},
 	getClassName: function(ctx)
 	{
-		return "Bayrell.TimePlanner.Admin.AdminerPage";
+		return "Bayrell.TimePlanner.AdminService.AdminerPage";
 	},
 });
-Object.assign(Bayrell.TimePlanner.Admin.AdminerPage, Runtime.Web.Component);
-Object.assign(Bayrell.TimePlanner.Admin.AdminerPage,
+Object.assign(Bayrell.TimePlanner.AdminService.AdminerPage, Runtime.Web.Component);
+Object.assign(Bayrell.TimePlanner.AdminService.AdminerPage,
 {
 	render: function(ctx, layout, model, params, content)
 	{
@@ -94,11 +94,11 @@ Object.assign(Bayrell.TimePlanner.Admin.AdminerPage,
 	/* ======================= Class Init Functions ======================= */
 	getCurrentNamespace: function()
 	{
-		return "Bayrell.TimePlanner.Admin";
+		return "Bayrell.TimePlanner.AdminService";
 	},
 	getCurrentClassName: function()
 	{
-		return "Bayrell.TimePlanner.Admin.AdminerPage";
+		return "Bayrell.TimePlanner.AdminService.AdminerPage";
 	},
 	getParentClassName: function()
 	{
@@ -111,8 +111,8 @@ Object.assign(Bayrell.TimePlanner.Admin.AdminerPage,
 		var IntrospectionInfo = Runtime.IntrospectionInfo;
 		return new IntrospectionInfo(ctx, {
 			"kind": IntrospectionInfo.ITEM_CLASS,
-			"class_name": "Bayrell.TimePlanner.Admin.AdminerPage",
-			"name": "Bayrell.TimePlanner.Admin.AdminerPage",
+			"class_name": "Bayrell.TimePlanner.AdminService.AdminerPage",
+			"name": "Bayrell.TimePlanner.AdminService.AdminerPage",
 			"annotations": Collection.from([
 			]),
 		});
@@ -141,9 +141,9 @@ Object.assign(Bayrell.TimePlanner.Admin.AdminerPage,
 		return null;
 	},
 });
-Runtime.rtl.defClass(Bayrell.TimePlanner.Admin.AdminerPage);
-window["Bayrell.TimePlanner.Admin.AdminerPage"] = Bayrell.TimePlanner.Admin.AdminerPage;
-if (typeof module != "undefined" && typeof module.exports != "undefined") module.exports = Bayrell.TimePlanner.Admin.AdminerPage;
+Runtime.rtl.defClass(Bayrell.TimePlanner.AdminService.AdminerPage);
+window["Bayrell.TimePlanner.AdminService.AdminerPage"] = Bayrell.TimePlanner.AdminService.AdminerPage;
+if (typeof module != "undefined" && typeof module.exports != "undefined") module.exports = Bayrell.TimePlanner.AdminService.AdminerPage;
 "use strict;"
 /*
  *  Bayrell Time Planner
@@ -164,18 +164,18 @@ if (typeof module != "undefined" && typeof module.exports != "undefined") module
 */
 if (typeof Bayrell == 'undefined') Bayrell = {};
 if (typeof Bayrell.TimePlanner == 'undefined') Bayrell.TimePlanner = {};
-if (typeof Bayrell.TimePlanner.Admin == 'undefined') Bayrell.TimePlanner.Admin = {};
-Bayrell.TimePlanner.Admin.AdminLayout = function(ctx)
+if (typeof Bayrell.TimePlanner.AdminService == 'undefined') Bayrell.TimePlanner.AdminService = {};
+Bayrell.TimePlanner.AdminService.AdminLayout = function(ctx)
 {
 	Runtime.Web.Component.apply(this, arguments);
 };
-Bayrell.TimePlanner.Admin.AdminLayout.prototype = Object.create(Runtime.Web.Component.prototype);
-Bayrell.TimePlanner.Admin.AdminLayout.prototype.constructor = Bayrell.TimePlanner.Admin.AdminLayout;
-Object.assign(Bayrell.TimePlanner.Admin.AdminLayout.prototype,
+Bayrell.TimePlanner.AdminService.AdminLayout.prototype = Object.create(Runtime.Web.Component.prototype);
+Bayrell.TimePlanner.AdminService.AdminLayout.prototype.constructor = Bayrell.TimePlanner.AdminService.AdminLayout;
+Object.assign(Bayrell.TimePlanner.AdminService.AdminLayout.prototype,
 {
 	assignObject: function(ctx,o)
 	{
-		if (o instanceof Bayrell.TimePlanner.Admin.AdminLayout)
+		if (o instanceof Bayrell.TimePlanner.AdminService.AdminLayout)
 		{
 		}
 		Runtime.Web.Component.prototype.assignObject.call(this,ctx,o);
@@ -191,11 +191,11 @@ Object.assign(Bayrell.TimePlanner.Admin.AdminLayout.prototype,
 	},
 	getClassName: function(ctx)
 	{
-		return "Bayrell.TimePlanner.Admin.AdminLayout";
+		return "Bayrell.TimePlanner.AdminService.AdminLayout";
 	},
 });
-Object.assign(Bayrell.TimePlanner.Admin.AdminLayout, Runtime.Web.Component);
-Object.assign(Bayrell.TimePlanner.Admin.AdminLayout,
+Object.assign(Bayrell.TimePlanner.AdminService.AdminLayout, Runtime.Web.Component);
+Object.assign(Bayrell.TimePlanner.AdminService.AdminLayout,
 {
 	css: function(ctx, vars)
 	{
@@ -211,7 +211,7 @@ Object.assign(Bayrell.TimePlanner.Admin.AdminLayout,
 			
 			if (!Runtime.rtl.isEmpty(ctx, class_name))
 			{
-				[__vnull, __control_childs] = RenderDriver.e(__control, __control_childs, "component", {"name": class_name,"attrs": {"@bind":["Bayrell.TimePlanner.Admin.AdminLayout","page_model"],"@key":"view"}, "layout": layout});
+				[__vnull, __control_childs] = RenderDriver.e(__control, __control_childs, "component", {"name": class_name,"attrs": {"@bind":["Bayrell.TimePlanner.AdminService.AdminLayout","page_model"],"@key":"view"}, "layout": layout});
 			}
 			
 			return __control_childs;
@@ -224,11 +224,11 @@ Object.assign(Bayrell.TimePlanner.Admin.AdminLayout,
 	/* ======================= Class Init Functions ======================= */
 	getCurrentNamespace: function()
 	{
-		return "Bayrell.TimePlanner.Admin";
+		return "Bayrell.TimePlanner.AdminService";
 	},
 	getCurrentClassName: function()
 	{
-		return "Bayrell.TimePlanner.Admin.AdminLayout";
+		return "Bayrell.TimePlanner.AdminService.AdminLayout";
 	},
 	getParentClassName: function()
 	{
@@ -241,8 +241,8 @@ Object.assign(Bayrell.TimePlanner.Admin.AdminLayout,
 		var IntrospectionInfo = Runtime.IntrospectionInfo;
 		return new IntrospectionInfo(ctx, {
 			"kind": IntrospectionInfo.ITEM_CLASS,
-			"class_name": "Bayrell.TimePlanner.Admin.AdminLayout",
-			"name": "Bayrell.TimePlanner.Admin.AdminLayout",
+			"class_name": "Bayrell.TimePlanner.AdminService.AdminLayout",
+			"name": "Bayrell.TimePlanner.AdminService.AdminLayout",
 			"annotations": Collection.from([
 			]),
 		});
@@ -271,9 +271,9 @@ Object.assign(Bayrell.TimePlanner.Admin.AdminLayout,
 		return null;
 	},
 });
-Runtime.rtl.defClass(Bayrell.TimePlanner.Admin.AdminLayout);
-window["Bayrell.TimePlanner.Admin.AdminLayout"] = Bayrell.TimePlanner.Admin.AdminLayout;
-if (typeof module != "undefined" && typeof module.exports != "undefined") module.exports = Bayrell.TimePlanner.Admin.AdminLayout;
+Runtime.rtl.defClass(Bayrell.TimePlanner.AdminService.AdminLayout);
+window["Bayrell.TimePlanner.AdminService.AdminLayout"] = Bayrell.TimePlanner.AdminService.AdminLayout;
+if (typeof module != "undefined" && typeof module.exports != "undefined") module.exports = Bayrell.TimePlanner.AdminService.AdminLayout;
 "use strict;"
 /*
  *  Bayrell Time Planner
@@ -294,18 +294,18 @@ if (typeof module != "undefined" && typeof module.exports != "undefined") module
 */
 if (typeof Bayrell == 'undefined') Bayrell = {};
 if (typeof Bayrell.TimePlanner == 'undefined') Bayrell.TimePlanner = {};
-if (typeof Bayrell.TimePlanner.Admin == 'undefined') Bayrell.TimePlanner.Admin = {};
-Bayrell.TimePlanner.Admin.AdminPattern = function(ctx)
+if (typeof Bayrell.TimePlanner.AdminService == 'undefined') Bayrell.TimePlanner.AdminService = {};
+Bayrell.TimePlanner.AdminService.AdminPattern = function(ctx)
 {
 	Runtime.Web.Component.apply(this, arguments);
 };
-Bayrell.TimePlanner.Admin.AdminPattern.prototype = Object.create(Runtime.Web.Component.prototype);
-Bayrell.TimePlanner.Admin.AdminPattern.prototype.constructor = Bayrell.TimePlanner.Admin.AdminPattern;
-Object.assign(Bayrell.TimePlanner.Admin.AdminPattern.prototype,
+Bayrell.TimePlanner.AdminService.AdminPattern.prototype = Object.create(Runtime.Web.Component.prototype);
+Bayrell.TimePlanner.AdminService.AdminPattern.prototype.constructor = Bayrell.TimePlanner.AdminService.AdminPattern;
+Object.assign(Bayrell.TimePlanner.AdminService.AdminPattern.prototype,
 {
 	assignObject: function(ctx,o)
 	{
-		if (o instanceof Bayrell.TimePlanner.Admin.AdminPattern)
+		if (o instanceof Bayrell.TimePlanner.AdminService.AdminPattern)
 		{
 		}
 		Runtime.Web.Component.prototype.assignObject.call(this,ctx,o);
@@ -321,11 +321,11 @@ Object.assign(Bayrell.TimePlanner.Admin.AdminPattern.prototype,
 	},
 	getClassName: function(ctx)
 	{
-		return "Bayrell.TimePlanner.Admin.AdminPattern";
+		return "Bayrell.TimePlanner.AdminService.AdminPattern";
 	},
 });
-Object.assign(Bayrell.TimePlanner.Admin.AdminPattern, Runtime.Web.Component);
-Object.assign(Bayrell.TimePlanner.Admin.AdminPattern,
+Object.assign(Bayrell.TimePlanner.AdminService.AdminPattern, Runtime.Web.Component);
+Object.assign(Bayrell.TimePlanner.AdminService.AdminPattern,
 {
 	render: function(ctx, container, model, params, content)
 	{
@@ -352,7 +352,7 @@ Object.assign(Bayrell.TimePlanner.Admin.AdminPattern,
 			
 			[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "element", {"name": "link","attrs": {"rel":"shortcut icon","href":"data:image/x-icon;,","type":"image/x-icon"}});
 			
-			[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "element", {"name": "link","attrs": {"rel":"stylesheet","href":model.route_prefix + Runtime.rtl.toStr("/core.css?_=") + Runtime.rtl.toStr(model.f_inc)}});
+			[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "element", {"name": "link","attrs": {"rel":"stylesheet","href":model.route_prefix + Runtime.rtl.toStr("/assets/core.css?_=") + Runtime.rtl.toStr(model.f_inc)}});
 			
 			/* Element 'style' */
 			var __v2; var __v2_childs = [];
@@ -417,11 +417,11 @@ Object.assign(Bayrell.TimePlanner.Admin.AdminPattern,
 	/* ======================= Class Init Functions ======================= */
 	getCurrentNamespace: function()
 	{
-		return "Bayrell.TimePlanner.Admin";
+		return "Bayrell.TimePlanner.AdminService";
 	},
 	getCurrentClassName: function()
 	{
-		return "Bayrell.TimePlanner.Admin.AdminPattern";
+		return "Bayrell.TimePlanner.AdminService.AdminPattern";
 	},
 	getParentClassName: function()
 	{
@@ -434,8 +434,8 @@ Object.assign(Bayrell.TimePlanner.Admin.AdminPattern,
 		var IntrospectionInfo = Runtime.IntrospectionInfo;
 		return new IntrospectionInfo(ctx, {
 			"kind": IntrospectionInfo.ITEM_CLASS,
-			"class_name": "Bayrell.TimePlanner.Admin.AdminPattern",
-			"name": "Bayrell.TimePlanner.Admin.AdminPattern",
+			"class_name": "Bayrell.TimePlanner.AdminService.AdminPattern",
+			"name": "Bayrell.TimePlanner.AdminService.AdminPattern",
 			"annotations": Collection.from([
 			]),
 		});
@@ -464,9 +464,9 @@ Object.assign(Bayrell.TimePlanner.Admin.AdminPattern,
 		return null;
 	},
 });
-Runtime.rtl.defClass(Bayrell.TimePlanner.Admin.AdminPattern);
-window["Bayrell.TimePlanner.Admin.AdminPattern"] = Bayrell.TimePlanner.Admin.AdminPattern;
-if (typeof module != "undefined" && typeof module.exports != "undefined") module.exports = Bayrell.TimePlanner.Admin.AdminPattern;
+Runtime.rtl.defClass(Bayrell.TimePlanner.AdminService.AdminPattern);
+window["Bayrell.TimePlanner.AdminService.AdminPattern"] = Bayrell.TimePlanner.AdminService.AdminPattern;
+if (typeof module != "undefined" && typeof module.exports != "undefined") module.exports = Bayrell.TimePlanner.AdminService.AdminPattern;
 "use strict;"
 /*
  *  Bayrell Time Planner
@@ -487,18 +487,18 @@ if (typeof module != "undefined" && typeof module.exports != "undefined") module
 */
 if (typeof Bayrell == 'undefined') Bayrell = {};
 if (typeof Bayrell.TimePlanner == 'undefined') Bayrell.TimePlanner = {};
-if (typeof Bayrell.TimePlanner.Admin == 'undefined') Bayrell.TimePlanner.Admin = {};
-Bayrell.TimePlanner.Admin.MainPage = function(ctx)
+if (typeof Bayrell.TimePlanner.AdminService == 'undefined') Bayrell.TimePlanner.AdminService = {};
+Bayrell.TimePlanner.AdminService.MainPage = function(ctx)
 {
 	Runtime.Web.Component.apply(this, arguments);
 };
-Bayrell.TimePlanner.Admin.MainPage.prototype = Object.create(Runtime.Web.Component.prototype);
-Bayrell.TimePlanner.Admin.MainPage.prototype.constructor = Bayrell.TimePlanner.Admin.MainPage;
-Object.assign(Bayrell.TimePlanner.Admin.MainPage.prototype,
+Bayrell.TimePlanner.AdminService.MainPage.prototype = Object.create(Runtime.Web.Component.prototype);
+Bayrell.TimePlanner.AdminService.MainPage.prototype.constructor = Bayrell.TimePlanner.AdminService.MainPage;
+Object.assign(Bayrell.TimePlanner.AdminService.MainPage.prototype,
 {
 	assignObject: function(ctx,o)
 	{
-		if (o instanceof Bayrell.TimePlanner.Admin.MainPage)
+		if (o instanceof Bayrell.TimePlanner.AdminService.MainPage)
 		{
 		}
 		Runtime.Web.Component.prototype.assignObject.call(this,ctx,o);
@@ -514,11 +514,11 @@ Object.assign(Bayrell.TimePlanner.Admin.MainPage.prototype,
 	},
 	getClassName: function(ctx)
 	{
-		return "Bayrell.TimePlanner.Admin.MainPage";
+		return "Bayrell.TimePlanner.AdminService.MainPage";
 	},
 });
-Object.assign(Bayrell.TimePlanner.Admin.MainPage, Runtime.Web.Component);
-Object.assign(Bayrell.TimePlanner.Admin.MainPage,
+Object.assign(Bayrell.TimePlanner.AdminService.MainPage, Runtime.Web.Component);
+Object.assign(Bayrell.TimePlanner.AdminService.MainPage,
 {
 	/**
  * Route Action
@@ -530,13 +530,13 @@ Object.assign(Bayrell.TimePlanner.Admin.MainPage,
 		container = Runtime.rtl.setAttr(ctx, container, Runtime.Collection.from(["layout", "title"]), "Index page");
 		container = Runtime.rtl.setAttr(ctx, container, Runtime.Collection.from(["layout", "layout_name"]), "admin");
 		/* Set model */
-		container = Runtime.rtl.setAttr(ctx, container, Runtime.Collection.from(["layout", "page_class"]), "Bayrell.TimePlanner.Admin.MainPage");
+		container = Runtime.rtl.setAttr(ctx, container, Runtime.Collection.from(["layout", "page_class"]), "Bayrell.TimePlanner.AdminService.MainPage");
 		container = Runtime.rtl.setAttr(ctx, container, Runtime.Collection.from(["layout", "page_model"]), new Runtime.Dict(ctx));
 		return Promise.resolve(Runtime.Collection.from([container]));
 	},
 	css: function(ctx, vars)
 	{
-		return ".content.h-d995{" + Runtime.rtl.toStr("padding: 20px;") + Runtime.rtl.toStr("}");
+		return ".content.h-912a{" + Runtime.rtl.toStr("padding: 20px;") + Runtime.rtl.toStr("}");
 	},
 	render: function(ctx, layout, model, params, content)
 	{
@@ -561,11 +561,23 @@ Object.assign(Bayrell.TimePlanner.Admin.MainPage,
 			
 			/* Element 'a.link' */
 			var __v1; var __v1_childs = [];
-			[__v1, __v0_childs] = RenderDriver.e(__v0, __v0_childs, "element", {"name": "a","attrs": {"href":layout.route_prefix + Runtime.rtl.toStr("/adminer/info/"),"target":"_self","class":["link", this.getCssHash(ctx)].join(" "),"@elem_name":"link"}});
+			[__v1, __v0_childs] = RenderDriver.e(__v0, __v0_childs, "element", {"name": "a","attrs": {"href":layout.route_prefix + Runtime.rtl.toStr("/info/"),"target":"_self","class":["link", this.getCssHash(ctx)].join(" "),"@elem_name":"link"}});
 			
 			/* Text */
 			[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "text", {"content": "PHP info"});
 			RenderDriver.p(__v1, __v1_childs);
+			
+			[__vnull, __v0_childs] = RenderDriver.e(__v0, __v0_childs, "element", {"name": "br","attrs": {}});
+			
+			/* Element 'a.link' */
+			var __v1; var __v1_childs = [];
+			[__v1, __v0_childs] = RenderDriver.e(__v0, __v0_childs, "element", {"name": "a","attrs": {"href":layout.route_prefix + Runtime.rtl.toStr("/env/"),"target":"_self","class":["link", this.getCssHash(ctx)].join(" "),"@elem_name":"link"}});
+			
+			/* Text */
+			[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "text", {"content": "Enviroments"});
+			RenderDriver.p(__v1, __v1_childs);
+			
+			[__vnull, __v0_childs] = RenderDriver.e(__v0, __v0_childs, "element", {"name": "br","attrs": {}});
 			RenderDriver.p(__v0, __v0_childs);
 			
 			return __control_childs;
@@ -574,11 +586,11 @@ Object.assign(Bayrell.TimePlanner.Admin.MainPage,
 	/* ======================= Class Init Functions ======================= */
 	getCurrentNamespace: function()
 	{
-		return "Bayrell.TimePlanner.Admin";
+		return "Bayrell.TimePlanner.AdminService";
 	},
 	getCurrentClassName: function()
 	{
-		return "Bayrell.TimePlanner.Admin.MainPage";
+		return "Bayrell.TimePlanner.AdminService.MainPage";
 	},
 	getParentClassName: function()
 	{
@@ -591,8 +603,8 @@ Object.assign(Bayrell.TimePlanner.Admin.MainPage,
 		var IntrospectionInfo = Runtime.IntrospectionInfo;
 		return new IntrospectionInfo(ctx, {
 			"kind": IntrospectionInfo.ITEM_CLASS,
-			"class_name": "Bayrell.TimePlanner.Admin.MainPage",
-			"name": "Bayrell.TimePlanner.Admin.MainPage",
+			"class_name": "Bayrell.TimePlanner.AdminService.MainPage",
+			"name": "Bayrell.TimePlanner.AdminService.MainPage",
 			"annotations": Collection.from([
 			]),
 		});
@@ -626,7 +638,7 @@ Object.assign(Bayrell.TimePlanner.Admin.MainPage,
 			var IntrospectionInfo = Runtime.IntrospectionInfo;
 			return new IntrospectionInfo(ctx, {
 				"kind": IntrospectionInfo.ITEM_METHOD,
-				"class_name": "Bayrell.TimePlanner.Admin.MainPage",
+				"class_name": "Bayrell.TimePlanner.AdminService.MainPage",
 				"name": "MainPage",
 				"annotations": Collection.from([
 					new Runtime.Web.Route(ctx, Runtime.Dict.from({"uri":"/","name":"app.main"})),
@@ -637,9 +649,9 @@ Object.assign(Bayrell.TimePlanner.Admin.MainPage,
 		return null;
 	},
 });
-Runtime.rtl.defClass(Bayrell.TimePlanner.Admin.MainPage);
-window["Bayrell.TimePlanner.Admin.MainPage"] = Bayrell.TimePlanner.Admin.MainPage;
-if (typeof module != "undefined" && typeof module.exports != "undefined") module.exports = Bayrell.TimePlanner.Admin.MainPage;
+Runtime.rtl.defClass(Bayrell.TimePlanner.AdminService.MainPage);
+window["Bayrell.TimePlanner.AdminService.MainPage"] = Bayrell.TimePlanner.AdminService.MainPage;
+if (typeof module != "undefined" && typeof module.exports != "undefined") module.exports = Bayrell.TimePlanner.AdminService.MainPage;
 "use strict;"
 /*
  *  Bayrell Time Planner
@@ -660,18 +672,18 @@ if (typeof module != "undefined" && typeof module.exports != "undefined") module
 */
 if (typeof Bayrell == 'undefined') Bayrell = {};
 if (typeof Bayrell.TimePlanner == 'undefined') Bayrell.TimePlanner = {};
-if (typeof Bayrell.TimePlanner.Admin == 'undefined') Bayrell.TimePlanner.Admin = {};
-Bayrell.TimePlanner.Admin.Page404 = function(ctx)
+if (typeof Bayrell.TimePlanner.AdminService == 'undefined') Bayrell.TimePlanner.AdminService = {};
+Bayrell.TimePlanner.AdminService.Page404 = function(ctx)
 {
 	Runtime.Web.Component.apply(this, arguments);
 };
-Bayrell.TimePlanner.Admin.Page404.prototype = Object.create(Runtime.Web.Component.prototype);
-Bayrell.TimePlanner.Admin.Page404.prototype.constructor = Bayrell.TimePlanner.Admin.Page404;
-Object.assign(Bayrell.TimePlanner.Admin.Page404.prototype,
+Bayrell.TimePlanner.AdminService.Page404.prototype = Object.create(Runtime.Web.Component.prototype);
+Bayrell.TimePlanner.AdminService.Page404.prototype.constructor = Bayrell.TimePlanner.AdminService.Page404;
+Object.assign(Bayrell.TimePlanner.AdminService.Page404.prototype,
 {
 	assignObject: function(ctx,o)
 	{
-		if (o instanceof Bayrell.TimePlanner.Admin.Page404)
+		if (o instanceof Bayrell.TimePlanner.AdminService.Page404)
 		{
 		}
 		Runtime.Web.Component.prototype.assignObject.call(this,ctx,o);
@@ -687,11 +699,11 @@ Object.assign(Bayrell.TimePlanner.Admin.Page404.prototype,
 	},
 	getClassName: function(ctx)
 	{
-		return "Bayrell.TimePlanner.Admin.Page404";
+		return "Bayrell.TimePlanner.AdminService.Page404";
 	},
 });
-Object.assign(Bayrell.TimePlanner.Admin.Page404, Runtime.Web.Component);
-Object.assign(Bayrell.TimePlanner.Admin.Page404,
+Object.assign(Bayrell.TimePlanner.AdminService.Page404, Runtime.Web.Component);
+Object.assign(Bayrell.TimePlanner.AdminService.Page404,
 {
 	css: function(ctx, vars)
 	{
@@ -712,11 +724,11 @@ Object.assign(Bayrell.TimePlanner.Admin.Page404,
 	/* ======================= Class Init Functions ======================= */
 	getCurrentNamespace: function()
 	{
-		return "Bayrell.TimePlanner.Admin";
+		return "Bayrell.TimePlanner.AdminService";
 	},
 	getCurrentClassName: function()
 	{
-		return "Bayrell.TimePlanner.Admin.Page404";
+		return "Bayrell.TimePlanner.AdminService.Page404";
 	},
 	getParentClassName: function()
 	{
@@ -729,8 +741,8 @@ Object.assign(Bayrell.TimePlanner.Admin.Page404,
 		var IntrospectionInfo = Runtime.IntrospectionInfo;
 		return new IntrospectionInfo(ctx, {
 			"kind": IntrospectionInfo.ITEM_CLASS,
-			"class_name": "Bayrell.TimePlanner.Admin.Page404",
-			"name": "Bayrell.TimePlanner.Admin.Page404",
+			"class_name": "Bayrell.TimePlanner.AdminService.Page404",
+			"name": "Bayrell.TimePlanner.AdminService.Page404",
 			"annotations": Collection.from([
 			]),
 		});
@@ -759,9 +771,9 @@ Object.assign(Bayrell.TimePlanner.Admin.Page404,
 		return null;
 	},
 });
-Runtime.rtl.defClass(Bayrell.TimePlanner.Admin.Page404);
-window["Bayrell.TimePlanner.Admin.Page404"] = Bayrell.TimePlanner.Admin.Page404;
-if (typeof module != "undefined" && typeof module.exports != "undefined") module.exports = Bayrell.TimePlanner.Admin.Page404;
+Runtime.rtl.defClass(Bayrell.TimePlanner.AdminService.Page404);
+window["Bayrell.TimePlanner.AdminService.Page404"] = Bayrell.TimePlanner.AdminService.Page404;
+if (typeof module != "undefined" && typeof module.exports != "undefined") module.exports = Bayrell.TimePlanner.AdminService.Page404;
 "use strict;"
 /*!
  *  Bayrell Time Planner
@@ -782,15 +794,15 @@ if (typeof module != "undefined" && typeof module.exports != "undefined") module
  */
 if (typeof Bayrell == 'undefined') Bayrell = {};
 if (typeof Bayrell.TimePlanner == 'undefined') Bayrell.TimePlanner = {};
-if (typeof Bayrell.TimePlanner.Admin == 'undefined') Bayrell.TimePlanner.Admin = {};
-Bayrell.TimePlanner.Admin.Routes = function(ctx)
+if (typeof Bayrell.TimePlanner.AdminService == 'undefined') Bayrell.TimePlanner.AdminService = {};
+Bayrell.TimePlanner.AdminService.Routes = function(ctx)
 {
 };
-Object.assign(Bayrell.TimePlanner.Admin.Routes.prototype,
+Object.assign(Bayrell.TimePlanner.AdminService.Routes.prototype,
 {
 	assignObject: function(ctx,o)
 	{
-		if (o instanceof Bayrell.TimePlanner.Admin.Routes)
+		if (o instanceof Bayrell.TimePlanner.AdminService.Routes)
 		{
 		}
 	},
@@ -803,10 +815,10 @@ Object.assign(Bayrell.TimePlanner.Admin.Routes.prototype,
 	},
 	getClassName: function(ctx)
 	{
-		return "Bayrell.TimePlanner.Admin.Routes";
+		return "Bayrell.TimePlanner.AdminService.Routes";
 	},
 });
-Object.assign(Bayrell.TimePlanner.Admin.Routes,
+Object.assign(Bayrell.TimePlanner.AdminService.Routes,
 {
 	/**
 	 * Layout chain
@@ -815,11 +827,11 @@ Object.assign(Bayrell.TimePlanner.Admin.Routes,
 	{
 		if (layout.layout_name == "default")
 		{
-			layout = Runtime.rtl.setAttr(ctx, layout, Runtime.Collection.from(["layout_class"]), "Bayrell.TimePlanner.Admin.AdminLayout");
+			layout = Runtime.rtl.setAttr(ctx, layout, Runtime.Collection.from(["layout_class"]), "Bayrell.TimePlanner.AdminService.AdminLayout");
 		}
 		if (layout.layout_name == "admin")
 		{
-			layout = Runtime.rtl.setAttr(ctx, layout, Runtime.Collection.from(["layout_class"]), "Bayrell.TimePlanner.Admin.AdminLayout");
+			layout = Runtime.rtl.setAttr(ctx, layout, Runtime.Collection.from(["layout_class"]), "Bayrell.TimePlanner.AdminService.AdminLayout");
 		}
 		return Runtime.Collection.from([layout]);
 	},
@@ -830,7 +842,7 @@ Object.assign(Bayrell.TimePlanner.Admin.Routes,
 	{
 		if (container.pattern_name == "default" && container.pattern_class == "" || container.pattern_class == "")
 		{
-			container = Runtime.rtl.setAttr(ctx, container, Runtime.Collection.from(["pattern_class"]), "Bayrell.TimePlanner.Admin.AdminPattern");
+			container = Runtime.rtl.setAttr(ctx, container, Runtime.Collection.from(["pattern_class"]), "Bayrell.TimePlanner.AdminService.AdminPattern");
 		}
 		return Runtime.Collection.from([container]);
 	},
@@ -858,7 +870,7 @@ Object.assign(Bayrell.TimePlanner.Admin.Routes,
 		container = Runtime.rtl.setAttr(ctx, container, Runtime.Collection.from(["layout", "title"]), "Page not found");
 		container = Runtime.rtl.setAttr(ctx, container, Runtime.Collection.from(["layout", "layout_name"]), "default");
 		/* Set model */
-		container = Runtime.rtl.setAttr(ctx, container, Runtime.Collection.from(["layout", "page_class"]), "Bayrell.TimePlanner.Admin.Page404");
+		container = Runtime.rtl.setAttr(ctx, container, Runtime.Collection.from(["layout", "page_class"]), "Bayrell.TimePlanner.AdminService.Page404");
 		container = Runtime.rtl.setAttr(ctx, container, Runtime.Collection.from(["layout", "page_model"]), null);
 		/* Set 404 code */
 		container = Runtime.rtl.setAttr(ctx, container, Runtime.Collection.from(["new_http_code"]), 404);
@@ -867,11 +879,11 @@ Object.assign(Bayrell.TimePlanner.Admin.Routes,
 	/* ======================= Class Init Functions ======================= */
 	getCurrentNamespace: function()
 	{
-		return "Bayrell.TimePlanner.Admin";
+		return "Bayrell.TimePlanner.AdminService";
 	},
 	getCurrentClassName: function()
 	{
-		return "Bayrell.TimePlanner.Admin.Routes";
+		return "Bayrell.TimePlanner.AdminService.Routes";
 	},
 	getParentClassName: function()
 	{
@@ -884,8 +896,8 @@ Object.assign(Bayrell.TimePlanner.Admin.Routes,
 		var IntrospectionInfo = Runtime.IntrospectionInfo;
 		return new IntrospectionInfo(ctx, {
 			"kind": IntrospectionInfo.ITEM_CLASS,
-			"class_name": "Bayrell.TimePlanner.Admin.Routes",
-			"name": "Bayrell.TimePlanner.Admin.Routes",
+			"class_name": "Bayrell.TimePlanner.AdminService.Routes",
+			"name": "Bayrell.TimePlanner.AdminService.Routes",
 			"annotations": Collection.from([
 				new Runtime.Web.RouteList(ctx, Runtime.Dict.from({})),
 			]),
@@ -915,9 +927,9 @@ Object.assign(Bayrell.TimePlanner.Admin.Routes,
 		return null;
 	},
 });
-Runtime.rtl.defClass(Bayrell.TimePlanner.Admin.Routes);
-window["Bayrell.TimePlanner.Admin.Routes"] = Bayrell.TimePlanner.Admin.Routes;
-if (typeof module != "undefined" && typeof module.exports != "undefined") module.exports = Bayrell.TimePlanner.Admin.Routes;
+Runtime.rtl.defClass(Bayrell.TimePlanner.AdminService.Routes);
+window["Bayrell.TimePlanner.AdminService.Routes"] = Bayrell.TimePlanner.AdminService.Routes;
+if (typeof module != "undefined" && typeof module.exports != "undefined") module.exports = Bayrell.TimePlanner.AdminService.Routes;
 "use strict;"
 /*!
  *  Bayrell Time Planner
@@ -938,15 +950,15 @@ if (typeof module != "undefined" && typeof module.exports != "undefined") module
  */
 if (typeof Bayrell == 'undefined') Bayrell = {};
 if (typeof Bayrell.TimePlanner == 'undefined') Bayrell.TimePlanner = {};
-if (typeof Bayrell.TimePlanner.Admin == 'undefined') Bayrell.TimePlanner.Admin = {};
-Bayrell.TimePlanner.Admin.ModuleDescription = function(ctx)
+if (typeof Bayrell.TimePlanner.AdminService == 'undefined') Bayrell.TimePlanner.AdminService = {};
+Bayrell.TimePlanner.AdminService.ModuleDescription = function(ctx)
 {
 };
-Object.assign(Bayrell.TimePlanner.Admin.ModuleDescription.prototype,
+Object.assign(Bayrell.TimePlanner.AdminService.ModuleDescription.prototype,
 {
 	assignObject: function(ctx,o)
 	{
-		if (o instanceof Bayrell.TimePlanner.Admin.ModuleDescription)
+		if (o instanceof Bayrell.TimePlanner.AdminService.ModuleDescription)
 		{
 		}
 	},
@@ -959,10 +971,10 @@ Object.assign(Bayrell.TimePlanner.Admin.ModuleDescription.prototype,
 	},
 	getClassName: function(ctx)
 	{
-		return "Bayrell.TimePlanner.Admin.ModuleDescription";
+		return "Bayrell.TimePlanner.AdminService.ModuleDescription";
 	},
 });
-Object.assign(Bayrell.TimePlanner.Admin.ModuleDescription,
+Object.assign(Bayrell.TimePlanner.AdminService.ModuleDescription,
 {
 	/**
 	 * Returns module name
@@ -970,7 +982,7 @@ Object.assign(Bayrell.TimePlanner.Admin.ModuleDescription,
 	 */
 	getModuleName: function(ctx)
 	{
-		return "Bayrell.TimePlanner.Admin";
+		return "Bayrell.TimePlanner.AdminService";
 	},
 	/**
 	 * Returns module name
@@ -993,7 +1005,7 @@ Object.assign(Bayrell.TimePlanner.Admin.ModuleDescription,
 	 */
 	entities: function(ctx)
 	{
-		return Runtime.Collection.from([new Runtime.Core.Driver(ctx, Runtime.Dict.from({"name":"root-controller","value":"Runtime.Web.RenderController","params":Runtime.Dict.from({"selector":"#root","main_controller":true,"window":"RootController"})})),new Runtime.Core.LambdaChain(ctx, Runtime.Dict.from({"name":Runtime.Web.RenderDriver.LAYOUT_CHAIN,"pos":10,"value":"Bayrell.TimePlanner.Admin.Routes::layoutChain"})),new Runtime.Core.LambdaChain(ctx, Runtime.Dict.from({"name":Runtime.Web.RenderDriver.RENDER_CHAIN,"value":"Bayrell.TimePlanner.Admin.Routes::Page404","pos":Runtime.Web.RenderDriver.RENDER_CHAIN_CALL_PAGE_NOT_FOUND,"is_async":true})),new Runtime.Core.LambdaChain(ctx, Runtime.Dict.from({"name":Runtime.Web.RenderDriver.RENDER_CHAIN,"value":"Bayrell.TimePlanner.Admin.Routes::renderChainRouteAfter","pos":Runtime.Web.RenderDriver.RENDER_CHAIN_CALL_ROUTE_AFTER,"is_async":true})),new Runtime.Core.Entity(ctx, Runtime.Dict.from({"name":"Bayrell.TimePlanner.Admin.Routes"})),new Runtime.Web.RouteList(ctx, Runtime.Dict.from({"name":"Bayrell.TimePlanner.Admin.MainPage"}))]);
+		return Runtime.Collection.from([new Runtime.Core.Driver(ctx, Runtime.Dict.from({"name":"root-controller","value":"Runtime.Web.RenderController","params":Runtime.Dict.from({"selector":"#root","main_controller":true,"window":"RootController"})})),new Runtime.Core.LambdaChain(ctx, Runtime.Dict.from({"name":Runtime.Web.RenderDriver.LAYOUT_CHAIN,"pos":10,"value":"Bayrell.TimePlanner.AdminService.Routes::layoutChain"})),new Runtime.Core.LambdaChain(ctx, Runtime.Dict.from({"name":Runtime.Web.RenderDriver.RENDER_CHAIN,"value":"Bayrell.TimePlanner.AdminService.Routes::Page404","pos":Runtime.Web.RenderDriver.RENDER_CHAIN_CALL_PAGE_NOT_FOUND,"is_async":true})),new Runtime.Core.LambdaChain(ctx, Runtime.Dict.from({"name":Runtime.Web.RenderDriver.RENDER_CHAIN,"value":"Bayrell.TimePlanner.AdminService.Routes::renderChainRouteAfter","pos":Runtime.Web.RenderDriver.RENDER_CHAIN_CALL_ROUTE_AFTER,"is_async":true})),new Runtime.Core.Entity(ctx, Runtime.Dict.from({"name":"Bayrell.TimePlanner.AdminService.Routes"})),new Runtime.Web.RouteList(ctx, Runtime.Dict.from({"name":"Bayrell.TimePlanner.AdminService.MainPage"}))]);
 	},
 	/**
 	 * Returns context settings
@@ -1028,11 +1040,11 @@ Object.assign(Bayrell.TimePlanner.Admin.ModuleDescription,
 	/* ======================= Class Init Functions ======================= */
 	getCurrentNamespace: function()
 	{
-		return "Bayrell.TimePlanner.Admin";
+		return "Bayrell.TimePlanner.AdminService";
 	},
 	getCurrentClassName: function()
 	{
-		return "Bayrell.TimePlanner.Admin.ModuleDescription";
+		return "Bayrell.TimePlanner.AdminService.ModuleDescription";
 	},
 	getParentClassName: function()
 	{
@@ -1045,8 +1057,8 @@ Object.assign(Bayrell.TimePlanner.Admin.ModuleDescription,
 		var IntrospectionInfo = Runtime.IntrospectionInfo;
 		return new IntrospectionInfo(ctx, {
 			"kind": IntrospectionInfo.ITEM_CLASS,
-			"class_name": "Bayrell.TimePlanner.Admin.ModuleDescription",
-			"name": "Bayrell.TimePlanner.Admin.ModuleDescription",
+			"class_name": "Bayrell.TimePlanner.AdminService.ModuleDescription",
+			"name": "Bayrell.TimePlanner.AdminService.ModuleDescription",
 			"annotations": Collection.from([
 			]),
 		});
@@ -1076,6 +1088,6 @@ Object.assign(Bayrell.TimePlanner.Admin.ModuleDescription,
 		return null;
 	},
 });
-Runtime.rtl.defClass(Bayrell.TimePlanner.Admin.ModuleDescription);
-window["Bayrell.TimePlanner.Admin.ModuleDescription"] = Bayrell.TimePlanner.Admin.ModuleDescription;
-if (typeof module != "undefined" && typeof module.exports != "undefined") module.exports = Bayrell.TimePlanner.Admin.ModuleDescription;
+Runtime.rtl.defClass(Bayrell.TimePlanner.AdminService.ModuleDescription);
+window["Bayrell.TimePlanner.AdminService.ModuleDescription"] = Bayrell.TimePlanner.AdminService.ModuleDescription;
+if (typeof module != "undefined" && typeof module.exports != "undefined") module.exports = Bayrell.TimePlanner.AdminService.ModuleDescription;

@@ -2627,28 +2627,28 @@ Object.assign(Runtime.Web.Input.Select,
 			var __v0; var __v0_childs = [];
 			[__v0, __control_childs] = RenderDriver.e(__control, __control_childs, "element", {"name": "select","attrs": {"@event:Runtime.Web.Events.ChangeEvent":["Runtime.Web.Input.Select","onChange"],"name":name,"value":value,"class":["select", this.getCssHash(ctx)].join(" "),"@elem_name":"select"}});
 			
+			var selected = Runtime.Dict.from({});
+			
+			if (Runtime.rtl.get(ctx, params, "show_select_value") == true)
+			{
+				if (value === "" || value === null)
+				{
+					selected = Runtime.Dict.from({"selected":"selected"});
+				}
+				
+				/* Element 'option' */
+				var __v1; var __v1_childs = [];
+				[__v1, __v0_childs] = RenderDriver.e(__v0, __v0_childs, "element", {"name": "option","attrs": this.mergeAttrs(ctx, {"value":""},selected)});
+				
+				/* Text */
+				[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "text", {"content": ctx.translate(ctx, "Runtime.Web.Input", "Select value")});
+				RenderDriver.p(__v1, __v1_childs);
+			}
+			
 			var options = Runtime.rtl.get(ctx, params, "options");
 			
 			if (Runtime.rtl.exists(ctx, options))
 			{
-				var selected = Runtime.Dict.from({});
-				
-				if (Runtime.rtl.get(ctx, params, "show_select_value") == true)
-				{
-					if (value === "" || value === null)
-					{
-						selected = Runtime.Dict.from({"selected":"selected"});
-					}
-					
-					/* Element 'option' */
-					var __v1; var __v1_childs = [];
-					[__v1, __v0_childs] = RenderDriver.e(__v0, __v0_childs, "element", {"name": "option","attrs": this.mergeAttrs(ctx, {"value":""},selected)});
-					
-					/* Text */
-					[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "text", {"content": ctx.translate(ctx, "Runtime.Web.Input", "Select value")});
-					RenderDriver.p(__v1, __v1_childs);
-				}
-				
 				for (var i = 0;i < options.count(ctx);i++)
 				{
 					var item = Runtime.rtl.get(ctx, options, i);
@@ -3677,6 +3677,10 @@ Object.assign(Runtime.Web.CRUD.Form,
 			
 			var field = Runtime.Web.CRUD.FieldInfo.getFieldInfo(ctx, struct, field_name);
 			
+			var __v0 = new Runtime.Monad(ctx, Runtime.rtl.get(ctx, params, "extends_name"));
+			__v0 = __v0.monad(ctx, Runtime.rtl.m_to(ctx, "string", "form"));
+			var extends_name = __v0.value(ctx);
+			
 			if (field != null)
 			{
 				/* Patch field */
@@ -3685,13 +3689,9 @@ Object.assign(Runtime.Web.CRUD.Form,
 				var model_path = this.getBindPath(ctx, field);
 				
 				/* Get class name */
-				var __v0 = new Runtime.Monad(ctx, Runtime.rtl.get(ctx, field, "class_name"));
-				__v0 = __v0.monad(ctx, Runtime.rtl.m_to(ctx, "string", ""));
-				var class_name = __v0.value(ctx);
+				var class_name = Runtime.rtl.get(ctx, field, "class_name");
 				
-				var __v0 = new Runtime.Monad(ctx, Runtime.rtl.attr(ctx, field, ["info", "form", "class_name"]));
-				__v0 = __v0.monad(ctx, Runtime.rtl.m_to(ctx, "string", ""));
-				var class_name_form = __v0.value(ctx);
+				var class_name_form = Runtime.rtl.attr(ctx, field, ["info", extends_name, "class_name"]);
 				
 				if (!Runtime.rtl.isEmpty(ctx, class_name_form))
 				{
@@ -3703,7 +3703,7 @@ Object.assign(Runtime.Web.CRUD.Form,
 				__v0 = __v0.monad(ctx, Runtime.rtl.m_to(ctx, "Runtime.Dict", Runtime.Dict.from({})));
 				var class_settings = __v0.value(ctx);
 				
-				var __v0 = new Runtime.Monad(ctx, Runtime.rtl.attr(ctx, field, ["info", "form", "class_settings"]));
+				var __v0 = new Runtime.Monad(ctx, Runtime.rtl.attr(ctx, field, ["info", extends_name, "class_settings"]));
 				__v0 = __v0.monad(ctx, Runtime.rtl.m_to(ctx, "Runtime.Dict", null));
 				var class_settings_form = __v0.value(ctx);
 				
@@ -3712,7 +3712,7 @@ Object.assign(Runtime.Web.CRUD.Form,
 					class_settings = class_settings.concat(ctx, class_settings_form);
 				}
 				
-				class_settings = class_settings.setIm(ctx, "name", field_name).setIm(ctx, "crud_class_name", class_name).setIm(ctx, "crud_kind", "form").setIm(ctx, "crud_field_name", field_name).setIm(ctx, "crud_field_info", field).setIm(ctx, "crud_struct", struct).setIm(ctx, "crud_item", Runtime.rtl.get(ctx, model, "item")).setIm(ctx, "crud_form_model_path", model_path).setIm(ctx, "crud_form_model", model);
+				class_settings = class_settings.setIm(ctx, "name", field_name).setIm(ctx, "crud_kind", extends_name).setIm(ctx, "crud_field_name", field_name).setIm(ctx, "crud_field_info", field).setIm(ctx, "crud_struct", struct).setIm(ctx, "crud_item", Runtime.rtl.get(ctx, model, "item")).setIm(ctx, "crud_form_model_path", model_path).setIm(ctx, "crud_form_model", model);
 				
 				/* Get value */
 				var value = Runtime.rtl.attr(ctx, model, model_path);
@@ -3720,7 +3720,7 @@ Object.assign(Runtime.Web.CRUD.Form,
 				/* Calculate new value */
 				var calc = Runtime.rtl.get(ctx, field, "calc");
 				
-				var calc_form = Runtime.rtl.attr(ctx, field, ["info", "form", "calc"]);
+				var calc_form = Runtime.rtl.attr(ctx, field, ["info", extends_name, "calc"]);
 				
 				if (calc_form != null)
 				{
@@ -3734,13 +3734,25 @@ Object.assign(Runtime.Web.CRUD.Form,
 				
 				class_settings = class_settings.setIm(ctx, "value", value);
 				
+				/* Calc class name */
+				if (!Runtime.rtl.isString(ctx, class_name) && Runtime.rtl.isFn(ctx, class_name))
+				{
+					class_name = class_name(ctx, layout, value, class_settings);
+				}
+				
+				var __v0 = new Runtime.Monad(ctx, class_name);
+				__v0 = __v0.monad(ctx, Runtime.rtl.m_to(ctx, "string", ""));
+				class_name = __v0.value(ctx);
+				
+				class_settings = class_settings.setIm(ctx, "crud_class_name", class_name);
+				
 				/* Patch settings */
 				class_settings = this.patchSettings(ctx, layout, field, class_settings, model, params);
 				
 				/* Render value */
 				var render = Runtime.rtl.get(ctx, field, "render");
 				
-				var render_form = Runtime.rtl.attr(ctx, field, ["info", "form", "render"]);
+				var render_form = Runtime.rtl.attr(ctx, field, ["info", extends_name, "render"]);
 				
 				if (!Runtime.rtl.isEmpty(ctx, render_form))
 				{
@@ -3749,7 +3761,7 @@ Object.assign(Runtime.Web.CRUD.Form,
 				
 				var can_render = Runtime.rtl.get(ctx, field, "can_render");
 				
-				var can_render_form = Runtime.rtl.attr(ctx, field, ["info", "form", "can_render"]);
+				var can_render_form = Runtime.rtl.attr(ctx, field, ["info", extends_name, "can_render"]);
 				
 				if (!Runtime.rtl.isEmpty(ctx, can_render_form))
 				{
@@ -3765,7 +3777,7 @@ Object.assign(Runtime.Web.CRUD.Form,
 				[__v1, __v0_childs] = RenderDriver.e(__v0, __v0_childs, "element", {"name": "div","attrs": {"class":["form_label", this.getCssHash(ctx)].join(" "),"@elem_name":"form_label"}});
 				
 				/* Text */
-				[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "text", {"content": (Runtime.rtl.attr(ctx, field, ["info", "form", "label"])) ? (Runtime.rtl.attr(ctx, field, ["info", "form", "label"])) : (Runtime.rtl.get(ctx, field, "label"))});
+				[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "text", {"content": (Runtime.rtl.attr(ctx, field, ["info", extends_name, "label"])) ? (Runtime.rtl.attr(ctx, field, ["info", extends_name, "label"])) : (Runtime.rtl.get(ctx, field, "label"))});
 				
 				/* Text */
 				[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "text", {"content": ":"});
@@ -3775,7 +3787,7 @@ Object.assign(Runtime.Web.CRUD.Form,
 				var __v1; var __v1_childs = [];
 				[__v1, __v0_childs] = RenderDriver.e(__v0, __v0_childs, "element", {"name": "div","attrs": {"class":["form_value", this.getCssHash(ctx)].join(" "),"@elem_name":"form_value"}});
 				
-				if (Runtime.rtl.exists(ctx, render) && (!Runtime.rtl.exists(ctx, can_render) || Runtime.rtl.exists(ctx, can_render) && can_render(ctx, layout, model, class_settings)))
+				if (Runtime.rtl.exists(ctx, render) && (!Runtime.rtl.exists(ctx, can_render) || Runtime.rtl.exists(ctx, can_render) && can_render(ctx, layout, value, class_settings)))
 				{
 					/* Text */
 					[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "text", {"content": render(ctx, layout, Runtime.rtl.attr(ctx, model, model_path), class_settings)});
@@ -4521,7 +4533,7 @@ Object.assign(Runtime.Web.CRUD.FormModel,
 	 */
 	clear: function(ctx, model)
 	{
-		return new Runtime.Web.CRUD.FormModel(ctx, Runtime.Dict.from({"item":new Runtime.Dict(ctx),"fields_errors":null,"message":"","success_message":"","error_message":""}));
+		return model.copy(ctx, Runtime.Dict.from({"item":new Runtime.Dict(ctx),"old_item":null,"fields_errors":null,"message":"","success_message":"","error_message":"","data":""}));
 	},
 	/* ======================= Class Init Functions ======================= */
 	getCurrentNamespace: function()
@@ -5005,7 +5017,7 @@ Object.assign(Runtime.Web.CRUD.Table,
 			
 			/* Element 'table.table' */
 			var __v0; var __v0_childs = [];
-			[__v0, __control_childs] = RenderDriver.e(__control, __control_childs, "element", {"name": "table","attrs": {"class":["table", this.getCssHash(ctx)].join(" "),"@elem_name":"table"}});
+			[__v0, __control_childs] = RenderDriver.e(__control, __control_childs, "element", {"name": "table","attrs": {"class":["table", this.getCssHash(ctx)].join(" "),"@key":"table","@elem_name":"table"}});
 			
 			/* Text */
 			[__vnull, __v0_childs] = RenderDriver.e(__v0, __v0_childs, "text", {"content": this.renderHeader(ctx, layout, model, params, content)});
@@ -5045,6 +5057,10 @@ Object.assign(Runtime.Web.CRUD.Table,
 			
 			var fields = Runtime.rtl.get(ctx, params, "fields");
 			
+			var __v0 = new Runtime.Monad(ctx, Runtime.rtl.get(ctx, params, "extends_name"));
+			__v0 = __v0.monad(ctx, Runtime.rtl.m_to(ctx, "string", "table"));
+			var extends_name = __v0.value(ctx);
+			
 			/* Element 'tr.header' */
 			var __v0; var __v0_childs = [];
 			[__v0, __control_childs] = RenderDriver.e(__control, __control_childs, "element", {"name": "tr","attrs": {"class":["header", this.getCssHash(ctx)].join(" "),"@elem_name":"header"}});
@@ -5060,7 +5076,7 @@ Object.assign(Runtime.Web.CRUD.Table,
 				[__v1, __v0_childs] = RenderDriver.e(__v0, __v0_childs, "element", {"name": "th","attrs": {"data-name":field_name,"class":["th", "th--" + Runtime.rtl.toStr(field_name), this.getCssHash(ctx)].join(" "),"@key":"th-" + Runtime.rtl.toStr(field_name),"@elem_name":"th"}});
 				
 				/* Text */
-				[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "text", {"content": (Runtime.rtl.attr(ctx, field, ["info", "table", "label"])) ? (Runtime.rtl.attr(ctx, field, ["info", "table", "label"])) : (Runtime.rtl.get(ctx, field, "label"))});
+				[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "text", {"content": (Runtime.rtl.attr(ctx, field, ["info", extends_name, "label"])) ? (Runtime.rtl.attr(ctx, field, ["info", extends_name, "label"])) : (Runtime.rtl.get(ctx, field, "label"))});
 				RenderDriver.p(__v1, __v1_childs);
 			}
 			RenderDriver.p(__v0, __v0_childs);
@@ -5079,6 +5095,10 @@ Object.assign(Runtime.Web.CRUD.Table,
 			
 			var fields = Runtime.rtl.get(ctx, params, "fields");
 			
+			var __v0 = new Runtime.Monad(ctx, Runtime.rtl.get(ctx, params, "extends_name"));
+			__v0 = __v0.monad(ctx, Runtime.rtl.m_to(ctx, "string", "table"));
+			var extends_name = __v0.value(ctx);
+			
 			/* Element 'tr.row' */
 			var __v0; var __v0_childs = [];
 			[__v0, __control_childs] = RenderDriver.e(__control, __control_childs, "element", {"name": "tr","attrs": {"data-index":index,"class":["row", this.getCssHash(ctx)].join(" "),"@key":"tr-" + Runtime.rtl.toStr(index),"@elem_name":"row"}});
@@ -5089,11 +5109,11 @@ Object.assign(Runtime.Web.CRUD.Table,
 				
 				var field = Runtime.Web.CRUD.FieldInfo.getFieldInfo(ctx, Runtime.rtl.get(ctx, params, "struct"), field_name);
 				
-				var __v1 = new Runtime.Monad(ctx, Runtime.rtl.attr(ctx, field, ["info", "table", "text-align"]));
+				var __v1 = new Runtime.Monad(ctx, Runtime.rtl.attr(ctx, field, ["info", extends_name, "text-align"]));
 				__v1 = __v1.monad(ctx, Runtime.rtl.m_to(ctx, "string", "left"));
 				var text_align = __v1.value(ctx);
 				
-				var __v1 = new Runtime.Monad(ctx, Runtime.rtl.attr(ctx, field, ["info", "table", "width"]));
+				var __v1 = new Runtime.Monad(ctx, Runtime.rtl.attr(ctx, field, ["info", extends_name, "width"]));
 				__v1 = __v1.monad(ctx, Runtime.rtl.m_to(ctx, "string", ""));
 				var td_width = __v1.value(ctx);
 				
@@ -5123,6 +5143,10 @@ Object.assign(Runtime.Web.CRUD.Table,
 			
 			var field = Runtime.Web.CRUD.FieldInfo.getFieldInfo(ctx, Runtime.rtl.get(ctx, params, "struct"), field_name);
 			
+			var __v0 = new Runtime.Monad(ctx, Runtime.rtl.get(ctx, params, "extends_name"));
+			__v0 = __v0.monad(ctx, Runtime.rtl.m_to(ctx, "string", "table"));
+			var extends_name = __v0.value(ctx);
+			
 			if (field != null)
 			{
 				/* Patch field settings */
@@ -5133,7 +5157,7 @@ Object.assign(Runtime.Web.CRUD.Table,
 				__v0 = __v0.monad(ctx, Runtime.rtl.m_to(ctx, "string", ""));
 				var class_name = __v0.value(ctx);
 				
-				var __v0 = new Runtime.Monad(ctx, Runtime.rtl.attr(ctx, field, ["info", "table", "class_name"]));
+				var __v0 = new Runtime.Monad(ctx, Runtime.rtl.attr(ctx, field, ["info", extends_name, "class_name"]));
 				__v0 = __v0.monad(ctx, Runtime.rtl.m_to(ctx, "string", ""));
 				var class_name_table = __v0.value(ctx);
 				
@@ -5147,7 +5171,7 @@ Object.assign(Runtime.Web.CRUD.Table,
 				__v0 = __v0.monad(ctx, Runtime.rtl.m_to(ctx, "Runtime.Dict", Runtime.Dict.from({})));
 				var class_settings = __v0.value(ctx);
 				
-				var __v0 = new Runtime.Monad(ctx, Runtime.rtl.attr(ctx, field, ["info", "table", "class_settings"]));
+				var __v0 = new Runtime.Monad(ctx, Runtime.rtl.attr(ctx, field, ["info", extends_name, "class_settings"]));
 				__v0 = __v0.monad(ctx, Runtime.rtl.m_to(ctx, "Runtime.Dict", null));
 				var class_settings_table = __v0.value(ctx);
 				
@@ -5156,7 +5180,7 @@ Object.assign(Runtime.Web.CRUD.Table,
 					class_settings = class_settings.concat(ctx, class_settings_table);
 				}
 				
-				class_settings = class_settings.setIm(ctx, "name", field_name).setIm(ctx, "crud_class_name", class_name).setIm(ctx, "crud_kind", "table").setIm(ctx, "crud_struct", struct).setIm(ctx, "crud_field_name", field_name).setIm(ctx, "crud_field_info", field).setIm(ctx, "crud_index", index).setIm(ctx, "crud_item", row).setIm(ctx, "crud_table_model", model);
+				class_settings = class_settings.setIm(ctx, "name", field_name).setIm(ctx, "crud_kind", "table").setIm(ctx, "crud_struct", struct).setIm(ctx, "crud_field_name", field_name).setIm(ctx, "crud_field_info", field).setIm(ctx, "crud_index", index).setIm(ctx, "crud_item", row).setIm(ctx, "crud_table_model", model);
 				
 				/* Get value */
 				var value = Runtime.rtl.attr(ctx, model, ["rows", index, field_name]);
@@ -5164,7 +5188,7 @@ Object.assign(Runtime.Web.CRUD.Table,
 				/* Calculate new value */
 				var calc = Runtime.rtl.get(ctx, field, "calc");
 				
-				var calc_table = Runtime.rtl.attr(ctx, field, ["info", "table", "calc"]);
+				var calc_table = Runtime.rtl.attr(ctx, field, ["info", extends_name, "calc"]);
 				
 				if (calc_table != null)
 				{
@@ -5178,13 +5202,25 @@ Object.assign(Runtime.Web.CRUD.Table,
 				
 				class_settings = class_settings.setIm(ctx, "value", value);
 				
+				/* Calc class name */
+				if (!Runtime.rtl.isString(ctx, class_name) && Runtime.rtl.isFn(ctx, class_name))
+				{
+					class_name = class_name(ctx, layout, value, class_settings);
+				}
+				
+				var __v0 = new Runtime.Monad(ctx, class_name);
+				__v0 = __v0.monad(ctx, Runtime.rtl.m_to(ctx, "string", ""));
+				class_name = __v0.value(ctx);
+				
+				class_settings = class_settings.setIm(ctx, "crud_class_name", class_name);
+				
 				/* Patch settings */
 				class_settings = this.patchSettings(ctx, layout, field, class_settings, model, params);
 				
 				/* Render value */
 				var render = Runtime.rtl.get(ctx, field, "render");
 				
-				var render_table = Runtime.rtl.attr(ctx, field, ["info", "table", "render"]);
+				var render_table = Runtime.rtl.attr(ctx, field, ["info", extends_name, "render"]);
 				
 				if (!Runtime.rtl.isEmpty(ctx, render_table))
 				{
@@ -5193,14 +5229,14 @@ Object.assign(Runtime.Web.CRUD.Table,
 				
 				var can_render = Runtime.rtl.get(ctx, field, "can_render");
 				
-				var can_render_table = Runtime.rtl.attr(ctx, field, ["info", "table", "can_render"]);
+				var can_render_table = Runtime.rtl.attr(ctx, field, ["info", extends_name, "can_render"]);
 				
 				if (!Runtime.rtl.isEmpty(ctx, can_render_table))
 				{
 					can_render = can_render_table;
 				}
 				
-				if (Runtime.rtl.exists(ctx, render) && (!Runtime.rtl.exists(ctx, can_render) || Runtime.rtl.exists(ctx, can_render) && can_render(ctx, layout, model, class_settings)))
+				if (Runtime.rtl.exists(ctx, render) && (!Runtime.rtl.exists(ctx, can_render) || Runtime.rtl.exists(ctx, can_render) && can_render(ctx, layout, value, class_settings)))
 				{
 					/* Text */
 					[__vnull, __control_childs] = RenderDriver.e(__control, __control_childs, "text", {"content": render(ctx, layout, value, class_settings)});
@@ -6199,7 +6235,7 @@ Object.assign(Runtime.Web.CRUD.CrudPage,
 				var __v1; var __v1_childs = [];
 				[__v1, __v0_childs] = RenderDriver.e(__v0, __v0_childs, "element", {"name": "div","attrs": {"class":["filter", this.getCssHash(ctx)].join(" "),"@elem_name":"filter"}});
 				
-				[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "component", {"name": "Runtime.Web.CRUD.CrudFilter","attrs": {"@name":["Runtime.Web.CRUD.CrudPage","filter"],"struct":struct,"fields":filter_fields}, "layout": layout});
+				[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "component", {"name": "Runtime.Web.CRUD.CrudFilter","attrs": {"@name":["Runtime.Web.CRUD.CrudPage","filter"],"struct":struct,"fields":filter_fields,"extends_name":"filter"}, "layout": layout});
 				RenderDriver.p(__v1, __v1_childs);
 			}
 			
@@ -6529,7 +6565,7 @@ Object.assign(Runtime.Web.CRUD.CrudPage,
 			return __control_childs;
 		};
 	},
-	renderButtons: function(ctx, layout, settings)
+	renderButtons: function(ctx, layout, value, settings)
 	{
 		return (__control) =>
 		{
@@ -6577,15 +6613,24 @@ Object.assign(Runtime.Web.CRUD.CrudPage,
 			}
 			else if (button_type == "view")
 			{
+				var target = Runtime.Dict.from({});
+				
 				var url = layout.route_prefix + Runtime.rtl.toStr(Runtime.rtl.get(ctx, options, "url"));
 				
 				var pk = this.getPrimaryKey(ctx, struct, item);
 				
 				url = Runtime.Web.Route.replace(ctx, url, pk);
 				
+				var label = (!Runtime.rtl.isEmpty(ctx, Runtime.rtl.get(ctx, options, "label"))) ? (Runtime.rtl.get(ctx, options, "label")) : (ctx.translate(ctx, "Runtime.Web.CRUD", "View"));
+				
+				if (!Runtime.rtl.isEmpty(ctx, Runtime.rtl.get(ctx, options, "target")))
+				{
+					target = Runtime.Dict.from({"target":Runtime.rtl.get(ctx, options, "target")});
+				}
+				
 				/* Element 'a.nolink' */
 				var __v0; var __v0_childs = [];
-				[__v0, __control_childs] = RenderDriver.e(__control, __control_childs, "element", {"name": "a","attrs": {"href":url,"class":["nolink", this.getCssHash(ctx)].join(" "),"@key":"view","@elem_name":"nolink"}});
+				[__v0, __control_childs] = RenderDriver.e(__control, __control_childs, "element", {"name": "a","attrs": this.mergeAttrs(ctx, {"href":url,"class":["nolink", this.getCssHash(ctx)].join(" "),"@key":"view","@elem_name":"nolink"},target)});
 				
 				/* Component 'Button' */
 				[__vnull, __v0_childs] = RenderDriver.e(__v0, __v0_childs, "component", {"name": "Runtime.Web.Input.Button","attrs": {"type":"small"}, "layout": layout, "content": (__control) =>
@@ -6594,14 +6639,13 @@ Object.assign(Runtime.Web.CRUD.CrudPage,
 					var __control_childs = [];
 					
 					/* Text */
-					[__vnull, __control_childs] = RenderDriver.e(__control, __control_childs, "text", {"content": ctx.translate(ctx, "Runtime.Web.CRUD", "View")});
+					[__vnull, __control_childs] = RenderDriver.e(__control, __control_childs, "text", {"content": label});
 					
 					return __control_childs;
 				}});
 				RenderDriver.p(__v0, __v0_childs);
 			}
-			
-			if (button_type == "delete")
+			else if (button_type == "delete")
 			{
 				var table_model = Runtime.rtl.get(ctx, settings, "crud_table_model");
 				

@@ -1387,19 +1387,6 @@ Object.assign(Bayrell.TimePlanner.AdminLayout,
 			[__vnull, __v7_childs] = RenderDriver.e(__v7, __v7_childs, "text", {"content": ctx.translate(ctx, "Bayrell.TimePlanner", "Projects settings")});
 			RenderDriver.p(__v7, __v7_childs);
 			RenderDriver.p(__v6, __v6_childs);
-			
-			/* Element 'li' */
-			var __v6; var __v6_childs = [];
-			[__v6, __v5_childs] = RenderDriver.e(__v5, __v5_childs, "element", {"name": "li","attrs": {"class":[((Runtime.rs.start(ctx, Runtime.rtl.attr(ctx, layout, ["route", "name"]), "app.admin.info")) ? ("active") : ("")), this.getCssHash(ctx)].join(" ")}});
-			
-			/* Element 'a.nolink' */
-			var __v7; var __v7_childs = [];
-			[__v7, __v6_childs] = RenderDriver.e(__v6, __v6_childs, "element", {"name": "a","attrs": {"href":layout.route_prefix + Runtime.rtl.toStr("/admin/info/"),"class":["nolink", this.getCssHash(ctx)].join(" "),"@elem_name":"nolink"}});
-			
-			/* Text */
-			[__vnull, __v7_childs] = RenderDriver.e(__v7, __v7_childs, "text", {"content": ctx.translate(ctx, "Bayrell.TimePlanner", "Admin info")});
-			RenderDriver.p(__v7, __v7_childs);
-			RenderDriver.p(__v6, __v6_childs);
 			RenderDriver.p(__v5, __v5_childs);
 			RenderDriver.p(__v4, __v4_childs);
 			

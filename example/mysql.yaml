@@ -3,8 +3,8 @@ version: "3.7"
 services:
 
     mysql1:
-        image: bayrell/alpine_mariadb:10.4-20200426_165923
-        command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --sql-mode="" --ft_min_word_len=1 --wait_timeout=600 --max_allowed_packet=1G
+        image: bayrell/alpine_mariadb:10.4-20201022_104625
+        command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --sql-mode="" --ft_min_word_len=1 --wait_timeout=600 --max_allowed_packet=1G --innodb_buffer_pool_size=100M --net_read_timeout=3600 --net_write_timeout=3600
         hostname: "{{.Service.Name}}.{{.Task.ID}}.local"
         volumes:
             - "mysql1_data:/data"
@@ -15,6 +15,7 @@ services:
             MYSQL_ROOT_PASSWORD: "7DF&d7jr!Lk5rZ^b"
         deploy:
             replicas: 1
+            endpoint_mode: dnsrr
             update_config:
                 parallelism: 1
                 failure_action: rollback
@@ -25,7 +26,7 @@ services:
                 window: 120s
             placement:
                 constraints:
-                    - node.hostname == raspberrypi
+                    - node.hostname == docker0
         networks:
             - backend
         logging:
@@ -35,7 +36,7 @@ volumes:
     mysql1_data:
 
 networks:
-
+    
     backend:
         driver: overlay
         attachable: true

@@ -17,7 +17,7 @@
 -->
 
 <class version="1.0"
-	name="Bayrell.TimePlanner.Admin.MainPage" extends="Runtime.Web.Component" 
+	name="Bayrell.TimePlanner.AdminService.MainPage" extends="Runtime.Web.Component" 
 	module="Bayrell.TimePlanner" model="Runtime.Dict"
 >
 
@@ -30,7 +30,7 @@
 <use name="Runtime.Web.RouteList" />
 <use name="Runtime.Web.RouteMiddleware" />
 <use name="Runtime.Web.Events.MouseClickEvent" />
-<use name="Bayrell.TimePlanner.Admin.MainPage" />
+<use name="Bayrell.TimePlanner.AdminService.MainPage" />
 
 
 <script>
@@ -67,7 +67,8 @@ static async RenderContainer MainPage(RenderContainer container)
 <template name="render">
 	<div class='content'>
 		<a class='link' href={ layout.route_prefix ~ "/adminer/" } target="_self">Adminer</a><br/>
-		<a class='link' href={ layout.route_prefix ~ "/adminer/info/" } target="_self">PHP info</a>
+		<a class='link' href={ layout.route_prefix ~ "/info/" } target="_self">PHP info</a><br/>
+		<a class='link' href={ layout.route_prefix ~ "/env/" } target="_self">Enviroments</a><br/>
 	</div>
 </template>
 

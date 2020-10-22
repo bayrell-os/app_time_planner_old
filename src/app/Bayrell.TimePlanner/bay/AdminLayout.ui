@@ -219,11 +219,6 @@ span.lpad5{
 									{ _("Bayrell.TimePlanner", "Projects settings") }
 								</a>
 							</li>
-							<li class={ rs::start(layout["route", "name"], "app.admin.info") ? "active": "" }>
-								<a class='nolink' href={ layout.route_prefix ~ '/admin/info/' }>
-									{ _("Bayrell.TimePlanner", "Admin info") }
-								</a>
-							</li>
 						</ul>
 					</div>
 					

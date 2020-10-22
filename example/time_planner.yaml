@@ -3,25 +3,23 @@ version: "3.7"
 secrets:
     AUTH_PUBLIC_KEY:
         file: ./auth_public.key
-    AUTH_PRIVATE_KEY:
-        file: ./auth_private.key
 
 
 services:
     
     time_planner:
-        image: bayrell/time_planner:20200929_120148
+        image: bayrell/time_planner:0.1-20201022_112220
         hostname: "{{.Service.Name}}.{{.Task.ID}}.local"
         volumes:
             - "time_planner_data:/data"
-            - "/var/run/docker.sock:/var/run/docker.sock:ro"
             - "../src:/var/www"
         secrets:
             - AUTH_PUBLIC_KEY
-            - AUTH_PRIVATE_KEY
         env_file:
             - common.env
         environment:
+            CLOUD_SYSTEM_PANEL: cloud_os_system_panel
+            CLOUD_SOFTWARE_NAME: "bayrell.time_planner"
             MEMCACHED: "memcached1"
             MYSQL_HOST: "mysql1"
             MYSQL_USERNAME: "lasto4ka"
@@ -31,6 +29,7 @@ services:
             COOKIE_EXPIRE: 86400
         deploy:
             replicas: 1
+            endpoint_mode: dnsrr
             update_config:
                 parallelism: 1
                 failure_action: rollback
@@ -39,9 +38,12 @@ services:
                 condition: "on-failure"
                 delay: 10s
                 window: 120s
+            placement:
+                constraints:
+                    - node.hostname == docker0
         networks:
             - backend
-            - balancer
+            - cloud_router
         logging:
             driver: journald
 
@@ -50,7 +52,7 @@ volumes:
 
 networks:
     
-    balancer:
+    cloud_router:
         external: true
     
     backend:

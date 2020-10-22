@@ -226,13 +226,12 @@ static class ModuleDescription
 		#ifdef BACKEND then
 		
 		/* Find space id */
-		string layer_id = @.env("X-LAYER-ID", "");
-		string layer_uid = @.env("X-LAYER-UID", "");
-		if (layer_id != "")
+		string layer_uid = c.env("X-LAYER-UID", "");
+		if (layer_uid != "")
 		{
 			Layer item = Layer::select()
 				|> .filter([
-					["layer_id", "=", layer_id]
+					["layer_uid", "=", layer_uid]
 				])
 				|> await .one()
 			;
@@ -240,10 +239,11 @@ static class ModuleDescription
 			{
 				item = Layer::save
 				{
-					"layer_id": layer_id,
 					"layer_uid": layer_uid,
 				}
 			}
+			
+			c <= enviroments <= "X-LAYER-ID" <= item.layer_id;
 		}
 		
 		#endif

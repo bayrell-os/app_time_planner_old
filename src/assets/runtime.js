@@ -8386,7 +8386,7 @@ Object.assign(Runtime.ModuleDescription,
 	 */
 	getModuleVersion: function(ctx)
 	{
-		return "0.10.4";
+		return "0.10.5";
 	},
 	/**
 	 * Returns required modules
@@ -8796,6 +8796,16 @@ Object.assign(Runtime.Core.Context.prototype,
 	{
 		var driver = this.getDriver(ctx, "default:external_bus");
 		await driver.sendMessage(ctx, msg);
+	},
+	/**
+	 * Remote call
+	 * @param Dict items
+	 * @return RemoteCallAnswer
+	 */
+	remoteBusCall: async function(ctx, items)
+	{
+		var driver = this.getDriver(ctx, "default:external_bus");
+		return Promise.resolve(await driver.remoteCall(ctx, items));
 	},
 	/* ---------------------- Chain --------------------- */
 	/**
@@ -13547,7 +13557,7 @@ Object.assign(Runtime.Web.LayoutModel,
 		if (field_name == "page_model") return new IntrospectionInfo(ctx, {
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.LayoutModel",
-			"t": "Runtime.BaseStruct",
+			"t": "var",
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -13717,7 +13727,6 @@ Object.assign(Runtime.Web.RenderContainer.prototype,
 		this.pattern_class = "";
 		this.frontend_controller_name = "";
 		this.api_storage = new Runtime.Dict(ctx);
-		this.backend_storage = new Runtime.Dict(ctx);
 		this.new_cookies = Runtime.Dict.from({});
 		this.new_headers = Runtime.Collection.from([]);
 		this.new_http_code = 200;
@@ -13738,7 +13747,6 @@ Object.assign(Runtime.Web.RenderContainer.prototype,
 			this.pattern_class = o.pattern_class;
 			this.frontend_controller_name = o.frontend_controller_name;
 			this.api_storage = o.api_storage;
-			this.backend_storage = o.backend_storage;
 			this.new_cookies = o.new_cookies;
 			this.new_headers = o.new_headers;
 			this.new_http_code = o.new_http_code;
@@ -13758,7 +13766,6 @@ Object.assign(Runtime.Web.RenderContainer.prototype,
 		else if (k == "pattern_class")this.pattern_class = v;
 		else if (k == "frontend_controller_name")this.frontend_controller_name = v;
 		else if (k == "api_storage")this.api_storage = v;
-		else if (k == "backend_storage")this.backend_storage = v;
 		else if (k == "new_cookies")this.new_cookies = v;
 		else if (k == "new_headers")this.new_headers = v;
 		else if (k == "new_http_code")this.new_http_code = v;
@@ -13778,7 +13785,6 @@ Object.assign(Runtime.Web.RenderContainer.prototype,
 		else if (k == "pattern_class")return this.pattern_class;
 		else if (k == "frontend_controller_name")return this.frontend_controller_name;
 		else if (k == "api_storage")return this.api_storage;
-		else if (k == "backend_storage")return this.backend_storage;
 		else if (k == "new_cookies")return this.new_cookies;
 		else if (k == "new_headers")return this.new_headers;
 		else if (k == "new_http_code")return this.new_http_code;
@@ -13835,7 +13841,6 @@ Object.assign(Runtime.Web.RenderContainer,
 			a.push("pattern_class");
 			a.push("frontend_controller_name");
 			a.push("api_storage");
-			a.push("backend_storage");
 			a.push("new_cookies");
 			a.push("new_headers");
 			a.push("new_http_code");
@@ -13931,15 +13936,6 @@ Object.assign(Runtime.Web.RenderContainer,
 			]),
 		});
 		if (field_name == "api_storage") return new IntrospectionInfo(ctx, {
-			"kind": IntrospectionInfo.ITEM_FIELD,
-			"class_name": "Runtime.Web.RenderContainer",
-			"t": "Runtime.Dict",
-			"s": ["primitive"],
-			"name": field_name,
-			"annotations": Collection.from([
-			]),
-		});
-		if (field_name == "backend_storage") return new IntrospectionInfo(ctx, {
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Web.RenderContainer",
 			"t": "Runtime.Dict",
