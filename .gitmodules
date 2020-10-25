@@ -40,3 +40,6 @@
 [submodule "src/lib/Runtime.Components.AirDatepicker"]
 	path = src/lib/Runtime.Components.AirDatepicker
 	url = https://github.com/bayrell/Runtime.Components.AirDatepicker
+[submodule "src/lib/Bayrell.CloudOS.Lib"]
+	path = src/lib/Bayrell.CloudOS.Lib
+	url = https://github.com/bayrell-os/Bayrell.CloudOS.Lib

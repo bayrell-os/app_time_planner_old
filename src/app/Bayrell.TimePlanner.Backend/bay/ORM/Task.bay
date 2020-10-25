@@ -18,16 +18,19 @@
 
 namespace Bayrell.TimePlanner.Backend.ORM;
 
+use Runtime.Date;
 use Runtime.DateTime;
 use Runtime.ORM.Annotations.AutoIncrement;
 use Runtime.ORM.Annotations.BigIntType;
 use Runtime.ORM.Annotations.BooleanType;
+use Runtime.ORM.Annotations.DateType;
 use Runtime.ORM.Annotations.DateTimeType;
 use Runtime.ORM.Annotations.ForeignKey;
 use Runtime.ORM.Annotations.Index;
 use Runtime.ORM.Annotations.JsonType;
 use Runtime.ORM.Annotations.Primary;
 use Runtime.ORM.Annotations.StringType;
+use Runtime.ORM.Annotations.TextType;
 use Runtime.ORM.Annotations.TinyIntType;
 use Runtime.ORM.Annotations.Unique;
 use Runtime.ORM.Annotations.Virtual;
@@ -66,6 +69,9 @@ struct Task extends Record
 	@StringType{}
 	string task_name;
 	
+	@TextType{}
+	string description;
+	
 	@TinyIntType{}
 	int state;
 	
@@ -78,11 +84,11 @@ struct Task extends Record
 	@BigIntType{}
 	int plan_cost_hours;
 	
-	@DateTimeType{ "nullable": true, "comment": "DateTime by UTC" }
-	DateTime plan_begin;
+	@DateType{ "nullable": true, "comment": "Date by UTC" }
+	Date plan_begin;
 	
-	@DateTimeType{ "nullable": true, "comment": "DateTime by UTC" }
-	DateTime plan_end;
+	@DateType{ "nullable": true, "comment": "Date by UTC" }
+	Date plan_end;
 	
 	@DateTimeType{ "nullable": true, "comment": "DateTime by UTC" }
 	DateTime real_begin;

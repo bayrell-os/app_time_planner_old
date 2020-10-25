@@ -23,6 +23,7 @@
 
 <use name="Runtime.lib" />
 <use name="Runtime.Exceptions.RuntimeException" />
+<use name="Runtime.Components.AirDatepicker.DatePicker" component="true" />
 <use name="Runtime.Core.Message" />
 <use name="Runtime.Core.RemoteCallAnswer" />
 <use name="Runtime.Web.LayoutModel" />
@@ -32,7 +33,6 @@
 <use name="Runtime.Web.RouteList" />
 <use name="Runtime.Web.RouteMiddleware" />
 <use name="Runtime.Web.Events.MouseClickEvent" />
-<use name="Runtime.Components.AirDatepicker.DatePicker" component="true" />
 <use name="Runtime.Web.CRUD.CrudPageModel" />
 <use name="Runtime.Web.CRUD.FieldInfo" />
 <use name="Runtime.Web.CRUD.Form" />
@@ -238,6 +238,19 @@ pure Collection<FieldInfo> getStruct(LayoutModel layout, CrudPageModel model, Di
 	},
 	new FieldInfo
 	{
+		"api_name": "description",
+		"label": "Description",
+		"class_name": classof Label,
+		"info":
+		{
+			"form":
+			{
+				"class_name": classof TextArea,
+			},
+		},		
+	},
+	new FieldInfo
+	{
 		"api_name": "project_id",
 		"label": "Project",
 		"class_name": classof Select,
@@ -429,11 +442,12 @@ pure Collection<string> getFilterFields(LayoutModel layout, CrudPageModel model,
 pure Collection<string> getFormFields(LayoutModel layout, CrudPageModel model, Dict params) =>
 [
 	"project_id",
-	"task_name",
 	"state",
+	"task_name",
 	"user",
 	"plan_begin",
 	"plan_end",
+	"description",
 ];
 
 
@@ -449,10 +463,7 @@ pure Collection<string> getTableFields(LayoutModel layout, CrudPageModel model, 
 	"state",
 	"user",
 	"plan_begin",
-	"plan_cost_hours",
 	"plan_end",
-	"real_begin",
-	"real_end",
 	"edit-buttons"
 ];
 
@@ -469,10 +480,8 @@ pure Collection<string> getViewFields(LayoutModel layout, CrudPageModel model, D
 	"state",
 	"user",
 	"plan_begin",
-	"plan_cost_hours",
 	"plan_end",
-	"real_begin",
-	"real_end",
+	"description",
 ];
 
 

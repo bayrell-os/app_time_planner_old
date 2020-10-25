@@ -22,6 +22,7 @@
 >
 
 <use name="Runtime.lib" />
+<use name="Runtime.Components.AirDatepicker.DatePicker" component="true" />
 <use name="Runtime.Core.Message" />
 <use name="Runtime.Web.Events.ChangeEvent" />
 <use name="Runtime.Web.Events.MouseClickEvent" />
@@ -47,11 +48,25 @@
 
 <template name="renderContent">
 	{ static::renderRow(layout, model, params, "project_id") }
-	{ static::renderRow(layout, model, params, "task_name") }
 	{ static::renderRow(layout, model, params, "state") }
+	{ static::renderRow(layout, model, params, "task_name") }
 	{ static::renderRow(layout, model, params, "user") }
-	{ static::renderRow(layout, model, params, "plan_begin") }
 	
+	<div class='form_row form_row--plan' @key="plan">
+		<div class='form_label'>Plan:</div>
+		<div class='form_value'>
+			<DatePicker range={ true }
+				value={ [ model["item", "plan_begin"], model["item", "plan_end"] ] }
+				multipleDatesSeparator=" - " toggleSelected={ false }
+				@event:ChangeEvent="onPlanChange"
+			/>
+		</div>
+		{ static::renderFieldError(layout, model, "plan_cost") }
+	</div>
+	
+	{ static::renderRow(layout, model, params, "description") }
+	
+	<!--
 	<div class='form_row form_row--plan_cost' @key="plan_cost">
 		<div class='form_label'>Plan cost:</div>
 		<div class='form_value'>
@@ -68,11 +83,13 @@
 		</div>
 		{ static::renderFieldError(layout, model, "plan_cost") }
 	</div>
+	-->
 	
 </template>
 
 
 <script type="frontend">
+
 
 /**
  * Render component
@@ -85,6 +102,20 @@ public void onRender(bool created)
 		this.updateModel("setAttr", ["item", "plan_cost"], { "value": 0, "kind": "work_hours" });
 	}
 }
+
+
+
+/**
+ * Plan change
+ */
+public void onPlanChange(Message<ChangeEvent> msg)
+{
+	var plan_begin = msg.data.value[0];
+	var plan_end = msg.data.value[1];
+	this.updateModel("setAttr", ["item", "plan_begin"], plan_begin);
+	this.updateModel("setAttr", ["item", "plan_end"], plan_end);
+}
+
 
 </script>
 

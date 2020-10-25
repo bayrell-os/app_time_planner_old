@@ -2480,8 +2480,15 @@ Object.assign(Runtime.Web.Input.Label,
 				value = def_value;
 			}
 			
-			/* Text */
-			[__vnull, __control_childs] = RenderDriver.e(__control, __control_childs, "text", {"content": value});
+			value = (Runtime.rtl.isString(ctx, value)) ? (Runtime.rs.split(ctx, "\n", value)) : (Runtime.Collection.from([value]));
+			
+			for (var i = 0;i < value.count(ctx);i++)
+			{
+				/* Text */
+				[__vnull, __control_childs] = RenderDriver.e(__control, __control_childs, "text", {"content": Runtime.rtl.get(ctx, value, i)});
+				
+				[__vnull, __control_childs] = RenderDriver.e(__control, __control_childs, "element", {"name": "br","attrs": {}});
+			}
 			
 			return __control_childs;
 		};
@@ -3540,10 +3547,14 @@ Object.assign(Runtime.Web.CRUD.Form.prototype,
 		var model = this.model(ctx);
 		var params = msg.sender.params;
 		var field_name = Runtime.rtl.get(ctx, params, "name");
-		var value = msg.data.value;
+		var new_value = msg.data.value;
+		var old_value = msg.data.old_value;
 		var model_path = Runtime.rtl.get(ctx, params, "crud_form_model_path");
-		var event = new Runtime.Web.CRUD.FormEvent(ctx, Runtime.Dict.from({"event":Runtime.Web.CRUD.FormEvent.ACTION_CHANGE,"item":model.item,"field_name":field_name,"old_value":Runtime.rtl.attr(ctx, model, model_path, null),"value":value}));
-		this.update(ctx, "setAttr", model_path, value);
+		var event = new Runtime.Web.CRUD.FormEvent(ctx, Runtime.Dict.from({"event":Runtime.Web.CRUD.FormEvent.ACTION_CHANGE,"item":model.item,"field_name":field_name,"old_value":old_value,"value":new_value}));
+		if (model_path != null)
+		{
+			this.update(ctx, "setAttr", model_path, new_value);
+		}
 		await this.signal(ctx, event);
 	},
 	/**
@@ -6155,7 +6166,7 @@ Object.assign(Runtime.Web.CRUD.CrudPage,
 	},
 	css: function(ctx, vars)
 	{
-		return ".view.h-2873{" + Runtime.rtl.toStr("}.view_row.h-2873 td{") + Runtime.rtl.toStr("padding-bottom: 5px;") + Runtime.rtl.toStr("}.view_row_label.h-2873{") + Runtime.rtl.toStr("text-align: right;padding-right: 5px;") + Runtime.rtl.toStr("}.view_row_content.h-2873{") + Runtime.rtl.toStr("padding-left: 5px;") + Runtime.rtl.toStr("}.view.h-2873 .buttons.h-2873{") + Runtime.rtl.toStr("text-align: center;padding-top: 10px;") + Runtime.rtl.toStr("}.view.h-2873 .buttons.h-2873 .button.h-2873, .view.h-2873 .buttons.h-2873 .button.h-de49{") + Runtime.rtl.toStr("margin-left: 2px;margin-right: 2px;") + Runtime.rtl.toStr("}");
+		return ".view.h-2873{" + Runtime.rtl.toStr("}.view_row.h-2873 td{") + Runtime.rtl.toStr("padding-bottom: 5px;") + Runtime.rtl.toStr("}.view_row_label.h-2873{") + Runtime.rtl.toStr("vertical-align: top;text-align: right;padding-right: 5px;") + Runtime.rtl.toStr("}.view_row_content.h-2873{") + Runtime.rtl.toStr("padding-left: 5px;") + Runtime.rtl.toStr("}.view.h-2873 .buttons.h-2873{") + Runtime.rtl.toStr("text-align: center;padding-top: 10px;") + Runtime.rtl.toStr("}.view.h-2873 .buttons.h-2873 .button.h-2873, .view.h-2873 .buttons.h-2873 .button.h-de49{") + Runtime.rtl.toStr("margin-left: 2px;margin-right: 2px;") + Runtime.rtl.toStr("}");
 	},
 	render: function(ctx, layout, model, params, content)
 	{
@@ -7269,10 +7280,22 @@ Object.assign(Runtime.Components.AirDatepicker.DatePicker.prototype,
  */
 	onChange: function(ctx, msg)
 	{
-		var value = msg.data.value;
-		var new_value = new Runtime.DateTime(ctx, Runtime.Dict.from({"y":Runtime.rs.substr(ctx, value, 0, 4),"m":Runtime.rs.substr(ctx, value, 5, 2),"d":Runtime.rs.substr(ctx, value, 8, 2),"tz":this.controller.layout.tz}));
-		msg.data = msg.data.copy(ctx, Runtime.Dict.from({"value":new_value}));
-		this.signal(ctx, msg.data);
+		var isRange = Runtime.rtl.get(ctx, this.params, "range") == true;
+		if (isRange)
+		{
+			var value = msg.data.value;
+			var plan_begin = new Runtime.DateTime(ctx, Runtime.Dict.from({"y":Runtime.rs.substr(ctx, value, 0, 4),"m":Runtime.rs.substr(ctx, value, 5, 2),"d":Runtime.rs.substr(ctx, value, 8, 2),"tz":this.controller.layout.tz}));
+			var plan_end = new Runtime.DateTime(ctx, Runtime.Dict.from({"y":Runtime.rs.substr(ctx, value, 13, 4),"m":Runtime.rs.substr(ctx, value, 18, 2),"d":Runtime.rs.substr(ctx, value, 21, 2),"tz":this.controller.layout.tz}));
+			msg.data = msg.data.copy(ctx, Runtime.Dict.from({"value":Runtime.Collection.from([plan_begin,plan_end])}));
+			this.signal(ctx, msg.data);
+		}
+		else
+		{
+			var value = msg.data.value;
+			var new_value = new Runtime.DateTime(ctx, Runtime.Dict.from({"y":Runtime.rs.substr(ctx, value, 0, 4),"m":Runtime.rs.substr(ctx, value, 5, 2),"d":Runtime.rs.substr(ctx, value, 8, 2),"tz":this.controller.layout.tz}));
+			msg.data = msg.data.copy(ctx, Runtime.Dict.from({"value":new_value}));
+			this.signal(ctx, msg.data);
+		}
 	},
 	/**
  * Returns true if repaint overrided
@@ -7295,17 +7318,44 @@ Object.assign(Runtime.Components.AirDatepicker.DatePicker.prototype,
 		return this.childs;
 	},
 	/**
+ * Returns text from model
+ */
+	getInputTextFromValue: function(ctx, value, isRange)
+	{
+		var text = "";
+		var isRange = Runtime.rtl.get(ctx, this.params, "range") == true;
+		if (value instanceof Runtime.Collection)
+		{
+			if (isRange)
+			{
+				if (!Runtime.rtl.isEmpty(ctx, Runtime.rtl.get(ctx, value, 0)) && (Runtime.rtl.get(ctx, value, 0) instanceof Runtime.Date || Runtime.rtl.get(ctx, value, 0) instanceof Runtime.DateTime))
+				{
+					text = Runtime.rtl.get(ctx, value, 0).getDate(ctx, this.controller.layout.tz);
+					if (!Runtime.rtl.isEmpty(ctx, Runtime.rtl.get(ctx, value, 1)) && (Runtime.rtl.get(ctx, value, 1) instanceof Runtime.Date || Runtime.rtl.get(ctx, value, 1) instanceof Runtime.DateTime))
+					{
+						text += Runtime.rtl.toStr(" - " + Runtime.rtl.toStr(Runtime.rtl.get(ctx, value, 1).getDate(ctx, this.controller.layout.tz)));
+					}
+				}
+			}
+		}
+		else if (value instanceof Runtime.DateTime)
+		{
+			text = value.getDate(ctx, this.controller.layout.tz);
+		}
+		return text;
+	},
+	/**
  * Update component
  */
 	updateComponent: function(ctx, control, created)
 	{
 		Runtime.Web.Component.prototype.updateComponent.bind(this)(ctx, control, created);
+		/* Returns value */
 		var value = this.constructor.getValue(ctx, this.controller.layout, this.model(ctx), this.params);
-		var text = "";
-		if (value != null)
-		{
-			text = value.getDate(ctx, this.controller.layout.tz);
-		}
+		var text = this.getInputTextFromValue(ctx, value);
+		var isRange = Runtime.rtl.get(ctx, this.params, "range") == true;
+		var isChanged = this.old_value != value;
+		this.old_value = value;
 		/* Create datepicker */
 		var input = control.parent_elem.querySelector("input");
 	if (input && input.value != text) input.value = text;
@@ -7316,24 +7366,90 @@ Object.assign(Runtime.Components.AirDatepicker.DatePicker.prototype,
 		options["dateFormat"] = "yyyy-mm-dd";
 		options["autoClose"] = options["autoClose"] || true;
 		options["position"] = options["position"] || "top left";
-		options["onSelect"] = (value) =>
+		options["onSelect"] = (value, date, inst) =>
 		{
-			if (this.old_value == value) return;
 			var ctx = globalContext;
-			var data = new Runtime.Web.Events.ChangeEvent(ctx, { "value": value });
-			var msg = new Runtime.Core.Message(ctx, data);
-			this.onChange(ctx, msg);
+			var is_changed = false;
+			var new_value = null;
+			
+			if (isRange && date instanceof Array && date.length == 2)
+			{
+				var date_begin = date[0];
+				var date_end = date[1];
+				var date_begin_old = (this.old_value[0] != null) ? this.old_value[0].toObject(ctx) : null;
+				var date_end_old = (this.old_value[1] != null) ? this.old_value[1].toObject(ctx) : null;
+				var date_begin_t = (date_begin != null) ? date_begin.getTime() : null;
+				var date_end_t = (date_end != null) ? date_end.getTime() : null;
+				var date_begin_old_t = (date_begin_old != null) ? date_begin_old.getTime() : null;
+				var date_end_old_t = (date_end_old != null) ? date_end_old.getTime() : null;
+				if (date_begin_t != date_begin_old_t || date_end_t != date_end_old_t)
+				{
+					var date_begin_obj = Runtime.Date.fromObject(ctx, date_begin, this.controller.layout.tz);
+					var date_end_obj = Runtime.Date.fromObject(ctx, date_end, this.controller.layout.tz);
+					new_value = Runtime.Collection.from([date_begin_obj, date_end_obj]);
+					is_changed = true;
+				}
+			}
+			
+			else if (!isRange)
+			{
+				var date_old = (this.old_value != null) ? this.old_value.toObject(ctx) : null;
+				var date_t = (date != null) ? date.getTime() : null;
+				var date_old_t = (date != null) ? date_old.getTime() : null;
+				if (date_t != date_old_t)
+				{
+					new_value = Runtime.Date.fromObject(ctx, date, this.controller.layout.tz);
+					is_changed = true;
+				}
+			}
+			
+			else if (value == "" && this.old_value != null)
+			{
+				new_value = null;
+				is_changed = true;
+			}
+			
+			if (is_changed)
+			{
+				var data = new Runtime.Web.Events.ChangeEvent
+				(
+					ctx, 
+					{ "value": new_value, "old_value": this.old_value }
+				);
+				this.signal(ctx, data);
+			}
 		};
 		
 		this.datepicker = $(input).datepicker(options);
 	}
 	
-	if (value != null && this.datepicker && this.old_value != text)
+	if (value != null && this.datepicker && isChanged)
 	{
 		var datepicker = this.datepicker.data('datepicker');
-		datepicker.selectDate( value.getObjectData(ctx) );
+		var datepicker_value = null;
+		
+		if (value instanceof Runtime.Collection)
+		{
+			datepicker_value = value
+				.map
+				(
+					ctx, (ctx, item) => (item != null &&
+						(item instanceof Runtime.Date || item instanceof Runtime.DateTime))
+						? item.toObject(ctx) : null,
+				)
+				.filter( ctx, Runtime.lib.equalNot(ctx, null) )
+				.toArray()
+			;
+		}
+		else
+		{
+			datepicker_value = (value != null &&
+				(value instanceof Runtime.Date || value instanceof Runtime.DateTime))
+				? value.toObject(ctx) : null;
+		}
+		
+		datepicker.selectDate( datepicker_value );
 	}
-		this.old_value = text;
 	},
 	_init: function(ctx)
 	{
@@ -7469,7 +7585,7 @@ Object.assign(Runtime.Components.AirDatepicker.DatePicker,
 		if (field_name == "old_value") return new IntrospectionInfo(ctx, {
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Runtime.Components.AirDatepicker.DatePicker",
-			"t": "string",
+			"t": "var",
 			"name": field_name,
 			"annotations": Collection.from([
 			]),

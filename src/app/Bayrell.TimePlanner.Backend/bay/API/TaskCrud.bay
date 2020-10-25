@@ -66,10 +66,9 @@ static class TaskCrud extends CrudApi
 				"parent_task_id",
 				"project_id",
 				"task_name",
+				"description",
 				"state",
 				"user",
-				"plan_cost",
-				"plan_cost_hours",
 				"plan_begin",
 				"plan_end",
 				"real_begin",
@@ -78,7 +77,6 @@ static class TaskCrud extends CrudApi
 		},
 		new ReadOnly{ "api_name": "task_id" },
 		new ReadOnly{ "api_name": "plan_cost_hours" },
-		new ReadOnly{ "api_name": "plan_end" },
 		new ReadOnly{ "api_name": "real_begin" },
 		new ReadOnly{ "api_name": "real_end" },
 		new Required{ "api_name": "task_name" },
@@ -142,16 +140,10 @@ static class TaskCrud extends CrudApi
 		int layer_id = @.env("X-LAYER-ID");
 		item <= layer_id <= layer_id;
 		
-		/* Calc plan end */
-		if (item.plan_begin != null and item.plan_cost != null)
+		/* Calc plan_cost_hours */
+		if (item.plan_cost != null)
 		{
 			int work_hours = item.plan_cost.getWorkHours();
-			DateTime plan_end = DateTime::createDateTime
-			(
-				item.plan_begin.getTimestamp() + item.plan_cost.getHours() * 60,
-				item.plan_begin.tz
-			);
-			item <= plan_end <= plan_end;
 			item <= plan_cost_hours <= work_hours;
 		}
 		
