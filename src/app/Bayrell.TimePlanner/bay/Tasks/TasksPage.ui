@@ -207,9 +207,6 @@ pure Collection<FieldInfo> getStruct(LayoutModel layout, CrudPageModel model, Di
 		"api_name": "number",
 		"label": "",
 		"class_name": classof Label,
-		"class_settings":
-		{
-		},
 		"render": method static::renderNumber,
 	},
 	new FieldInfo
@@ -279,6 +276,7 @@ pure Collection<FieldInfo> getStruct(LayoutModel layout, CrudPageModel model, Di
 		"class_name": classof Select,
 		"class_settings":
 		{
+			"default": 1,
 			"show_select_value_filter": true,
 			"show_select_value": true,
 			"options": static::getOptions(layout, model, params, "states"),

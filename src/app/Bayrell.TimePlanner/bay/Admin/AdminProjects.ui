@@ -18,7 +18,7 @@
 
 <class version="1.0"
 	name="Bayrell.TimePlanner.Admin.AdminProjects" extends="Runtime.Web.CRUD.CrudPage"
-	module="Bayrell.TimePlanner" model="Bayrell.TimePlanner.Admin.CrudPageModel"
+	module="Bayrell.TimePlanner" model="Runtime.Web.CRUD.CrudPageModel"
 >
 
 <use name="Runtime.Exceptions.RuntimeException" />
@@ -60,15 +60,7 @@ pure string getCrudObjectName() => "Bayrell.TimePlanner.Admin.Project";
 static async RenderContainer actionIndex(RenderContainer container)
 {
 	/* Create model */
-	CrudPageModel page_model = await CrudPageModel::crudSearch
-	(
-		{
-			"object_name": static::getCrudObjectName(),
-			"interface_name": "core.crud",
-			"method_name": "search",
-		},
-		container
-	);
+	CrudPageModel page_model = await CrudPageModel::crudSearch(static::getCrudObjectName(), container);
 	
 	/* Set title */
 	container <= layout <= title <= "Projects page";
@@ -109,10 +101,7 @@ pure Collection<FieldInfo> getStruct(LayoutModel layout, CrudPageModel model, Di
 		"api_name": "number",
 		"label": "",
 		"class_name": classof Label,
-		"class_settings":
-		{
-			"render": method static::renderNumber,
-		},
+		"render": method static::renderNumber,
 	},
 	
 	new FieldInfo
@@ -120,7 +109,14 @@ pure Collection<FieldInfo> getStruct(LayoutModel layout, CrudPageModel model, Di
 		"api_name": "project_name",
 		"label": "Name",
 		"class_name": classof Input,
-		"class_name_table": classof Label,
+		"class_name": classof Input,
+		"info":
+		{
+			"table":
+			{
+				"class_name": classof Label,
+			},
+		},
 	},
 	
 	new FieldInfo
@@ -128,10 +124,7 @@ pure Collection<FieldInfo> getStruct(LayoutModel layout, CrudPageModel model, Di
 		"api_name": "edit-buttons",
 		"label": "",
 		"class_name": classof Label,
-		"class_settings":
-		{
-			"render": method static::renderButtons,
-		},
+		"render": method static::renderButtons,
 	}
 ];
 

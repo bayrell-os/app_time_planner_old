@@ -86,8 +86,8 @@ static class TaskCrud extends CrudApi
 		/* Add projects dictionary */
 		new Dictionary
 		{
+			"name": "projects",
 			"class_name": classof Project,
-			"field_name": "projects",
 			"buildSearchQuery": QueryBuilder (QueryBuilder q)
 			{
 				int layer_id = @.env("X-LAYER-ID");

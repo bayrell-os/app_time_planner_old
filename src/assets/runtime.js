@@ -14599,7 +14599,7 @@ Object.assign(Runtime.Web.RenderController.prototype,
 				{
 					if (elem.tagName == "INPUT" || elem.tagName == "SELECT" || elem.tagName == "TEXTAREA")
 					{
-						if (value == null && elem.value != "") elem.value = "";
+						if (value == null && elem.value != "" && value !== 0 && value !== "0") elem.value = "";
 						else if (elem.value != value) elem.value = value;
 						elem._old_value = value;
 						continue;
