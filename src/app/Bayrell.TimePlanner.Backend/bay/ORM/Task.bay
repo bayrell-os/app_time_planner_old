@@ -78,11 +78,8 @@ struct Task extends Record
 	@StringType{}
 	string user;
 	
-	@JsonType{ "nullable": true }
-	TaskPlanCost plan_cost;
-	
 	@BigIntType{}
-	int plan_cost_hours;
+	int plan_hours;
 	
 	@DateType{ "nullable": true, "comment": "Date by UTC" }
 	Date plan_begin;

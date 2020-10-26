@@ -61,8 +61,12 @@
 				@event:ChangeEvent="onPlanChange"
 			/>
 		</div>
-		{ static::renderFieldError(layout, model, "plan_cost") }
+		{ static::renderFieldError(layout, model, "plan_begin") }
+		{ static::renderFieldError(layout, model, "plan_end") }
 	</div>
+	
+	{ static::renderRow(layout, model, params, "plan_hours") }
+	{ static::renderRow(layout, model, params, "real_hours") }
 	
 	{ static::renderRow(layout, model, params, "description") }
 	

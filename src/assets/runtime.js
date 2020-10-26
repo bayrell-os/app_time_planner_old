@@ -7963,10 +7963,11 @@ Object.assign(Runtime.RuntimeUtils,
 	 * @param string class_name
 	 * @return Vector<IntrospectionInfo>
 	 */
-	getClassIntrospection: function(ctx, class_name)
+	getClassIntrospection: function(ctx, class_name, include_parents)
 	{
 		var __memorize_value = Runtime.rtl._memorizeValue("Runtime.RuntimeUtils.getClassIntrospection", arguments);
 		if (__memorize_value != Runtime.rtl._memorize_not_found) return __memorize_value;
+		if (include_parents == undefined) include_parents = false;
 		var class_info = null;
 		var fields = new Runtime.Map(ctx);
 		var methods = new Runtime.Map(ctx);
@@ -8012,7 +8013,15 @@ Object.assign(Runtime.RuntimeUtils,
 			}
 		}
 		/* Get parents names */
-		var class_names = Runtime.RuntimeUtils.getParents(ctx, class_name);
+		var class_names = Runtime.Collection.from([]);
+		if (include_parents)
+		{
+			class_names = Runtime.RuntimeUtils.getParents(ctx, class_name);
+		}
+		else
+		{
+			class_names = Runtime.Collection.from([class_name]);
+		}
 		for (var i = 0;i < class_names.count(ctx);i++)
 		{
 			var item_class_name = class_names.item(ctx, i);
@@ -8085,7 +8094,7 @@ Object.assign(Runtime.RuntimeUtils,
 	{
 		var __memorize_value = Runtime.rtl._memorizeValue("Runtime.RuntimeUtils.getClassIntrospectionWithParents", arguments);
 		if (__memorize_value != Runtime.rtl._memorize_not_found) return __memorize_value;
-		var __memorize_value = this.getClassIntrospection(ctx, class_name);
+		var __memorize_value = this.getClassIntrospection(ctx, class_name, true);
 		Runtime.rtl._memorizeSave("Runtime.RuntimeUtils.getClassIntrospectionWithParents", arguments, __memorize_value);
 		return __memorize_value;
 	},
@@ -12370,6 +12379,15 @@ Object.assign(Runtime.Web.Component.prototype,
 	 */
 	onRender: function(ctx, created)
 	{
+	},
+	/**
+	 * Remote bus call
+	 * @param Dict items
+	 * @return RemoteCallAnswer
+	 */
+	externalBusCall: async function(ctx, items)
+	{
+		return await Runtime.Web.RenderDriver.externalBusCall(ctx, items);
 	},
 	_init: function(ctx)
 	{

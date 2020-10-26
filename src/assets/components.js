@@ -5909,11 +5909,14 @@ Object.assign(Runtime.Web.CRUD.CrudPage.prototype,
 	onRowEditClick: async function(ctx, msg)
 	{
 		var pk = Runtime.rtl.get(ctx, msg.sender.params, "data-pk");
-		var item = this.table.call(ctx, "getFirstItem", pk);
-		this.dialog_edit.update(ctx, "show");
-		this.form_edit.update(ctx, "clear");
-		this.form_edit.update(ctx, "setItem", item);
-		this.form_edit.update(ctx, "setKind", "table");
+		var item = this.call(ctx, "getFirstItem", pk);
+		if (item)
+		{
+			this.dialog_edit.update(ctx, "show");
+			this.form_edit.update(ctx, "clear");
+			this.form_edit.update(ctx, "setItem", item);
+			this.form_edit.update(ctx, "setKind", "table");
+		}
 	},
 	/**
  * On row delete
@@ -5921,7 +5924,7 @@ Object.assign(Runtime.Web.CRUD.CrudPage.prototype,
 	onRowDeleteClick: async function(ctx, msg)
 	{
 		var pk = Runtime.rtl.get(ctx, msg.sender.params, "data-pk");
-		var item = this.table.call(ctx, "getFirstItem", pk);
+		var item = this.call(ctx, "getFirstItem", pk);
 		var message = "";
 		var messages = this.constructor.getMessages(ctx, this.constructor.layout, this.model(ctx), this.params);
 		var f = Runtime.rtl.get(ctx, messages, "delete");
@@ -6005,14 +6008,21 @@ Object.assign(Runtime.Web.CRUD.CrudPage.prototype,
 		{
 			if (kind == "table")
 			{
-				this.table.update(ctx, "prependItem", Runtime.rtl.get(ctx, answer.response, "new_item"));
+				this.update(ctx, "prependItem", Runtime.rtl.get(ctx, answer.response, "new_item"));
 			}
 			this.dialog_add.update(ctx, "hide");
+			await this.onItemCreated(ctx, answer);
 		}
 		else
 		{
 			this.form_add.update(ctx, "setAnswer", answer);
 		}
+	},
+	/**
+ * Updated item
+ */
+	onItemCreated: async function(ctx, answer)
+	{
 	},
 	/**
  * Update item
@@ -6030,18 +6040,25 @@ Object.assign(Runtime.Web.CRUD.CrudPage.prototype,
 		{
 			if (kind == "table")
 			{
-				this.table.update(ctx, "setItem", pk, Runtime.rtl.get(ctx, answer.response, "new_item"));
+				this.update(ctx, "setItem", pk, Runtime.rtl.get(ctx, answer.response, "new_item"));
 			}
 			else if (kind == "view")
 			{
 				this.update(ctx, "setAttr", "item", Runtime.rtl.get(ctx, answer.response, "new_item"));
 			}
 			this.dialog_edit.update(ctx, "hide");
+			await this.onItemUpdated(ctx, answer);
 		}
 		else
 		{
 			this.form_edit.update(ctx, "setAnswer", answer);
 		}
+	},
+	/**
+ * Updated item
+ */
+	onItemUpdated: async function(ctx, answer)
+	{
 	},
 	/**
  * Delete item
@@ -6056,18 +6073,25 @@ Object.assign(Runtime.Web.CRUD.CrudPage.prototype,
 		{
 			if (kind == "table")
 			{
-				this.table.update(ctx, "removeItem", pk);
+				this.update(ctx, "removeItem", pk);
 			}
 			else if (kind == "view")
 			{
 				this.update(ctx, "setAttr", "item", null);
 			}
 			this.dialog_delete.update(ctx, "hide");
+			await this.onItemDeleted(ctx, answer);
 		}
 		else
 		{
 			this.dialog_delete.update(ctx, "setAnswer", answer);
 		}
+	},
+	/**
+ * Deleted item
+ */
+	onItemDeleted: async function(ctx, answer)
+	{
 	},
 	assignObject: function(ctx,o)
 	{
@@ -6924,6 +6948,52 @@ Object.assign(Runtime.Web.CRUD.CrudPageModel,
 			data.set(ctx, "filter", Runtime.Collection.from([]));
 		}
 		return data.toDict(ctx);
+	},
+	/**
+	 * Returns position of item
+	 */
+	findPos: function(ctx, model, find)
+	{
+		return model.table.constructor.findPos(ctx, model.table, find);
+	},
+	/**
+	 * Find first item
+	 */
+	getFirstItem: function(ctx, model, find)
+	{
+		return model.table.constructor.getFirstItem(ctx, model.table, find);
+	},
+	/**
+	 * Add item
+	 */
+	addItem: function(ctx, model, item)
+	{
+		model = Runtime.rtl.setAttr(ctx, model, Runtime.Collection.from(["table"]), model.table.constructor.addItem(ctx, model.table, item));
+		return model;
+	},
+	/**
+	 * Prepend item
+	 */
+	prependItem: function(ctx, model, item)
+	{
+		model = Runtime.rtl.setAttr(ctx, model, Runtime.Collection.from(["table"]), model.table.constructor.prependItem(ctx, model.table, item));
+		return model;
+	},
+	/**
+	 * Set item
+	 */
+	setItem: function(ctx, model, find, item)
+	{
+		model = Runtime.rtl.setAttr(ctx, model, Runtime.Collection.from(["table"]), model.table.constructor.setItem(ctx, model.table, find, item));
+		return model;
+	},
+	/**
+	 * Remove item by id
+	 */
+	removeItem: function(ctx, model, find)
+	{
+		model = Runtime.rtl.setAttr(ctx, model, Runtime.Collection.from(["table"]), model.table.constructor.removeItem(ctx, model.table, find));
+		return model;
 	},
 	/* ======================= Class Init Functions ======================= */
 	getCurrentNamespace: function()

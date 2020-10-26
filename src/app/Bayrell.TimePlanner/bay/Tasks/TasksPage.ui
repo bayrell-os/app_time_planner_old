@@ -69,7 +69,7 @@ pure string getCrudObjectName() => "Bayrell.TimePlanner.Task";
  */
 @Route{ "uri": "/tasks/", "name": "app.tasks" }
 @RouteMiddleware{ "value": "Runtime.Web.Auth.AuthFrontend::checkAuthMiddleware" }
-static async RenderContainer actionIndex(RenderContainer container)
+static async RenderContainer actionTasks(RenderContainer container)
 {
 	/* Create model */
 	TasksPageModel page_model = await TasksPageModel::crudSearch(static::getCrudObjectName(), container);
@@ -168,7 +168,8 @@ pure Collection getOptions(LayoutModel layout, CrudPageModel model, Dict params,
 			{ "id": 1, "value": "New" },
 			{ "id": 2, "value": "Planned" },
 			{ "id": 3, "value": "In work" },
-			{ "id": 4, "value": "Completed" },
+			{ "id": 4, "value": "Ready" },
+			{ "id": 5, "value": "Completed" },
 		];
 		
 	if (name == "users")
@@ -356,10 +357,20 @@ pure Collection<FieldInfo> getStruct(LayoutModel layout, CrudPageModel model, Di
 	},
 	new FieldInfo
 	{
-		"api_name": "plan_cost_hours",
+		"api_name": "plan_hours",
 		"label": "Plan hours",
-		"class_name": classof Label,
-		"calc": string (LayoutModel layout, var value, Dict settings) => rtl::ceil(value / 60),
+		"class_name": classof Input,
+		"info":
+		{
+			"table":
+			{
+				"class_name": classof Label,
+			},
+			"view":
+			{
+				"class_name": classof Label,
+			}
+		},
 	},
 	new FieldInfo
 	{
@@ -397,6 +408,23 @@ pure Collection<FieldInfo> getStruct(LayoutModel layout, CrudPageModel model, Di
 				"class_name": classof Label,
 				"render": method static::renderDateTime,
 			},
+		},
+	},
+	new FieldInfo
+	{
+		"api_name": "real_hours",
+		"label": "Real hours",
+		"class_name": classof Input,
+		"info":
+		{
+			"table":
+			{
+				"class_name": classof Label,
+			},
+			"view":
+			{
+				"class_name": classof Label,
+			}
 		},
 	},
 	new FieldInfo
@@ -445,6 +473,8 @@ pure Collection<string> getFormFields(LayoutModel layout, CrudPageModel model, D
 	"user",
 	"plan_begin",
 	"plan_end",
+	"plan_hours",
+	"real_hours",
 	"description",
 ];
 
@@ -462,6 +492,8 @@ pure Collection<string> getTableFields(LayoutModel layout, CrudPageModel model, 
 	"user",
 	"plan_begin",
 	"plan_end",
+	"plan_hours",
+	"real_hours",
 	"edit-buttons"
 ];
 
@@ -501,6 +533,7 @@ pure Dict<string> getMessages(LayoutModel layout, CrudPageModel model, Dict para
  */
 pure Dict getDialogSettings(LayoutModel layout, CrudPageModel model, Dict params) =>
 {
+	"width": "500px",
 };
 
 

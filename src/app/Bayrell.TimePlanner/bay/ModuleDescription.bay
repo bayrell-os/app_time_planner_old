@@ -120,6 +120,7 @@ static class ModuleDescription
 		/* Register routes */
 		new RouteList{ "name": "Bayrell.TimePlanner.Admin.AdminInfo" },
 		new RouteList{ "name": "Bayrell.TimePlanner.Admin.AdminProjects" },
+		new RouteList{ "name": "Bayrell.TimePlanner.Tasks.PlanPage" },
 		new RouteList{ "name": "Bayrell.TimePlanner.Tasks.TasksPage" },
 		new RouteList{ "name": "Bayrell.TimePlanner.MainPage" },
 		

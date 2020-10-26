@@ -1,0 +1,231 @@
+<!--
+ *  Bayrell Cloud OS
+ *
+ *  (c) Copyright 2020 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+-->
+
+<class version="1.0"
+	name="Bayrell.TimePlanner.Tasks.PlanPage" extends="Bayrell.TimePlanner.Tasks.TasksPage"
+	module="Bayrell.TimePlanner" model="Bayrell.TimePlanner.Tasks.PlanPageModel"
+>
+
+
+<use name="Runtime.lib" />
+<use name="Runtime.Exceptions.RuntimeException" />
+<use name="Runtime.Components.AirDatepicker.DatePicker" component="true" />
+<use name="Runtime.Core.Message" />
+<use name="Runtime.Core.RemoteCallAnswer" />
+<use name="Runtime.Web.LayoutModel" />
+<use name="Runtime.Web.RenderContainer" />
+<use name="Runtime.Web.RenderDriver" />
+<use name="Runtime.Web.Route" />
+<use name="Runtime.Web.RouteList" />
+<use name="Runtime.Web.RouteMiddleware" />
+<use name="Runtime.Web.Events.ChangeEvent" />
+<use name="Runtime.Web.Events.MouseClickEvent" />
+<use name="Runtime.Web.CRUD.CrudPageModel" />
+<use name="Runtime.Web.CRUD.FieldInfo" />
+<use name="Runtime.Web.Input.Button" component="true" />
+<use name="Runtime.Web.Input.Input" component="true" />
+<use name="Runtime.Web.Input.Label" component="true" />
+<use name="Runtime.Web.Input.Select" component="true" />
+<use name="Bayrell.TimePlanner.Tasks.TasksPage" component="true" />
+<use name="Bayrell.TimePlanner.Tasks.TasksPageModel" />
+
+
+<script>
+
+/**
+ * Route Action
+ * @return RenderContainer
+ */
+@Route{ "uri": "/plan/", "name": "app.plan" }
+@RouteMiddleware{ "value": "Runtime.Web.Auth.AuthFrontend::checkAuthMiddleware" }
+static async RenderContainer actionPlan(RenderContainer container)
+{
+	/* Send api request */
+	RemoteCallAnswer answer = await container.externalBusCall
+	{
+		"object_name": static::getCrudObjectName(),
+		"interface_name": "core.crud",
+		"method_name": "search",
+		"data":
+		{
+			"filter":
+			[
+				["state", "=", [2, 3, 4]], /* Planned, In work, Ready */
+			],
+			"order":
+			[
+				["plan_begin", "asc"],
+			],
+			"limit": 1000,
+		},
+	};
+	
+	/* Throw exception */
+	if (not answer.isSuccess())
+	{
+		throw new RuntimeException(answer.error_message, answer.error_code);
+	}
+	
+	/* Answer */
+	PlanPageModel page_model = PlanPageModel::newInstance{ "action": "search" };
+	if (answer.isSuccess())
+	{
+		page_model <= table <= rows <= answer.response["items"];
+		page_model <= table <= page <= answer.response["page"];
+		page_model <= table <= pages <= answer.response["pages"];
+		page_model <= table <= limit <= answer.response["limit"];
+		page_model <= foreigns <= answer.response["foreigns"];
+	}
+	
+	/* Set title */
+	container <= layout <= title <= "Plan";
+	container <= layout <= layout_name <= "admin";
+	
+	/* Set model */
+	container <= layout <= page_class <= classof PlanPage;
+	container <= layout <= page_model <= page_model;
+	
+	return [ container ];
+}
+
+
+</script>
+
+
+<style>
+.table{
+	border-collapse: collapse;
+	border: 1px ${ vars["colors", "default", "border"] } solid;
+	margin-top: 10px;
+	width: 100%;
+}
+.td, .th{
+	border: 1px ${ vars["colors", "default", "border"] } solid;
+	padding: 5px;
+	text-align: left;
+}
+.row:hover td{
+	background-color: ${ vars["colors", "default", "hover-background"] };
+	color: ${ vars["colors", "default", "hover-text"] };
+}
+.th, .td--status, .td--plan_begin, .td--plan_end{
+	text-align: center;
+}
+.td--number{
+	width: 50px;
+}
+.td-edit-buttons{
+	text-align: center;
+	margin-left: -2px;
+	margin-right: -2px;
+	width: 110px;
+}
+.td-edit-buttons .button, .td-edit-buttons %(Button)button{
+	margin-left: 2px;
+	margin-right: 2px;
+}
+.items > .items{
+	padding-left: 10px;
+}
+</style>
+
+
+<template>
+	
+	<table class='table'>
+		<tr class='tr items_header' @key="header">
+			<th class='th'></th>
+			<th class='th'>Name</th>
+			<th class='th'>Status</th>
+			<th class='th'>Description</th>
+			<th class='th'>Plan begin</th>
+			<th class='th'>Plan end</th>
+			<th class='th'>Plan hours</th>
+			<th class='th'>Real hours</th>
+			<th class='th'></th>
+		</tr>
+		%render static::renderItems(layout, model, 0, 0, "");
+	</table>
+	
+	<div class='crud_dialog'>
+		{ static::renderDialog(layout, model, params) }
+	</div>
+	
+</template>
+
+
+
+<template name="renderItems" args="LayoutModel layout, PlanPageModel model, int task_id, int level, string number">
+	
+	%var Collection<FieldInfo> struct = static::getStruct(layout, model, null);
+	%var Collection<Dict> states = TasksPage::getOptions(layout, model, null, "states");
+	%var Collection<Dict> items = model["table", "rows"] |> default Collection [];
+	%var int pos = 1;
+	
+	%for (int i=0; i<items.count(); i++)
+	{
+		%var Dict item = items[i];
+		%if (item["parent_task_id"] == task_id or (task_id == 0 and rtl::isEmpty(item["parent_task_id"])))
+		{
+			%var string item_number = number ~ ((number != "") ? "." : "") ~ pos;
+			<tr class='tr item' @key={ item_number }>
+				<td class='td td--number'>{ item_number }</td>
+				<td class='td td--name'>
+					<span style={ { "padding-left": level * 10 ~ "px" } } />
+					{ item["task_name"] }
+				</td>
+				<td class='td td--status'>
+				{
+					states.findItem( lib::equalAttr("id", item["state"]) )
+					|> attr "value"
+				}
+				</td>
+				<td class='td td--description'>
+					<Label value={ item["description"] } />
+				</td>
+				<td class='td td--plan_begin'>{ item["plan_begin"] |> .getDate() }</td>
+				<td class='td td--plan_end'>{ item["plan_begin"] |> .getDate() }</td>
+				<td class='td td--plan_hours'>{ item["plan_hours"] }</td>
+				<td class='td td--real_hours'>{ item["real_hours"] }</td>
+				<td class='td td-edit-buttons'>
+					<Button type='small' @event:MouseClickEvent="onRowEditClick" @key="edit"
+						data-pk={ static::getPrimaryKey(struct, item) }
+					>
+						{ _("Runtime.Web.CRUD", "Edit") }
+					</Button>
+					<Button type='small danger' @event:MouseClickEvent="onRowDeleteClick" @key="delete"
+						data-pk={ static::getPrimaryKey(struct, item) }
+					>
+						{ _("Runtime.Web.CRUD", "Delete") }
+					</Button>
+				</td>
+			</tr>
+			%render static::renderItems(layout, model, item["task_id"], level + 1, item_number);
+			%var pos = pos + 1;
+		}
+	}
+</template>
+
+
+
+<script>
+
+</script>
+
+
+</class>

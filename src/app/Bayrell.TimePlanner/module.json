@@ -7,6 +7,8 @@
 		"Tasks/TaskForm",
 		"Tasks/TasksPage",
 		"Tasks/TasksPageModel",
+		"Tasks/PlanPage",
+		"Tasks/PlanPageModel",		
 		"AdminLayout",
 		"DefaultLayout",
 		"MainPage",

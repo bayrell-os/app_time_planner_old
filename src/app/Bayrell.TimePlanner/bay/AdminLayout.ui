@@ -105,7 +105,6 @@ span.lpad5{
 	position: relative;
 	height: calc(100% - 45px);
 	padding-bottom: 0;
-	padding-right: 0;
 }
 .layout_menu_label{
 	font-size: 14px;

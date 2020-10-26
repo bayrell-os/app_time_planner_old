@@ -43,3 +43,6 @@
 [submodule "src/lib/Bayrell.CloudOS.Lib"]
 	path = src/lib/Bayrell.CloudOS.Lib
 	url = https://github.com/bayrell-os/Bayrell.CloudOS.Lib
+[submodule "src/lib/Runtime.Components.FontAwesome"]
+	path = src/lib/Runtime.Components.FontAwesome
+	url = https://github.com/bayrell/Runtime.Components.FontAwesome
