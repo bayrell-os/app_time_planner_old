@@ -2764,17 +2764,13 @@ Object.assign(Runtime.rs,
 	url_get_add: function(ctx, s, key, value)
 	{
 		var pos = this.strpos(ctx, s, "?");
-		var s1 = this.substr(ctx, s, 0, pos);
+		var s1 = (pos >= 0) ? (this.substr(ctx, s, 0, pos)) : (s);
 		var s2 = (pos >= 0) ? (this.substr(ctx, s, pos + 1)) : ("");
 		var find = false;
 		var arr = this.explode(ctx, "&", s2);
 		arr = arr.map(ctx, (ctx, s) => 
 		{
 			var arr = this.explode(ctx, "=", s);
-			if (value == "")
-			{
-				return "";
-			}
 			if (Runtime.rtl.get(ctx, arr, 0) == key)
 			{
 				find = true;
@@ -9690,16 +9686,14 @@ if (typeof module != "undefined" && typeof module.exports != "undefined") module
  */
 if (typeof Runtime == 'undefined') Runtime = {};
 if (typeof Runtime.Core == 'undefined') Runtime.Core = {};
-Runtime.Core.CoreObject = function(ctx, object_name, entity)
+Runtime.Core.CoreObject = function(ctx, object_name)
 {
 	if (object_name == undefined) object_name = "";
-	if (entity == undefined) entity = null;
 	/* Init object */
 	this._init(ctx);
 	/* Set object name */
 	this.object_name = (object_name != "") ? (object_name) : (this.getClassName(ctx) + Runtime.rtl.toStr(".") + Runtime.rtl.toStr(Runtime.rtl.uid(ctx)));
 	this.childs = new Runtime.Vector(ctx);
-	this.entity = entity;
 };
 Runtime.Core.CoreObject.prototype = Object.create(Runtime.BaseObject.prototype);
 Runtime.Core.CoreObject.prototype.constructor = Runtime.Core.CoreObject;
@@ -9711,13 +9705,6 @@ Object.assign(Runtime.Core.CoreObject.prototype,
 	getObjectName: function(ctx)
 	{
 		return this.object_name;
-	},
-	/**
-	 * Returns entity
-	 */
-	getEntity: function(ctx)
-	{
-		return this.entity;
 	},
 	/**
 	 * Handle message
@@ -9738,7 +9725,6 @@ Object.assign(Runtime.Core.CoreObject.prototype,
 		this.parent = null;
 		this.childs = null;
 		this.manager = null;
-		this.entity = null;
 		Runtime.BaseObject.prototype._init.call(this,ctx);
 	},
 	assignObject: function(ctx,o)
@@ -9749,7 +9735,6 @@ Object.assign(Runtime.Core.CoreObject.prototype,
 			this.parent = o.parent;
 			this.childs = o.childs;
 			this.manager = o.manager;
-			this.entity = o.entity;
 		}
 		Runtime.BaseObject.prototype.assignObject.call(this,ctx,o);
 	},
@@ -9759,7 +9744,6 @@ Object.assign(Runtime.Core.CoreObject.prototype,
 		else if (k == "parent")this.parent = v;
 		else if (k == "childs")this.childs = v;
 		else if (k == "manager")this.manager = v;
-		else if (k == "entity")this.entity = v;
 		else Runtime.BaseObject.prototype.assignValue.call(this,ctx,k,v);
 	},
 	takeValue: function(ctx,k,d)
@@ -9769,7 +9753,6 @@ Object.assign(Runtime.Core.CoreObject.prototype,
 		else if (k == "parent")return this.parent;
 		else if (k == "childs")return this.childs;
 		else if (k == "manager")return this.manager;
-		else if (k == "entity")return this.entity;
 		return Runtime.BaseObject.prototype.takeValue.call(this,ctx,k,d);
 	},
 	getClassName: function(ctx)
@@ -9816,7 +9799,6 @@ Object.assign(Runtime.Core.CoreObject,
 			a.push("parent");
 			a.push("childs");
 			a.push("manager");
-			a.push("entity");
 		}
 		return Runtime.Collection.from(a);
 	},
@@ -9858,14 +9840,6 @@ Object.assign(Runtime.Core.CoreObject,
 			"annotations": Collection.from([
 			]),
 		});
-		if (field_name == "entity") return new IntrospectionInfo(ctx, {
-			"kind": IntrospectionInfo.ITEM_FIELD,
-			"class_name": "Runtime.Core.CoreObject",
-			"t": "Runtime.Core.Entity",
-			"name": field_name,
-			"annotations": Collection.from([
-			]),
-		});
 		return null;
 	},
 	getMethodsList: function(ctx)
@@ -9902,34 +9876,52 @@ if (typeof module != "undefined" && typeof module.exports != "undefined") module
  */
 if (typeof Runtime == 'undefined') Runtime = {};
 if (typeof Runtime.Core == 'undefined') Runtime.Core = {};
-Runtime.Core.CoreDriver = function(ctx)
+Runtime.Core.CoreDriver = function(ctx, object_name, entity)
 {
-	Runtime.Core.CoreObject.apply(this, arguments);
+	if (object_name == undefined) object_name = "";
+	if (entity == undefined) entity = null;
+	Runtime.Core.CoreObject.call(this, ctx, object_name);
+	this.entity = entity;
 };
 Runtime.Core.CoreDriver.prototype = Object.create(Runtime.Core.CoreObject.prototype);
 Runtime.Core.CoreDriver.prototype.constructor = Runtime.Core.CoreDriver;
 Object.assign(Runtime.Core.CoreDriver.prototype,
 {
 	/**
+	 * Returns entity
+	 */
+	getEntity: function(ctx)
+	{
+		return this.entity;
+	},
+	/**
 	 * Start driver
 	 */
 	startDriver: async function(ctx)
 	{
 	},
+	_init: function(ctx)
+	{
+		this.entity = null;
+		Runtime.Core.CoreObject.prototype._init.call(this,ctx);
+	},
 	assignObject: function(ctx,o)
 	{
 		if (o instanceof Runtime.Core.CoreDriver)
 		{
+			this.entity = o.entity;
 		}
 		Runtime.Core.CoreObject.prototype.assignObject.call(this,ctx,o);
 	},
 	assignValue: function(ctx,k,v)
 	{
-		Runtime.Core.CoreObject.prototype.assignValue.call(this,ctx,k,v);
+		if (k == "entity")this.entity = v;
+		else Runtime.Core.CoreObject.prototype.assignValue.call(this,ctx,k,v);
 	},
 	takeValue: function(ctx,k,d)
 	{
 		if (d == undefined) d = null;
+		if (k == "entity")return this.entity;
 		return Runtime.Core.CoreObject.prototype.takeValue.call(this,ctx,k,d);
 	},
 	getClassName: function(ctx)
@@ -9970,6 +9962,10 @@ Object.assign(Runtime.Core.CoreDriver,
 	{
 		var a = [];
 		if (f==undefined) f=0;
+		if ((f|2)==2)
+		{
+			a.push("entity");
+		}
 		return Runtime.Collection.from(a);
 	},
 	getFieldInfoByName: function(ctx,field_name)
@@ -9977,6 +9973,14 @@ Object.assign(Runtime.Core.CoreDriver,
 		var Collection = Runtime.Collection;
 		var Dict = Runtime.Dict;
 		var IntrospectionInfo = Runtime.IntrospectionInfo;
+		if (field_name == "entity") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Runtime.Core.CoreDriver",
+			"t": "Runtime.Core.Entity",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
 		return null;
 	},
 	getMethodsList: function(ctx)
@@ -12389,6 +12393,18 @@ Object.assign(Runtime.Web.Component.prototype,
 	{
 		return await Runtime.Web.RenderDriver.externalBusCall(ctx, items);
 	},
+	/**
+	 * Open url
+	 */
+	openUrl: async function(ctx, url)
+	{
+		var controller = ctx.getDriver(ctx, "Runtime.Web.RouteController");
+		await controller.openUrl(ctx, url);
+	},
+	pageOpen: async function(ctx, url)
+	{
+		return await this.openUrl(ctx, url);
+	},
 	_init: function(ctx)
 	{
 		this.path_id = "";
@@ -12396,6 +12412,8 @@ Object.assign(Runtime.Web.Component.prototype,
 		this.controller = null;
 		this.params = null;
 		this.model_path = Runtime.Collection.from([]);
+		this.old_model = null;
+		this.elements = null;
 		Runtime.Core.CoreObject.prototype._init.call(this,ctx);
 	},
 	assignObject: function(ctx,o)
@@ -12407,6 +12425,8 @@ Object.assign(Runtime.Web.Component.prototype,
 			this.controller = o.controller;
 			this.params = o.params;
 			this.model_path = o.model_path;
+			this.old_model = o.old_model;
+			this.elements = o.elements;
 		}
 		Runtime.Core.CoreObject.prototype.assignObject.call(this,ctx,o);
 	},
@@ -12417,6 +12437,8 @@ Object.assign(Runtime.Web.Component.prototype,
 		else if (k == "controller")this.controller = v;
 		else if (k == "params")this.params = v;
 		else if (k == "model_path")this.model_path = v;
+		else if (k == "old_model")this.old_model = v;
+		else if (k == "elements")this.elements = v;
 		else Runtime.Core.CoreObject.prototype.assignValue.call(this,ctx,k,v);
 	},
 	takeValue: function(ctx,k,d)
@@ -12427,6 +12449,8 @@ Object.assign(Runtime.Web.Component.prototype,
 		else if (k == "controller")return this.controller;
 		else if (k == "params")return this.params;
 		else if (k == "model_path")return this.model_path;
+		else if (k == "old_model")return this.old_model;
+		else if (k == "elements")return this.elements;
 		return Runtime.Core.CoreObject.prototype.takeValue.call(this,ctx,k,d);
 	},
 	getClassName: function(ctx)
@@ -12577,6 +12601,8 @@ Object.assign(Runtime.Web.Component,
 			a.push("controller");
 			a.push("params");
 			a.push("model_path");
+			a.push("old_model");
+			a.push("elements");
 		}
 		return Runtime.Collection.from(a);
 	},
@@ -12622,6 +12648,22 @@ Object.assign(Runtime.Web.Component,
 			"class_name": "Runtime.Web.Component",
 			"t": "Runtime.Collection",
 			"s": ["string"],
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "old_model") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Runtime.Web.Component",
+			"t": "var",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "elements") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Runtime.Web.Component",
+			"t": "var",
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -16181,12 +16223,36 @@ Object.assign(Runtime.Web.RenderDriver,
 				attrs["model"] = model;
 			}
 			
+			/* Create new control */
+			new_control = control.copy(ctx, {
+				"type": type,
+				"index": index,
+				"path_id": path_id,
+				"component": component,
+				"model": model,
+			});
+			
+			/* Render optimization */
+			/*
+			if (!created)
+			{
+				if (this.equalAttrs(component.old_attrs, attrs) && component.old_model == model)
+				{
+					childs.push( component.elements.slice() );
+					return [new_control, childs];
+				}
+			}
+			*/
+			
+			/* Get dict attrs */
 			var dict_attrs = Runtime.Dict.from(attrs);
 			
 			/* Set new model */
 			component.setParams(ctx, dict_attrs);
 			component.setModelPath(ctx, model_path);
 			component.setParent(ctx, control.component);
+			component.old_attrs = attrs;
+			component.old_model = model;
 			
 			/* Set reference */
 			if (attrs != null && attrs["@ref"] != undefined)
@@ -16197,15 +16263,6 @@ Object.assign(Runtime.Web.RenderDriver,
 			{
 				controller.setReference(ctx, component.path_id, attrs["@name"], component);
 			}
-			
-			/* Create new control */
-			new_control = control.copy(ctx, {
-				"type": type,
-				"index": index,
-				"path_id": path_id,
-				"component": component,
-				"model": model,
-			});
 			
 			if (!component.isRepaintOverridden(ctx, new_control))
 			{
@@ -16225,6 +16282,9 @@ Object.assign(Runtime.Web.RenderDriver,
 				/* Add childs */
 				childs = childs.slice();
 				if (res != null) childs.push(res);
+				
+				/* Set childs */
+				component.elements = childs;
 			}
 			else
 			{
@@ -17568,7 +17628,8 @@ Object.assign(Runtime.Web.RouteController.prototype,
 				var arr = Runtime.rs.explode(ctx, "=", s);
 				var key = Runtime.rtl.get(ctx, arr, 0);
 				var value = Runtime.rtl.get(ctx, arr, 1);
-				query.set(ctx, key, value);
+				var keys = this.constructor.getQueryKeys(ctx, key);
+				query = Runtime.rtl.setAttr(ctx, query, keys, value);
 			});
 		}
 		var request = new Runtime.Web.Request(ctx, Runtime.Dict.from({"uri":uri,"host":host,"protocol":protocol,"query":query.toDict(ctx),"route_prefix":this.route_prefix}));
@@ -17741,6 +17802,15 @@ Object.assign(Runtime.Web.RouteController,
 				catch (e) { console.log(e.stack); }
 			})();
 		}
+	},
+	/**
+	 * Get query keys
+	 */
+	getQueryKeys: function(ctx, key)
+	{
+		key = Runtime.rs.replace(ctx, "]", "", key);
+		var arr = Runtime.rs.split(ctx, "\\[", key);
+		return arr;
 	},
 	/**
 	 * Returns routes

@@ -245,6 +245,10 @@ pure Collection<FieldInfo> getStruct(LayoutModel layout, CrudPageModel model, Di
 			{
 				"class_name": classof TextArea,
 			},
+			"table":
+			{
+				"text-align": "left",
+			},
 		},		
 	},
 	new FieldInfo
@@ -277,13 +281,19 @@ pure Collection<FieldInfo> getStruct(LayoutModel layout, CrudPageModel model, Di
 		"class_name": classof Select,
 		"class_settings":
 		{
-			"default": 1,
 			"show_select_value_filter": true,
 			"show_select_value": true,
 			"options": static::getOptions(layout, model, params, "states"),
 		},
 		"info":
 		{
+			"form":
+			{
+				"class_settings":
+				{
+					"default": 1,
+				},
+			},
 			"table":
 			{
 				"class_name": classof SelectText,
@@ -490,6 +500,7 @@ pure Collection<string> getTableFields(LayoutModel layout, CrudPageModel model, 
 	"task_name",
 	"state",
 	"user",
+	"description",
 	"plan_begin",
 	"plan_end",
 	"plan_hours",

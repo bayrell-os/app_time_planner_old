@@ -4812,7 +4812,7 @@ Object.assign(Runtime.Web.CRUD.Pagination,
 				
 				/* Element 'a' */
 				var __v3; var __v3_childs = [];
-				[__v3, __v2_childs] = RenderDriver.e(__v2, __v2_childs, "element", {"name": "a","attrs": {"href":Runtime.rs.url_get_add(ctx, layout.uri, "page", 1)}});
+				[__v3, __v2_childs] = RenderDriver.e(__v2, __v2_childs, "element", {"name": "a","attrs": {"href":Runtime.rs.url_get_add(ctx, layout.route_prefix + Runtime.rtl.toStr(layout.uri), "page", 1)}});
 				
 				/* Text */
 				[__vnull, __v3_childs] = RenderDriver.e(__v3, __v3_childs, "text", {"content": "1"});
@@ -4855,7 +4855,7 @@ Object.assign(Runtime.Web.CRUD.Pagination,
 						
 						/* Element 'a' */
 						var __v3; var __v3_childs = [];
-						[__v3, __v2_childs] = RenderDriver.e(__v2, __v2_childs, "element", {"name": "a","attrs": {"href":Runtime.rs.url_get_add(ctx, layout.uri, "page", i)}});
+						[__v3, __v2_childs] = RenderDriver.e(__v2, __v2_childs, "element", {"name": "a","attrs": {"href":Runtime.rs.url_get_add(ctx, layout.route_prefix + Runtime.rtl.toStr(layout.uri), "page", i)}});
 						
 						/* Text */
 						[__vnull, __v3_childs] = RenderDriver.e(__v3, __v3_childs, "text", {"content": i});
@@ -4895,7 +4895,7 @@ Object.assign(Runtime.Web.CRUD.Pagination,
 					
 					/* Element 'a' */
 					var __v3; var __v3_childs = [];
-					[__v3, __v2_childs] = RenderDriver.e(__v2, __v2_childs, "element", {"name": "a","attrs": {"href":Runtime.rs.url_get_add(ctx, layout.uri, "page", pages)}});
+					[__v3, __v2_childs] = RenderDriver.e(__v2, __v2_childs, "element", {"name": "a","attrs": {"href":Runtime.rs.url_get_add(ctx, layout.route_prefix + Runtime.rtl.toStr(layout.uri), "page", pages)}});
 					
 					/* Text */
 					[__vnull, __v3_childs] = RenderDriver.e(__v3, __v3_childs, "text", {"content": pages});
@@ -5121,7 +5121,7 @@ Object.assign(Runtime.Web.CRUD.Table,
 				var field = Runtime.Web.CRUD.FieldInfo.getFieldInfo(ctx, Runtime.rtl.get(ctx, params, "struct"), field_name);
 				
 				var __v1 = new Runtime.Monad(ctx, Runtime.rtl.attr(ctx, field, ["info", extends_name, "text-align"]));
-				__v1 = __v1.monad(ctx, Runtime.rtl.m_to(ctx, "string", "left"));
+				__v1 = __v1.monad(ctx, Runtime.rtl.m_to(ctx, "string", ""));
 				var text_align = __v1.value(ctx);
 				
 				var __v1 = new Runtime.Monad(ctx, Runtime.rtl.attr(ctx, field, ["info", extends_name, "width"]));
@@ -5130,7 +5130,7 @@ Object.assign(Runtime.Web.CRUD.Table,
 				
 				/* Element 'td.td' */
 				var __v1; var __v1_childs = [];
-				[__v1, __v0_childs] = RenderDriver.e(__v0, __v0_childs, "element", {"name": "td","attrs": {"data-name":field_name,"style":((text_align != "left") ? ("text-align: " + Runtime.rtl.toStr(text_align) + Runtime.rtl.toStr(";")) : (("" + Runtime.rtl.toStr(td_width) != "") ? ("width: " + Runtime.rtl.toStr(td_width) + Runtime.rtl.toStr(";")) : (""))),"class":["td", "td-" + Runtime.rtl.toStr(field_name), this.getCssHash(ctx)].join(" "),"@key":"td-" + Runtime.rtl.toStr(field_name),"@elem_name":"td"}});
+				[__v1, __v0_childs] = RenderDriver.e(__v0, __v0_childs, "element", {"name": "td","attrs": {"data-name":field_name,"style":((text_align != "") ? ("text-align: " + Runtime.rtl.toStr(text_align) + Runtime.rtl.toStr(";")) : (("" + Runtime.rtl.toStr(td_width) != "") ? ("width: " + Runtime.rtl.toStr(td_width) + Runtime.rtl.toStr(";")) : (""))),"class":["td", "td-" + Runtime.rtl.toStr(field_name), this.getCssHash(ctx)].join(" "),"@key":"td-" + Runtime.rtl.toStr(field_name),"@elem_name":"td"}});
 				
 				/* Text */
 				[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "text", {"content": this.renderCell(ctx, layout, model, params, row, field_name, index)});
@@ -5970,7 +5970,37 @@ Object.assign(Runtime.Web.CRUD.CrudPage.prototype,
 	onFormEvent: async function(ctx, msg)
 	{
 		var e = msg.data;
-		if (msg.sender == this.form_add)
+		if (e.event == Runtime.Web.CRUD.FormEvent.ACTION_SEARCH)
+		{
+			var layout = this.controller.layout;
+			var model = this.model(ctx);
+			var params = this.params;
+			var fields = this.constructor.getFilterFields(ctx, layout, model, params);
+			var uri = layout.route_prefix + Runtime.rtl.toStr(layout.uri);
+			/* Clear filter fields */
+			for (var i = 0;i < fields.count(ctx);i++)
+			{
+				var key = Runtime.rtl.get(ctx, fields, i);
+				uri = Runtime.rs.url_get_add(ctx, uri, "filter[" + Runtime.rtl.toStr(key) + Runtime.rtl.toStr("]"), "");
+			}
+			/* Add filter fields */
+			var item = e.item;
+			if (item != null)
+			{
+				var keys = item.keys(ctx);
+				for (var i = 0;i < keys.count(ctx);i++)
+				{
+					var key = Runtime.rtl.get(ctx, keys, i);
+					var value = Runtime.rtl.get(ctx, item, key);
+					uri = Runtime.rs.url_get_add(ctx, uri, "filter[" + Runtime.rtl.toStr(key) + Runtime.rtl.toStr("]"), value);
+				}
+			}
+			/* Clear page */
+			uri = Runtime.rs.url_get_add(ctx, uri, "page", "");
+			console.log(uri);
+			await this.pageOpen(ctx, uri);
+		}
+		else if (msg.sender == this.form_add)
 		{
 			if (e.event == Runtime.Web.CRUD.FormEvent.ACTION_CANCEL)
 			{
@@ -6270,7 +6300,7 @@ Object.assign(Runtime.Web.CRUD.CrudPage,
 				var __v1; var __v1_childs = [];
 				[__v1, __v0_childs] = RenderDriver.e(__v0, __v0_childs, "element", {"name": "div","attrs": {"class":["filter", this.getCssHash(ctx)].join(" "),"@elem_name":"filter"}});
 				
-				[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "component", {"name": "Runtime.Web.CRUD.CrudFilter","attrs": {"@name":["Runtime.Web.CRUD.CrudPage","filter"],"struct":struct,"fields":filter_fields,"extends_name":"filter"}, "layout": layout});
+				[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "component", {"name": "Runtime.Web.CRUD.CrudFilter","attrs": {"@name":["Runtime.Web.CRUD.CrudPage","filter"],"struct":struct,"fields":filter_fields,"extends_name":"filter","@event:Runtime.Web.CRUD.FormEvent":["Runtime.Web.CRUD.CrudPage","onFormEvent"]}, "layout": layout});
 				RenderDriver.p(__v1, __v1_childs);
 			}
 			
@@ -6907,6 +6937,14 @@ Object.assign(Runtime.Web.CRUD.CrudPageModel,
 			page_model = Runtime.rtl.setAttr(ctx, page_model, Runtime.Collection.from(["table", "limit"]), Runtime.rtl.get(ctx, answer.response, "limit"));
 			page_model = Runtime.rtl.setAttr(ctx, page_model, Runtime.Collection.from(["foreigns"]), Runtime.rtl.get(ctx, answer.response, "foreigns"));
 		}
+		/* Set filter items */
+		var __v0 = new Runtime.Monad(ctx, Runtime.rtl.get(ctx, container.request.query, "filter"));
+		__v0 = __v0.monad(ctx, Runtime.rtl.m_to(ctx, "Runtime.Dict", null));
+		var filter = __v0.value(ctx);
+		if (filter)
+		{
+			page_model = Runtime.rtl.setAttr(ctx, page_model, Runtime.Collection.from(["filter", "item"]), filter);
+		}
 		return Promise.resolve(page_model);
 	},
 	/**
@@ -6938,6 +6976,20 @@ Object.assign(Runtime.Web.CRUD.CrudPageModel,
 		var data = new Runtime.Map(ctx);
 		if (Runtime.rtl.exists(ctx, request.query))
 		{
+			var search_filter = new Runtime.Vector(ctx);
+			var __v0 = new Runtime.Monad(ctx, Runtime.rtl.get(ctx, request.query, "filter"));
+			__v0 = __v0.monad(ctx, Runtime.rtl.m_to(ctx, "Runtime.Dict", null));
+			var filter = __v0.value(ctx);
+			if (filter)
+			{
+				var keys = filter.keys(ctx);
+				for (var i = 0;i < keys.count(ctx);i++)
+				{
+					var key_name = Runtime.rtl.get(ctx, keys, i);
+					search_filter.push(ctx, Runtime.Collection.from([key_name,"=",Runtime.rtl.get(ctx, filter, key_name)]));
+				}
+				data.set(ctx, "filter", search_filter.toCollection(ctx));
+			}
 			var page = request.query.get(ctx, "page", 1) - 1;
 			if (page < 0)
 			{
@@ -6945,7 +6997,6 @@ Object.assign(Runtime.Web.CRUD.CrudPageModel,
 			}
 			data.set(ctx, "page", page);
 			data.set(ctx, "limit", 20);
-			data.set(ctx, "filter", Runtime.Collection.from([]));
 		}
 		return data.toDict(ctx);
 	},
