@@ -8,7 +8,7 @@ secrets:
 services:
     
     time_planner:
-        image: bayrell/time_planner:0.1-20201029_082302
+        image: bayrell/time_planner:0.1-20201029_175751
         hostname: "{{.Service.Name}}.{{.Task.ID}}.local"
         volumes:
             - "time_planner_data:/data"
@@ -48,6 +48,49 @@ services:
         logging:
             driver: journald
 
+
+    time_planner_cron:
+        image: bayrell/time_planner:0.1-20201029_175751
+        hostname: "{{.Service.Name}}.{{.Task.ID}}.local"
+        volumes:
+            - "time_planner_data:/data"
+            - "../src:/var/www"
+        secrets:
+            - AUTH_PUBLIC_KEY
+        env_file:
+            - common.env
+        environment:
+            CLOUD_PANEL: cloud_os_system_panel
+            CLOUD_KEY: mysecretkey
+            CLOUD_SOFTWARE_NAME: "bayrell.time_planner"
+            MEMCACHED: "memcached1"
+            MYSQL_HOST: "mysql1"
+            MYSQL_USERNAME: "lasto4ka"
+            MYSQL_PASSWORD: "7DF&d7jr!Lk5rZ^b"
+            MYSQL_DB: "time_planner"
+            COOKIE_NAME: auth_token
+            COOKIE_EXPIRE: 86400
+            ENABLE_CRON: 1
+        deploy:
+            replicas: 1
+            endpoint_mode: dnsrr
+            update_config:
+                parallelism: 1
+                failure_action: rollback
+                delay: 5s
+            restart_policy:
+                condition: "on-failure"
+                delay: 10s
+                window: 120s
+            placement:
+                constraints:
+                    - node.hostname == docker0
+        networks:
+            - backend
+            - cloud_router
+        logging:
+            driver: journald
+            
 volumes:
     time_planner_data:
 
