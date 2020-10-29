@@ -46,3 +46,6 @@
 [submodule "src/lib/Runtime.Components.FontAwesome"]
 	path = src/lib/Runtime.Components.FontAwesome
 	url = https://github.com/bayrell/Runtime.Components.FontAwesome
+[submodule "src/lib/Runtime.Cron"]
+	path = src/lib/Runtime.Cron
+	url = https://github.com/bayrell/Runtime.Cron

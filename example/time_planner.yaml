@@ -8,7 +8,7 @@ secrets:
 services:
     
     time_planner:
-        image: bayrell/time_planner:0.1-20201022_112220
+        image: bayrell/time_planner:0.1-20201029_082302
         hostname: "{{.Service.Name}}.{{.Task.ID}}.local"
         volumes:
             - "time_planner_data:/data"
@@ -18,7 +18,7 @@ services:
         env_file:
             - common.env
         environment:
-            CLOUD_SYSTEM_PANEL: cloud_os_system_panel
+            CLOUD_PANEL: cloud_os_system_panel
             CLOUD_SOFTWARE_NAME: "bayrell.time_planner"
             MEMCACHED: "memcached1"
             MYSQL_HOST: "mysql1"

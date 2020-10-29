@@ -715,7 +715,16 @@ Object.assign(Bayrell.TimePlanner.Tasks.TasksPage,
 		}
 		if (name == "users")
 		{
-			return Runtime.Collection.from([Runtime.Dict.from({"id":"admin","value":"Admin"})]);
+			var __v0 = new Runtime.Monad(ctx, model);
+			__v0 = __v0.attr(ctx, "foreigns");
+			__v0 = __v0.attr(ctx, "users");
+			__v0 = __v0.attr(ctx, "options");
+			__v0 = __v0.call(ctx, Runtime.lib.map(ctx, (ctx, item) => 
+			{
+				return Runtime.Dict.from({"id":Runtime.rtl.get(ctx, item, "user_id"),"value":Runtime.rtl.get(ctx, item, "login"),"item":item});
+			}));
+			__v0 = __v0.monad(ctx, Runtime.rtl.m_to(ctx, "Runtime.Collection", Runtime.Collection.from([])));
+			return __v0.value(ctx);
 		}
 		return Runtime.Web.CRUD.CrudPage.getOptions.bind(this)(ctx, layout, model, params, name);
 	},
@@ -1751,7 +1760,7 @@ Object.assign(Bayrell.TimePlanner.AdminLayout,
 {
 	css: function(ctx, vars)
 	{
-		return "*{" + Runtime.rtl.toStr("box-sizing: border-box;") + Runtime.rtl.toStr("}body{") + Runtime.rtl.toStr("margin:0;padding:0;") + Runtime.rtl.toStr("}a {") + Runtime.rtl.toStr(" text-decoration: inherit; color: #0000d0; cursor: pointer; ") + Runtime.rtl.toStr("}a:hover, a:visited:hover {") + Runtime.rtl.toStr(" text-decoration: underline; color: red; ") + Runtime.rtl.toStr("}a:visited {") + Runtime.rtl.toStr(" text-decoration: inherit; color: #0000d0; ") + Runtime.rtl.toStr("}a.link.h-3a49 {") + Runtime.rtl.toStr(" text-decoration: none; color: #0000d0; cursor: pointer; ") + Runtime.rtl.toStr("}a.link.h-3a49:hover, a.link.h-3a49:visited:hover {") + Runtime.rtl.toStr(" text-decoration: underline; color: red; ") + Runtime.rtl.toStr("}a.link.h-3a49:visited {") + Runtime.rtl.toStr(" text-decoration: none; color: #0000d0; ") + Runtime.rtl.toStr("}body, html{") + Runtime.rtl.toStr("font-family: 'Ubuntu', sans-serif;font-size: 14px;width: 100%;padding: 0;margin: 0;") + Runtime.rtl.toStr("}td, th{") + Runtime.rtl.toStr("font-family: 'Ubuntu', sans-serif;font-size: 14px;") + Runtime.rtl.toStr("}span.lpad5.h-3a49{") + Runtime.rtl.toStr("display: inline-block;padding-right: 5px;") + Runtime.rtl.toStr("}.layout.h-3a49{") + Runtime.rtl.toStr("height: 100%;") + Runtime.rtl.toStr("}.layout_wrap.h-3a49{") + Runtime.rtl.toStr("position: relative;display: flex;align-items: stretch;min-height: calc(100% - 25px);") + Runtime.rtl.toStr("}.layout_footer.h-3a49{") + Runtime.rtl.toStr("position: relative;width: 100%;height: 24px;border-top: 1px #ccc solid;background-color: white;font-size: 12px;") + Runtime.rtl.toStr("}.layout_footer.h-3a49 .b_in.h-3a49{") + Runtime.rtl.toStr("}.layout_menu_wrap.h-3a49{") + Runtime.rtl.toStr("position: relative;width: 200px;") + Runtime.rtl.toStr("}.layout_content_wrap.h-3a49{") + Runtime.rtl.toStr("position: relative;width: calc(100% - 200px);padding-bottom: 10px;") + Runtime.rtl.toStr("}.layout_site_name.h-3a49, .layout_title_wrap.h-3a49{") + Runtime.rtl.toStr("font-size: 16px;height: 40px;") + Runtime.rtl.toStr("}.layout_site_name.h-3a49, .layout_title_wrap.h-3a49, .layout_page.h-3a49, .layout_content.h-3a49{") + Runtime.rtl.toStr("padding: 10px;") + Runtime.rtl.toStr("}.layout_site_name.h-3a49{") + Runtime.rtl.toStr("border-right: 1px #ccc solid;") + Runtime.rtl.toStr("}.layout_title_wrap.h-3a49{") + Runtime.rtl.toStr("display: flex;align-items: stretch;") + Runtime.rtl.toStr("}.layout_title.h-3a49{") + Runtime.rtl.toStr("width: 350px;") + Runtime.rtl.toStr("}.layout_top_buttons.h-3a49{") + Runtime.rtl.toStr("width: calc(100% - 350px);padding-left: 10px;") + Runtime.rtl.toStr("}.layout_content.h-3a49{") + Runtime.rtl.toStr("position: relative;height: calc(100% - 45px);padding-bottom: 0;") + Runtime.rtl.toStr("}.layout_menu_label.h-3a49{") + Runtime.rtl.toStr("font-size: 14px;font-weight: bold;padding: 10px;") + Runtime.rtl.toStr("}.layout_menu.h-3a49{") + Runtime.rtl.toStr("position: relative;height: calc(100% - 40px);overflow-y: auto;border-right: 1px #ccc solid;") + Runtime.rtl.toStr("}.layout_menu_items.h-3a49{") + Runtime.rtl.toStr("}.layout_menu_items.h-3a49 ul, .layout_menu_items.h-3a49 li{") + Runtime.rtl.toStr("padding: 0; margin: 0;list-style: none;") + Runtime.rtl.toStr("}.layout_menu_items.h-3a49 ul{") + Runtime.rtl.toStr("}.layout_menu_items.h-3a49 li{") + Runtime.rtl.toStr("background-color: white;") + Runtime.rtl.toStr("}.layout_menu_items.h-3a49 li:hover{") + Runtime.rtl.toStr("background-color: " + Runtime.rtl.toStr(Runtime.rtl.attr(ctx, vars, ["colors", "default", "hover-background"])) + Runtime.rtl.toStr(";")) + Runtime.rtl.toStr("}.layout_menu_items.h-3a49 li a{") + Runtime.rtl.toStr("display: block;padding: 10px 15px;border-bottom: 1px solid #e7e7e7;") + Runtime.rtl.toStr("}.layout_menu_items.h-3a49 li.active.h-3a49 > a, .layout_menu_items.h-3a49 li.active.h-3a49 > a:hover{") + Runtime.rtl.toStr("background-color: #337ab7;border-color: #337ab7;color: white;") + Runtime.rtl.toStr("}.layout_menu_logout.h-3a49{") + Runtime.rtl.toStr("text-align: center;padding-top: 100px;") + Runtime.rtl.toStr("}.layout_menu_logout.h-3a49 > div{") + Runtime.rtl.toStr("padding-top: 5px;") + Runtime.rtl.toStr("}");
+		return "*{" + Runtime.rtl.toStr("box-sizing: border-box;") + Runtime.rtl.toStr("}body{") + Runtime.rtl.toStr("margin:0;padding:0;") + Runtime.rtl.toStr("}a {") + Runtime.rtl.toStr(" text-decoration: inherit; color: #0000d0; cursor: pointer; ") + Runtime.rtl.toStr("}a:hover, a:visited:hover {") + Runtime.rtl.toStr(" text-decoration: underline; color: red; ") + Runtime.rtl.toStr("}a:visited {") + Runtime.rtl.toStr(" text-decoration: inherit; color: #0000d0; ") + Runtime.rtl.toStr("}a.link.h-3a49 {") + Runtime.rtl.toStr(" text-decoration: none; color: #0000d0; cursor: pointer; ") + Runtime.rtl.toStr("}a.link.h-3a49:hover, a.link.h-3a49:visited:hover {") + Runtime.rtl.toStr(" text-decoration: underline; color: red; ") + Runtime.rtl.toStr("}a.link.h-3a49:visited {") + Runtime.rtl.toStr(" text-decoration: none; color: #0000d0; ") + Runtime.rtl.toStr("}body, html{") + Runtime.rtl.toStr("font-family: 'Ubuntu', sans-serif;font-size: 14px;width: 100%;padding: 0;margin: 0;") + Runtime.rtl.toStr("}td, th{") + Runtime.rtl.toStr("font-family: 'Ubuntu', sans-serif;font-size: 14px;") + Runtime.rtl.toStr("}span.lpad5.h-3a49{") + Runtime.rtl.toStr("display: inline-block;padding-right: 5px;") + Runtime.rtl.toStr("}.layout.h-3a49{") + Runtime.rtl.toStr("height: 100%;") + Runtime.rtl.toStr("}.layout_wrap.h-3a49{") + Runtime.rtl.toStr("position: relative;display: flex;align-items: stretch;min-height: 100%;") + Runtime.rtl.toStr("}.layout_footer.h-3a49 .b_in.h-3a49{") + Runtime.rtl.toStr("}.layout_menu_wrap.h-3a49{") + Runtime.rtl.toStr("position: relative;width: 200px;") + Runtime.rtl.toStr("}.layout_content_wrap.h-3a49{") + Runtime.rtl.toStr("position: relative;width: calc(100% - 200px);padding-bottom: 10px;") + Runtime.rtl.toStr("}.layout_site_name.h-3a49, .layout_title.h-3a49, .layout_top_menu.h-3a49{") + Runtime.rtl.toStr("font-size: 16px;height: 40px;") + Runtime.rtl.toStr("}.layout_site_name.h-3a49, .layout_title.h-3a49, .layout_top_menu.h-3a49, .layout_page.h-3a49, .layout_content.h-3a49{") + Runtime.rtl.toStr("padding: 10px;") + Runtime.rtl.toStr("}.layout_top_menu_item.h-3a49{") + Runtime.rtl.toStr("padding-left: 10px;padding-right: 10px;") + Runtime.rtl.toStr("}.layout_site_name.h-3a49{") + Runtime.rtl.toStr("border-right: 1px #ccc solid;") + Runtime.rtl.toStr("}.layout_top_menu.h-3a49{") + Runtime.rtl.toStr("display: flex;align-items: stretch;") + Runtime.rtl.toStr("}.layout_content.h-3a49{") + Runtime.rtl.toStr("position: relative;height: calc(100% - 70px);padding-bottom: 0;") + Runtime.rtl.toStr("}.layout_menu_label.h-3a49{") + Runtime.rtl.toStr("font-size: 14px;font-weight: bold;padding: 10px;") + Runtime.rtl.toStr("}.layout_menu.h-3a49{") + Runtime.rtl.toStr("position: relative;height: calc(100% - 40px);overflow-y: auto;border-right: 1px #ccc solid;") + Runtime.rtl.toStr("}.layout_menu_items.h-3a49{") + Runtime.rtl.toStr("}.layout_menu_items.h-3a49 ul, .layout_menu_items.h-3a49 li{") + Runtime.rtl.toStr("padding: 0; margin: 0;list-style: none;") + Runtime.rtl.toStr("}.layout_menu_items.h-3a49 ul{") + Runtime.rtl.toStr("}.layout_menu_items.h-3a49 li{") + Runtime.rtl.toStr("background-color: white;") + Runtime.rtl.toStr("}.layout_menu_items.h-3a49 li:hover{") + Runtime.rtl.toStr("background-color: " + Runtime.rtl.toStr(Runtime.rtl.attr(ctx, vars, ["colors", "default", "hover-background"])) + Runtime.rtl.toStr(";")) + Runtime.rtl.toStr("}.layout_menu_items.h-3a49 li a{") + Runtime.rtl.toStr("display: block;padding: 10px 15px;border-bottom: 1px solid #e7e7e7;") + Runtime.rtl.toStr("}.layout_menu_items.h-3a49 li.active.h-3a49 > a, .layout_menu_items.h-3a49 li.active.h-3a49 > a:hover{") + Runtime.rtl.toStr("background-color: #337ab7;border-color: #337ab7;color: white;") + Runtime.rtl.toStr("}.layout_menu_logout.h-3a49{") + Runtime.rtl.toStr("text-align: center;padding-top: 100px;") + Runtime.rtl.toStr("}.layout_menu_logout.h-3a49 > div{") + Runtime.rtl.toStr("padding-top: 5px;") + Runtime.rtl.toStr("}");
 	},
 	render: function(ctx, layout, model, params, content)
 	{
@@ -1923,27 +1932,50 @@ Object.assign(Bayrell.TimePlanner.AdminLayout,
 			var __v2; var __v2_childs = [];
 			[__v2, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "element", {"name": "div","attrs": {"class":["layout_content_wrap", this.getCssHash(ctx)].join(" "),"@elem_name":"layout_content_wrap"}});
 			
-			/* Element 'div.layout_title_wrap' */
+			/* Element 'div.layout_top_menu' */
 			var __v3; var __v3_childs = [];
-			[__v3, __v2_childs] = RenderDriver.e(__v2, __v2_childs, "element", {"name": "div","attrs": {"class":["layout_title_wrap", this.getCssHash(ctx)].join(" "),"@elem_name":"layout_title_wrap"}});
+			[__v3, __v2_childs] = RenderDriver.e(__v2, __v2_childs, "element", {"name": "div","attrs": {"class":["layout_top_menu", this.getCssHash(ctx)].join(" "),"@elem_name":"layout_top_menu"}});
+			
+			var __v4 = new Runtime.Monad(ctx, Runtime.rtl.attr(ctx, layout, ["keep_data", "cloud_os_top_menu"]));
+			__v4 = __v4.monad(ctx, Runtime.rtl.m_to(ctx, "Runtime.Collection", Runtime.Collection.from([])));
+			var top_menu = __v4.value(ctx);
+			
+			for (var i = 0;i < top_menu.count(ctx);i++)
+			{
+				var item = Runtime.rtl.get(ctx, top_menu, i);
+				
+				/* Element 'div.layout_top_menu_item' */
+				var __v4; var __v4_childs = [];
+				[__v4, __v3_childs] = RenderDriver.e(__v3, __v3_childs, "element", {"name": "div","attrs": {"class":["layout_top_menu_item", this.getCssHash(ctx)].join(" "),"@elem_name":"layout_top_menu_item"}});
+				
+				/* Element 'a.nolink' */
+				var __v5; var __v5_childs = [];
+				[__v5, __v4_childs] = RenderDriver.e(__v4, __v4_childs, "element", {"name": "a","attrs": {"href":Runtime.rtl.get(ctx, item, "href"),"target":"_self","class":["nolink", this.getCssHash(ctx)].join(" "),"@elem_name":"nolink"}});
+				
+				/* Text */
+				[__vnull, __v5_childs] = RenderDriver.e(__v5, __v5_childs, "text", {"content": Runtime.rtl.get(ctx, item, "name")});
+				RenderDriver.p(__v5, __v5_childs);
+				RenderDriver.p(__v4, __v4_childs);
+			}
+			RenderDriver.p(__v3, __v3_childs);
 			
 			/* Element 'div.layout_title' */
-			var __v4; var __v4_childs = [];
-			[__v4, __v3_childs] = RenderDriver.e(__v3, __v3_childs, "element", {"name": "div","attrs": {"class":["layout_title", this.getCssHash(ctx)].join(" "),"@elem_name":"layout_title"}});
+			var __v3; var __v3_childs = [];
+			[__v3, __v2_childs] = RenderDriver.e(__v2, __v2_childs, "element", {"name": "div","attrs": {"class":["layout_title", this.getCssHash(ctx)].join(" "),"@elem_name":"layout_title"}});
 			
 			/* Text */
-			[__vnull, __v4_childs] = RenderDriver.e(__v4, __v4_childs, "text", {"content": model.title});
-			RenderDriver.p(__v4, __v4_childs);
+			[__vnull, __v3_childs] = RenderDriver.e(__v3, __v3_childs, "text", {"content": model.title});
+			RenderDriver.p(__v3, __v3_childs);
 			
 			/* Element 'div.layout_top_buttons' */
-			var __v4; var __v4_childs = [];
-			[__v4, __v3_childs] = RenderDriver.e(__v3, __v3_childs, "element", {"name": "div","attrs": {"class":["layout_top_buttons", this.getCssHash(ctx)].join(" "),"@elem_name":"layout_top_buttons"}});
+			var __v3; var __v3_childs = [];
+			[__v3, __v2_childs] = RenderDriver.e(__v2, __v2_childs, "element", {"name": "div","attrs": {"class":["layout_top_buttons", this.getCssHash(ctx)].join(" "),"@elem_name":"layout_top_buttons"}});
 			
-			var __v5 = new Runtime.Monad(ctx, layout);
-			__v5 = __v5.attr(ctx, "data");
-			__v5 = __v5.attr(ctx, "Bayrell.TimePlanner.Layout.TopButtons");
-			__v5 = __v5.monad(ctx, Runtime.rtl.m_to(ctx, "Runtime.Collection", Runtime.Collection.from([])));
-			var top_buttons = __v5.value(ctx);
+			var __v4 = new Runtime.Monad(ctx, layout);
+			__v4 = __v4.attr(ctx, "data");
+			__v4 = __v4.attr(ctx, "Bayrell.TimePlanner.Layout.TopButtons");
+			__v4 = __v4.monad(ctx, Runtime.rtl.m_to(ctx, "Runtime.Collection", Runtime.Collection.from([])));
+			var top_buttons = __v4.value(ctx);
 			
 			if (Runtime.rtl.exists(ctx, top_buttons))
 			{
@@ -1952,7 +1984,7 @@ Object.assign(Bayrell.TimePlanner.AdminLayout,
 					var button = Runtime.rtl.get(ctx, top_buttons, i);
 					
 					/* Component 'Button' */
-					[__vnull, __v4_childs] = RenderDriver.e(__v4, __v4_childs, "component", {"name": "Runtime.Web.Button.Button","attrs": {"@event:Runtime.Web.Events.MouseClickEvent":["Bayrell.TimePlanner.AdminLayout","onTopButtonClick"],"@tag":button}, "layout": layout, "content": (__control) =>
+					[__vnull, __v3_childs] = RenderDriver.e(__v3, __v3_childs, "component", {"name": "Runtime.Web.Button.Button","attrs": {"@event:Runtime.Web.Events.MouseClickEvent":["Bayrell.TimePlanner.AdminLayout","onTopButtonClick"],"@tag":button}, "layout": layout, "content": (__control) =>
 					{
 						var __vnull = null;
 						var __control_childs = [];
@@ -1964,7 +1996,6 @@ Object.assign(Bayrell.TimePlanner.AdminLayout,
 					}});
 				}
 			}
-			RenderDriver.p(__v4, __v4_childs);
 			RenderDriver.p(__v3, __v3_childs);
 			
 			/* Element 'div.layout_content' */
@@ -1975,30 +2006,6 @@ Object.assign(Bayrell.TimePlanner.AdminLayout,
 			{
 				[__vnull, __v3_childs] = RenderDriver.e(__v3, __v3_childs, "component", {"name": class_name,"attrs": {"@bind":["Bayrell.TimePlanner.AdminLayout","page_model"],"@key":"view"}, "layout": layout});
 			}
-			RenderDriver.p(__v3, __v3_childs);
-			RenderDriver.p(__v2, __v2_childs);
-			RenderDriver.p(__v1, __v1_childs);
-			
-			/* Element 'div.layout_footer' */
-			var __v1; var __v1_childs = [];
-			[__v1, __v0_childs] = RenderDriver.e(__v0, __v0_childs, "element", {"name": "div","attrs": {"class":["layout_footer", this.getCssHash(ctx)].join(" "),"@elem_name":"layout_footer"}});
-			
-			/* Element 'div.b_out' */
-			var __v2; var __v2_childs = [];
-			[__v2, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "element", {"name": "div","attrs": {"class":["b_out", this.getCssHash(ctx)].join(" "),"@elem_name":"b_out"}});
-			
-			/* Element 'div.b_in' */
-			var __v3; var __v3_childs = [];
-			[__v3, __v2_childs] = RenderDriver.e(__v2, __v2_childs, "element", {"name": "div","attrs": {"class":["b_in", this.getCssHash(ctx)].join(" "),"@elem_name":"b_in"}});
-			
-			/* Text */
-			[__vnull, __v3_childs] = RenderDriver.e(__v3, __v3_childs, "text", {"content": "(c) BAYRELL Time Planner 2020 \"Ildar Bikmamatov\" <support@bayrell.org>"});
-			
-			/* Text */
-			[__vnull, __v3_childs] = RenderDriver.e(__v3, __v3_childs, "text", {"content": ".\n\t\t\t\tVersion: "});
-			
-			/* Text */
-			[__vnull, __v3_childs] = RenderDriver.e(__v3, __v3_childs, "text", {"content": Bayrell.TimePlanner.ModuleDescription.getModuleVersion(ctx)});
 			RenderDriver.p(__v3, __v3_childs);
 			RenderDriver.p(__v2, __v2_childs);
 			RenderDriver.p(__v1, __v1_childs);

@@ -173,10 +173,19 @@ pure Collection getOptions(LayoutModel layout, CrudPageModel model, Dict params,
 		];
 		
 	if (name == "users")
-		return
-		[
-			{ "id": "admin", "value": "Admin" },
-		];
+		return model
+			|> attr "foreigns", "users", "options"
+			|> lib::map
+			(
+				Dict (Dict item) =>
+				{
+					"id": item["user_id"],
+					"value": item["login"],
+					"item": item,
+				}
+			)
+			|> default Collection []
+		;
 		
 	return parent::getOptions(layout, model, params, name);
 }

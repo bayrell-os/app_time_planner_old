@@ -7534,7 +7534,7 @@ Object.assign(Runtime.Components.AirDatepicker.DatePicker.prototype,
 			{
 				var data = new Runtime.Web.Events.ChangeEvent
 				(
-					ctx, 
+					ctx,
 					{ "value": new_value, "old_value": this.old_value }
 				);
 				this.signal(ctx, data);

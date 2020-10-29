@@ -51,7 +51,10 @@ static class ModuleDescription
 	{
 		/* Backend */
 		#ifdef BACKEND then
+		'Runtime.Cron': '*',
+		'Runtime.Task': '*',
 		'Runtime.Web.Backend': '*',
+		'Bayrell.CloudOS.Lib': '*',
 		#endif
 	};
 	

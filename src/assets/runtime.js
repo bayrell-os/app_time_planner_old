@@ -1995,6 +1995,44 @@ Object.assign(Runtime.lib,
 			return value;
 		};
 	},
+	/**
+	 * Function or
+	 */
+	or: function(ctx, arr)
+	{
+		return (ctx, item) => 
+		{
+			for (var i = 0;i < arr.count(ctx);i++)
+			{
+				var f = Runtime.rtl.get(ctx, arr, i);
+				var res = f(ctx, item);
+				if (res)
+				{
+					return true;
+				}
+			}
+			return false;
+		};
+	},
+	/**
+	 * Function and
+	 */
+	and: function(ctx, arr)
+	{
+		return (ctx, item) => 
+		{
+			for (var i = 0;i < arr.count(ctx);i++)
+			{
+				var f = Runtime.rtl.get(ctx, arr, i);
+				var res = f(ctx, item);
+				if (res)
+				{
+					return true;
+				}
+			}
+			return false;
+		};
+	},
 	/* ======================= Class Init Functions ======================= */
 	getCurrentNamespace: function()
 	{

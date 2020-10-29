@@ -59,15 +59,7 @@ span.lpad5{
 	position: relative;
 	display: flex;
 	align-items: stretch;
-	min-height: calc(100% - 25px);
-}
-.layout_footer{
-	position: relative;
-	width: 100%;
-	height: 24px;
-	border-top: 1px #ccc solid;
-	background-color: white;
-	font-size: 12px;
+	min-height: 100%;
 }
 .layout_footer .b_in{
 }
@@ -80,30 +72,27 @@ span.lpad5{
 	width: calc(100% - 200px);
 	padding-bottom: 10px;
 }
-.layout_site_name, .layout_title_wrap{
+.layout_site_name, .layout_title, .layout_top_menu{
 	font-size: 16px;
 	height: 40px;
 }
-.layout_site_name, .layout_title_wrap, .layout_page, .layout_content{
+.layout_site_name, .layout_title, .layout_top_menu, .layout_page, .layout_content{
 	padding: 10px;
+}
+.layout_top_menu_item{
+	padding-left: 10px;
+	padding-right: 10px;
 }
 .layout_site_name{
 	border-right: 1px #ccc solid;
 }
-.layout_title_wrap{
+.layout_top_menu{
 	display: flex;
 	align-items: stretch;
 }
-.layout_title{
-	width: 350px;
-}
-.layout_top_buttons{
-	width: calc(100% - 350px);
-	padding-left: 10px;
-}
 .layout_content{
 	position: relative;
-	height: calc(100% - 45px);
+	height: calc(100% - 70px);
 	padding-bottom: 0;
 }
 .layout_menu_label{
@@ -231,24 +220,32 @@ span.lpad5{
 				
 			</div>
 			<div class='layout_content_wrap'>
-				<div class='layout_title_wrap'>
-					<div class='layout_title'>{ model.title }</div>
-					<div class='layout_top_buttons'>
-						%var Collection<Dict> top_buttons = layout
-							|> attr "data", "Bayrell.TimePlanner.Layout.TopButtons"
-							|> default Collection []
-						;
-						%if (rtl::exists(top_buttons))
+				<div class='layout_top_menu'>
+					%var Collection top_menu = layout["keep_data", "cloud_os_top_menu"] |> default Collection [];
+					%for (int i=0; i<top_menu.count(); i++)
+					{
+						%var Dict item = top_menu[i];
+						<div class='layout_top_menu_item'>
+							<a class='nolink' href={ item["href"] } target='_self'>{ item["name"] }</a>
+						</div>
+					}
+				</div>
+				<div class='layout_title'>{ model.title }</div>
+				<div class='layout_top_buttons'>
+					%var Collection<Dict> top_buttons = layout
+						|> attr "data", "Bayrell.TimePlanner.Layout.TopButtons"
+						|> default Collection []
+					;
+					%if (rtl::exists(top_buttons))
+					{
+						%for (int i=0; i<top_buttons.count(); i++)
 						{
-							%for (int i=0; i<top_buttons.count(); i++)
-							{
-								%var Dict button = top_buttons[i];
-								<Button @event:MouseClickEvent="onTopButtonClick" @tag={ button }>
-									{ button["label"] }
-								</Button>
-							}
+							%var Dict button = top_buttons[i];
+							<Button @event:MouseClickEvent="onTopButtonClick" @tag={ button }>
+								{ button["label"] }
+							</Button>
 						}
-					</div>
+					}
 				</div>
 				<div class='layout_content'>
 					%if (not rtl::isEmpty(class_name))
@@ -257,12 +254,6 @@ span.lpad5{
 					}
 				</div>
 			</div>
-		</div>
-		<div class='layout_footer'>
-			<div class='b_out'><div class='b_in'>
-				{ "(c) BAYRELL Time Planner 2020 \"Ildar Bikmamatov\" <support@bayrell.org>" }.
-				Version: { ModuleDescription::getModuleVersion() }
-			</div></div>
 		</div>
 	</div>
 </template>

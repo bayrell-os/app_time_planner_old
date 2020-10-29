@@ -39,6 +39,7 @@ use Runtime.Web.CRUD.Rules.Rule;
 use Bayrell.TimePlanner.Backend.ORM.Project;
 use Bayrell.TimePlanner.Backend.ORM.Task;
 use Bayrell.TimePlanner.Backend.ORM.TaskPlanCost;
+use Bayrell.CloudOS.Lib.ORM.User;
 
 
 @ApiList{ "object_name": "Bayrell.TimePlanner.Task", "interface_name": "core.crud" }
@@ -93,6 +94,18 @@ static class TaskCrud extends CrudApi
 			{
 				int layer_id = @.env("X-LAYER-ID");
 				q = q.prependFilter(["layer_id", "=", layer_id]);
+				return q;
+			},
+		},
+		
+		/* Add users dictionary */
+		new Dictionary
+		{
+			"name": "users",
+			"class_name": classof User,
+			"buildSearchQuery": QueryBuilder (QueryBuilder q)
+			{
+				q = q.prependFilter(["is_deleted", "=", 0]);
 				return q;
 			},
 		},
