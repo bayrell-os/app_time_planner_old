@@ -2033,6 +2033,16 @@ Object.assign(Runtime.lib,
 			return false;
 		};
 	},
+	/**
+	 * Join
+	 */
+	join: function(ctx, ch)
+	{
+		return (ctx, items) => 
+		{
+			return Runtime.rs.join(ctx, ch, items);
+		};
+	},
 	/* ======================= Class Init Functions ======================= */
 	getCurrentNamespace: function()
 	{

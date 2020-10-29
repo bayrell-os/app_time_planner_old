@@ -19,6 +19,7 @@ services:
             - common.env
         environment:
             CLOUD_PANEL: cloud_os_system_panel
+            CLOUD_KEY: mysecretkey
             CLOUD_SOFTWARE_NAME: "bayrell.time_planner"
             MEMCACHED: "memcached1"
             MYSQL_HOST: "mysql1"
