@@ -672,7 +672,14 @@ Object.assign(Bayrell.TimePlanner.Tasks.TasksPage,
 		var task_id = Runtime.rtl.get(ctx, container.layout.route_params, "task_id");
 		/* Create model */
 		var pk = Runtime.Dict.from({"task_id":task_id});
-		var page_model = await Bayrell.TimePlanner.Tasks.TasksPageModel.crudView(ctx, this.getCrudObjectName(ctx), pk, container);
+		var page_model = await Bayrell.TimePlanner.Tasks.TasksPageModel.crudView(ctx, this.getCrudObjectName(ctx), pk, container, (ctx, model, answer) => 
+		{
+			if (answer.isSuccess(ctx))
+			{
+				model = Runtime.rtl.setAttr(ctx, model, Runtime.Collection.from(["parent_items"]), Runtime.rtl.get(ctx, answer.response, "parent_items"));
+			}
+			return model;
+		});
 		/* Get subtasks */
 		var answer = await container.externalBusCall(ctx, Runtime.Dict.from({"object_name":this.getCrudObjectName(ctx),"interface_name":"core.crud","method_name":"search","data":Runtime.Dict.from({"filter":Runtime.Collection.from([Runtime.Collection.from(["parent_task_id","=",task_id])]),"limit":1000})}));
 		/* Throw exception */
@@ -813,7 +820,7 @@ Object.assign(Bayrell.TimePlanner.Tasks.TasksPage,
 	},
 	css: function(ctx, vars)
 	{
-		return ".view_subtasks.h-adff{" + Runtime.rtl.toStr("padding-top: 20px;") + Runtime.rtl.toStr("}.view_subtasks_label.h-adff span, .view_subtasks_label.h-adff .button.h-de49{") + Runtime.rtl.toStr("margin-left: 10px;") + Runtime.rtl.toStr("}.view_subtasks_label.h-adff span{") + Runtime.rtl.toStr("margin-left: 0px;font-weight: bold;") + Runtime.rtl.toStr("}.view_comments.h-adff{") + Runtime.rtl.toStr("padding-top: 20px;") + Runtime.rtl.toStr("}");
+		return ".view_subtasks.h-adff{" + Runtime.rtl.toStr("padding-top: 20px;") + Runtime.rtl.toStr("}.view_subtasks_label.h-adff span, .view_subtasks_label.h-adff .button.h-de49{") + Runtime.rtl.toStr("margin-left: 10px;") + Runtime.rtl.toStr("}.view_subtasks_label.h-adff span{") + Runtime.rtl.toStr("margin-left: 0px;font-weight: bold;") + Runtime.rtl.toStr("}.view_comments.h-adff{") + Runtime.rtl.toStr("padding-top: 20px;") + Runtime.rtl.toStr("}.parent_items.h-adff{") + Runtime.rtl.toStr("padding-bottom: 10px;") + Runtime.rtl.toStr("}.parent_item.h-adff{") + Runtime.rtl.toStr("display: inline-block;vertical-align: top;padding-left: 5px;padding-right: 5px;") + Runtime.rtl.toStr("}.parent_item.h-adff:first-child{") + Runtime.rtl.toStr("padding-left: 0px;") + Runtime.rtl.toStr("}.parent_item.h-adff:last-child{") + Runtime.rtl.toStr("padding-right: 0px;") + Runtime.rtl.toStr("}");
 	},
 	renderView: function(ctx, layout, model, params)
 	{
@@ -840,6 +847,42 @@ Object.assign(Bayrell.TimePlanner.Tasks.TasksPage,
 		"edit-buttons"
 	];
 	*/
+			/* Element 'div.parent_items' */
+			var __v0; var __v0_childs = [];
+			[__v0, __control_childs] = RenderDriver.e(__control, __control_childs, "element", {"name": "div","attrs": {"class":["parent_items", this.getCssHash(ctx)].join(" "),"@elem_name":"parent_items"}});
+			
+			var sz = model.parent_items.count(ctx);
+			
+			for (var i = 0;i < sz;i++)
+			{
+				var item = Runtime.rtl.get(ctx, model.parent_items, i);
+				
+				/* Element 'div.parent_item.parent_items--value' */
+				var __v1; var __v1_childs = [];
+				[__v1, __v0_childs] = RenderDriver.e(__v0, __v0_childs, "element", {"name": "div","attrs": {"class":["parent_item parent_items--value", this.getCssHash(ctx)].join(" "),"@elem_name":"parent_item"}});
+				
+				/* Element 'a' */
+				var __v2; var __v2_childs = [];
+				[__v2, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "element", {"name": "a","attrs": {"href":layout.route_prefix + Runtime.rtl.toStr(Runtime.Web.Route.replace(ctx, "/tasks/{task_id}/", Runtime.Dict.from({"task_id":Runtime.rtl.get(ctx, item, "task_id")})))}});
+				
+				/* Text */
+				[__vnull, __v2_childs] = RenderDriver.e(__v2, __v2_childs, "text", {"content": Runtime.rtl.get(ctx, item, "task_name")});
+				RenderDriver.p(__v2, __v2_childs);
+				RenderDriver.p(__v1, __v1_childs);
+				
+				if (i < sz - 1)
+				{
+					/* Element 'div.parent_item.parent_item--delimiter' */
+					var __v1; var __v1_childs = [];
+					[__v1, __v0_childs] = RenderDriver.e(__v0, __v0_childs, "element", {"name": "div","attrs": {"class":["parent_item parent_item--delimiter", this.getCssHash(ctx)].join(" "),"@elem_name":"parent_item"}});
+					
+					/* Text */
+					[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "text", {"content": " / "});
+					RenderDriver.p(__v1, __v1_childs);
+				}
+			}
+			RenderDriver.p(__v0, __v0_childs);
+			
 			/* Text */
 			[__vnull, __control_childs] = RenderDriver.e(__control, __control_childs, "text", {"content": Runtime.Web.CRUD.CrudPage.renderView.bind(this)(ctx, layout, model, params)});
 			
@@ -1030,6 +1073,7 @@ Object.assign(Bayrell.TimePlanner.Tasks.TasksPageModel.prototype,
 		this.subtask_form_edit = new Runtime.Web.CRUD.FormModel(ctx);
 		this.subtask_dialog_add = new Runtime.Web.Dialog.DialogModel(ctx);
 		this.subtask_dialog_edit = new Runtime.Web.Dialog.DialogModel(ctx);
+		this.parent_items = null;
 		Runtime.Web.CRUD.CrudPageModel.prototype._init.call(this,ctx);
 	},
 	assignObject: function(ctx,o)
@@ -1040,6 +1084,7 @@ Object.assign(Bayrell.TimePlanner.Tasks.TasksPageModel.prototype,
 			this.subtask_form_edit = o.subtask_form_edit;
 			this.subtask_dialog_add = o.subtask_dialog_add;
 			this.subtask_dialog_edit = o.subtask_dialog_edit;
+			this.parent_items = o.parent_items;
 		}
 		Runtime.Web.CRUD.CrudPageModel.prototype.assignObject.call(this,ctx,o);
 	},
@@ -1049,6 +1094,7 @@ Object.assign(Bayrell.TimePlanner.Tasks.TasksPageModel.prototype,
 		else if (k == "subtask_form_edit")this.subtask_form_edit = v;
 		else if (k == "subtask_dialog_add")this.subtask_dialog_add = v;
 		else if (k == "subtask_dialog_edit")this.subtask_dialog_edit = v;
+		else if (k == "parent_items")this.parent_items = v;
 		else Runtime.Web.CRUD.CrudPageModel.prototype.assignValue.call(this,ctx,k,v);
 	},
 	takeValue: function(ctx,k,d)
@@ -1058,6 +1104,7 @@ Object.assign(Bayrell.TimePlanner.Tasks.TasksPageModel.prototype,
 		else if (k == "subtask_form_edit")return this.subtask_form_edit;
 		else if (k == "subtask_dialog_add")return this.subtask_dialog_add;
 		else if (k == "subtask_dialog_edit")return this.subtask_dialog_edit;
+		else if (k == "parent_items")return this.parent_items;
 		return Runtime.Web.CRUD.CrudPageModel.prototype.takeValue.call(this,ctx,k,d);
 	},
 	getClassName: function(ctx)
@@ -1104,6 +1151,7 @@ Object.assign(Bayrell.TimePlanner.Tasks.TasksPageModel,
 			a.push("subtask_form_edit");
 			a.push("subtask_dialog_add");
 			a.push("subtask_dialog_edit");
+			a.push("parent_items");
 		}
 		return Runtime.Collection.from(a);
 	},
@@ -1140,6 +1188,15 @@ Object.assign(Bayrell.TimePlanner.Tasks.TasksPageModel,
 			"kind": IntrospectionInfo.ITEM_FIELD,
 			"class_name": "Bayrell.TimePlanner.Tasks.TasksPageModel",
 			"t": "Runtime.Web.Dialog.DialogModel",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "parent_items") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.TimePlanner.Tasks.TasksPageModel",
+			"t": "Runtime.Collection",
+			"s": ["Runtime.Dict"],
 			"name": field_name,
 			"annotations": Collection.from([
 			]),
@@ -1382,8 +1439,13 @@ Object.assign(Bayrell.TimePlanner.Tasks.PlanPage,
 					
 					[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "element", {"name": "span","attrs": {"style":Runtime.Dict.from({"padding-left":level * 10 + Runtime.rtl.toStr("px")})}});
 					
+					/* Element 'a' */
+					var __v2; var __v2_childs = [];
+					[__v2, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "element", {"name": "a","attrs": {"href":layout.route_prefix + Runtime.rtl.toStr(Runtime.Web.Route.replace(ctx, "/tasks/{task_id}/", Runtime.Dict.from({"task_id":Runtime.rtl.get(ctx, item, "task_id")})))}});
+					
 					/* Text */
-					[__vnull, __v1_childs] = RenderDriver.e(__v1, __v1_childs, "text", {"content": Runtime.rtl.get(ctx, item, "task_name")});
+					[__vnull, __v2_childs] = RenderDriver.e(__v2, __v2_childs, "text", {"content": Runtime.rtl.get(ctx, item, "task_name")});
+					RenderDriver.p(__v2, __v2_childs);
 					RenderDriver.p(__v1, __v1_childs);
 					
 					/* Element 'td.td.td--status' */

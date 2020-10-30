@@ -6917,8 +6917,9 @@ Object.assign(Runtime.Web.CRUD.CrudPageModel,
 	/**
 	 * Crud Search
 	 */
-	crudSearch: async function(ctx, object_name, container)
+	crudSearch: async function(ctx, object_name, container, f)
 	{
+		if (f == undefined) f = null;
 		/* Remote call */
 		var search_params = this.getCrudSearchParams(ctx, container.request);
 		var answer = await container.externalBusCall(ctx, Runtime.Dict.from({"object_name":object_name,"interface_name":"core.crud","method_name":"search","data":search_params}));
@@ -6945,13 +6946,18 @@ Object.assign(Runtime.Web.CRUD.CrudPageModel,
 		{
 			page_model = Runtime.rtl.setAttr(ctx, page_model, Runtime.Collection.from(["filter", "item"]), filter);
 		}
+		if (f)
+		{
+			page_model = f(ctx, page_model, answer);
+		}
 		return Promise.resolve(page_model);
 	},
 	/**
 	 * Crud View
 	 */
-	crudView: async function(ctx, object_name, pk, container)
+	crudView: async function(ctx, object_name, pk, container, f)
 	{
+		if (f == undefined) f = null;
 		/* Remote call */
 		var answer = await container.externalBusCall(ctx, Runtime.Dict.from({"object_name":object_name,"interface_name":"core.crud","method_name":"getItem","data":Runtime.Dict.from({"pk":pk})}));
 		/* Throw exception */
@@ -6965,6 +6971,10 @@ Object.assign(Runtime.Web.CRUD.CrudPageModel,
 		{
 			page_model = Runtime.rtl.setAttr(ctx, page_model, Runtime.Collection.from(["item"]), Runtime.rtl.get(ctx, answer.response, "item"));
 			page_model = Runtime.rtl.setAttr(ctx, page_model, Runtime.Collection.from(["foreigns"]), Runtime.rtl.get(ctx, answer.response, "foreigns"));
+		}
+		if (f)
+		{
+			page_model = f(ctx, page_model, answer);
 		}
 		return Promise.resolve(page_model);
 	},

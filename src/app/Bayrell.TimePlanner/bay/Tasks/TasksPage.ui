@@ -102,7 +102,19 @@ static async RenderContainer actionView(RenderContainer container)
 	{
 		"task_id": task_id,
 	};
-	TasksPageModel page_model = await TasksPageModel::crudView(static::getCrudObjectName(), pk, container);
+	TasksPageModel page_model = await TasksPageModel::crudView
+	(
+		static::getCrudObjectName(),
+		pk, container,
+		TasksPageModel (TasksPageModel model, RemoteCallAnswer answer)
+		{
+			if (answer.isSuccess())
+			{
+				model <= parent_items <= answer.response["parent_items"];
+			}
+			return model;
+		}
+	);
 	
 	/* Get subtasks */
 	RemoteCallAnswer answer = await container.externalBusCall
@@ -584,6 +596,21 @@ pure Dict getFormSettings(LayoutModel layout, CrudPageModel model, Dict params) 
 .view_comments{
 	padding-top: 20px;
 }
+.parent_items{
+	padding-bottom: 10px;
+}
+.parent_item{
+	display: inline-block;
+	vertical-align: top;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+.parent_item:first-child{
+	padding-left: 0px;
+}
+.parent_item:last-child{
+	padding-right: 0px;
+}
 </style>
 
 
@@ -604,6 +631,24 @@ pure Dict getFormSettings(LayoutModel layout, CrudPageModel model, Dict params) 
 		"edit-buttons"
 	];
 	-->
+	
+	<div class='parent_items'>
+		%var int sz = model.parent_items.count();
+		%for (int i=0; i<sz; i++)
+		{
+			%var Dict item = model.parent_items[i];
+			<div class='parent_item parent_items--value'>
+				<a href={ layout.route_prefix ~ Route::replace("/tasks/{task_id}/", { "task_id": item["task_id"] }) }>
+					{ item["task_name"] }
+				</a>
+			</div>
+			%if (i < sz - 1)
+			{
+				<div class='parent_item parent_item--delimiter'> / </div>
+			}
+		}
+	</div>
+	
 	%render parent::renderView(layout, model, params);
 	
 	<div class='view_subtasks'>

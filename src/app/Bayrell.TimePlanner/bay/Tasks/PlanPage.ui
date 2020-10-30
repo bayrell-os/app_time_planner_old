@@ -187,7 +187,12 @@ static async RenderContainer actionPlan(RenderContainer container)
 				<td class='td td--number'>{ item_number }</td>
 				<td class='td td--name'>
 					<span style={ { "padding-left": level * 10 ~ "px" } } />
-					{ item["task_name"] }
+					<a href={
+						layout.route_prefix ~ Route::replace("/tasks/{task_id}/",
+						{ "task_id": item["task_id"] })
+					}>
+						{ item["task_name"] }
+					</a>
 				</td>
 				<td class='td td--status'>
 				{

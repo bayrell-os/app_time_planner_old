@@ -30,4 +30,5 @@ struct TasksPageModel extends CrudPageModel
 	FormModel subtask_form_edit = new FormModel();
 	DialogModel subtask_dialog_add = new DialogModel();
 	DialogModel subtask_dialog_edit = new DialogModel();
+	Collection<Dict> parent_items = null;
 }

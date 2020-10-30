@@ -208,6 +208,19 @@ static class TaskCrud extends CrudApi
 		/* If is success */
 		if (this.isSuccess())
 		{
+			if (this.action == "getItem")
+			{
+				Vector items = new Vector();
+				int parent_id = this.new_item.task_id;
+				while (not rtl::isEmpty(parent_id))
+				{
+					Task item = Task::getById(parent_id);
+					items.push(item.convertToDict());
+					parent_id = item.parent_task_id;
+				}
+				items = items.toCollection().reverseIm();
+				this.answer = rtl::setAttr(this.answer, ["response", "parent_items"], items);
+			}
 		}
 	}
 	
