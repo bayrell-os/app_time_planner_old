@@ -65,7 +65,7 @@ body, html{
 		<div class="layout">
 			<div class="layout_menu_wrap">
 				<ul>
-					<li class={ rs::start(layout["route", "name"], "app.main") ? "active": "" }>
+					<li class={ rs::start(layout["route", "name"], "app.calendar") ? "active": "" }>
 						<a class="nolink" href="/">Календарь</a>
 					</li>
 					<li class={ rs::start(layout["route", "name"], "app.task") ? "active": "" }>

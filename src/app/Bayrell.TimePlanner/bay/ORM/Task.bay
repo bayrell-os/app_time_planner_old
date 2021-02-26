@@ -55,8 +55,16 @@ struct Task extends Record
 	string name;
 	
 	@DateTimeType{}
-	DateTime gmtime_create;
+	DateTime time_begin;
 	
+	@DateTimeType{}
+	DateTime time_end;
+	
+	@DateTimeType{}
+	DateTime time_create;
+	
+	@BigIntType{}
+	int time_diff;
 	
 	/**
 	 * Returns table name

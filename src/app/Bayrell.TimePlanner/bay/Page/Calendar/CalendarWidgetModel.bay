@@ -1,0 +1,82 @@
+/*!
+ *  Bayrell Runtime Library
+ *
+ *  (c) Copyright 2016-2021 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+namespace Bayrell.TimePlanner.Page.Calendar;
+
+use Runtime.BaseStruct;
+use Runtime.DateTime;
+use Runtime.Web.App.PageModel;
+use Runtime.Web.App.RemoteCallAnswer;
+use Runtime.Web.App.RenderContainer;
+use Runtime.Web.App.Request;
+use Runtime.Web.App.WidgetModel;
+use Runtime.Web.CRUD.TableWidget;
+use Runtime.Web.CRUD.TableWidgetModel;
+use Bayrell.TimePlanner.Page.Calendar.CalendarWidget;
+
+
+struct CalendarWidgetModel extends TableWidgetModel
+{
+	string class_name = classof CalendarWidget;
+	int year = 2021;
+	int week = 8;
+	
+	
+	/**
+	 * Call route widget model
+	 */
+	static async WidgetModel callRouteWidgetModel(RenderContainer container, string widget_key, WidgetModel widget_model)
+	{
+		DateTime week_start = new DateTime{ "y": widget_model.year };
+		week_start = week_start.setWeekNumber(widget_model.week);
+		DateTime week_end = week_start.shiftTime(604799);
+		
+		string week_begin_str = week_start.getDateTime();
+		string week_end_str = week_end.getDateTime();
+		
+		Dict search_params =
+		{
+			"filter":
+			[
+				["time_begin", ">=", week_begin_str],
+				["time_end", "<=", week_end_str],
+				["time_diff", "<=", 86400],
+			],
+		};
+		
+		/* Page class */
+		string page_class = container.layout.page_class;
+		
+		/* Get crud object name */
+		string object_name = rtl::applyMethod(page_class, "getCrudObjectName");
+		
+		/* Remote call */
+		RemoteCallAnswer answer = await container.externalBusCall
+		{
+			"object_name": object_name,
+			"interface_name": "core.crud",
+			"method_name": "search",
+			"data": search_params,
+		};
+		
+		widget_model = static::setCrudAnswer(widget_model, answer);
+		
+		return widget_model;
+	}
+	
+}

@@ -1,0 +1,163 @@
+<!--
+ *  Bayrell Time Planner
+ *
+ *  (c) Copyright 2020 - 2021 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+-->
+
+<class version="1.0"
+	name="Bayrell.TimePlanner.Page.Calendar.CalendarWidget" extends="Runtime.Web.App.Widget"
+	module="Bayrell.TimePlanner" model="Runtime.Web.CRUD.CrudPageModel"
+>
+
+<use name="Runtime.DateTime" />
+<use name="Runtime.Web.Message" />
+<use name="Runtime.Web.CRUD.CrudWidgetEvent" />
+<use name="Runtime.Web.Events.BaseEvent" />
+<use name="Runtime.Web.Events.MouseClickEvent" />
+<use name="Runtime.Web.Input.Button" component="true" />
+<use name="Bayrell.TimePlanner.Page.Calendar.CalendarWidgetModel" />
+
+
+<style>
+.calendar_items{
+	position: relative;
+	height: calc(100vh - 40px);
+	text-align: center;
+}
+.calendar_item{
+	display: inline-block;
+	vertical-align: top;
+	border-right: 1px #ccc solid;
+	text-align: left;
+	width: 14.2857%;
+	height: 100%;
+}
+.calendar_item:last-child{
+	border-right: 0px #ccc solid;
+}
+.calendar_item_title{
+	text-align: center;
+	padding: 10px;
+}
+</style>
+
+
+<template>
+	<div class="calendar_items">
+		%for (int i=0; i<7; i++)
+		{
+			<div class="calendar_item">
+				<div class="calendar_item_title">{ i + 1 }</div>
+				<div class="calendar_tasks">
+					{ static::getTasks(layout, model, params, i) }
+				</div>
+			</div>
+		}
+	</div>
+</template>
+
+
+<template name="getTasks" args="LayoutModel layout, PageModel model, Dict params, int index">
+	%var string widget_key = params["widget_key"];
+	%var CalendarWidgetModel widget_model = model["widgets", widget_key];
+	%var Collection rows = widget_model["rows"];
+	
+	%if (rows != null)
+	{
+		%for (int i=0; i<rows.count(); i++)
+		{
+			%var Dict task = rows[i];
+			%var DateTime time_begin = task["time_begin"];
+			%if (time_begin != null and time_begin.getDayOfWeek() == index + 1)
+			{
+				{ static::renderTask(layout, model, params, task) }
+			}
+		}
+	}
+</template>
+
+
+<template name="renderTask" args="LayoutModel layout, PageModel page_model, Dict params, Dict task">
+	%var string widget_key = params["widget_key"];
+	<div class="task" data-task-id={ task["task_id"] }>
+		{ task["name"] }
+		<Button type='small' data-pk={ page_model.getPrimaryKey(task) }
+			data-widget={ widget_key } data-widget-dest="dialog_edit" data-widget-action="open_dialog"
+			@event:MouseClickEvent="onButtonEvent" @key="edit"
+		>
+			{ _("Runtime.Web.CRUD", "Edit") }
+		</Button>
+	</div>
+</template>
+
+
+
+<script>
+
+/**
+ * On button event
+ */
+async void onButtonEvent(Message<BaseEvent> msg)
+{
+	Dict pk = msg.sender.params["data-pk"];
+	string widget_key = msg.sender.params["data-widget"] |> default string "";
+	string widget_dest = msg.sender.params["data-widget-dest"] |> default string "";
+	string widget_action = msg.sender.params["data-widget-action"] |> default string "";
+	
+	/* Get item */
+	CalendarWidgetModel widget_model = this.model(["widgets", widget_key]);
+	Dict item = widget_model::getFirstItem(widget_model, pk);
+	
+	CrudWidgetEvent event = new CrudWidgetEvent
+	{
+		"from": widget_key,
+		"dest": widget_dest,
+		"action": widget_action,
+		"current_widget": widget_key,
+		"item": item,
+	};
+	
+	await this.signal(event);
+}
+
+
+/**
+ * On widget event
+ */
+async void handleEvent(Message<BaseEvent> msg)
+{
+	string widget_key = this.getWidgetKey();
+	if (msg.data instanceof CrudWidgetEvent and widget_key == msg.data.dest)
+	{
+		CrudWidgetEvent event = msg.data;
+		if (event.action == CrudWidgetEvent::CREATE_ITEM)
+		{
+			this.widgetUpdate("prependItem", event.new_item);
+		}
+		else if (event.action == CrudWidgetEvent::UPDATE_ITEM)
+		{
+			this.widgetUpdate("setItem", event.pk, event.new_item);
+		}
+		else if (event.action == CrudWidgetEvent::DELETE_ITEM)
+		{
+			this.widgetUpdate("removeItem", event.pk);
+		}
+	}
+}
+
+</script>
+
+
+</class>

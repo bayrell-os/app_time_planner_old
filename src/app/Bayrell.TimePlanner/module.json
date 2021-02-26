@@ -2,10 +2,11 @@
 	"name": "Bayrell.TimePlanner",
 	"assets":
 	[
-		"Page/MainPage",
-		"Page/TestPage",
 		"Page/Project/ProjectPage",
 		"Page/Task/TaskPage",
+		"Page/Calendar/CalendarPage",
+		"Page/Calendar/CalendarWidget",
+		"Page/Calendar/CalendarWidgetModel",
 		"DefaultLayout",
 		"Frontend",
 		"Page404",

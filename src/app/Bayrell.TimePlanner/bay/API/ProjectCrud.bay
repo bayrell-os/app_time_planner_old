@@ -21,6 +21,7 @@ namespace Bayrell.TimePlanner.API;
 use Runtime.fs;
 use Runtime.rtl;
 use Runtime.lib;
+use Runtime.ORM.QueryBuilder;
 use Runtime.Web.CRUD.CrudApi;
 use Runtime.Web.CRUD.CrudApiList;
 use Runtime.Web.CRUD.Rules.AllowFields;
@@ -51,7 +52,16 @@ static class ProjectCrud extends CrudApi
 	 */
 	Collection<Rule> rules() =>
 	[
-		new AllowFields{ "fields": ["project_id", "name", "gmtime_create", "is_archive"] },
+		new AllowFields
+		{
+			"fields":
+			[
+				"name",
+				"project_id",
+				"gmtime_create",
+				"is_archive",
+			]
+		},
 		new ReadOnly{ "api_name": "project_id" },
 		new ReadOnly{ "api_name": "gmtime_create" },
 		new Required{ "api_name": "name" },
@@ -67,4 +77,14 @@ static class ProjectCrud extends CrudApi
 		["name", "asc"],
 	];
 	
+	
+	
+	/**
+	 * Build query
+	 */
+	QueryBuilder buildSearchQuery(QueryBuilder q)
+	{
+		q = parent::buildSearchQuery(q);
+		return q;
+	}
 }

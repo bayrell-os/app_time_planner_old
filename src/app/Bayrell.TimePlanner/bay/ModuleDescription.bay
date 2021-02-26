@@ -73,7 +73,7 @@ static class ModuleDescription
 	[
 		/* Register routes */
 		new Entity{ "name": "Bayrell.TimePlanner.Routes" },
-		new Entity{ "name": "Bayrell.TimePlanner.Page.MainPage" },
+		new Entity{ "name": "Bayrell.TimePlanner.Page.Calendar.CalendarPage" },
 		new Entity{ "name": "Bayrell.TimePlanner.Page.Project.ProjectPage" },
 		new Entity{ "name": "Bayrell.TimePlanner.Page.Task.TaskPage" },
 		
