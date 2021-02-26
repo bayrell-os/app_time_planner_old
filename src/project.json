@@ -1,18 +1,18 @@
 {
-	"name": "Time planner",
+	"name": "Time Planner",
 	"cache": "var/bundler",
 	"assets": "assets/",
 	"bundles":
 	[
 		{
 			"name": "runtime",
-			"dest": "assets/runtime.js",
+			"dest": "assets/render.js",
 			"lang": "es6",
 			"modules":
 			[
 				"Runtime",
-				"Runtime.Core",
-				"Runtime.Web"
+				"Runtime.Web",
+				"Runtime.Web.App"
 			]
 		},
 		{
@@ -21,50 +21,33 @@
 			"lang": "es6",
 			"modules":
 			[
-				"Runtime.Web.Auth",
-				"Runtime.Web.Dialog",
-				"Runtime.Web.Form",
-				"Runtime.Web.Input",
-				"Runtime.Web.Table",
 				"Runtime.Web.CRUD",
-				"Runtime.Components.jQuery",
-				"Runtime.Components.AirDatepicker"
+				"Runtime.Web.Dialog",
+				"Runtime.Web.Input"
 			]
 		},
 		{
-			"name": "core.css",
-			"dest": "assets/core.css",
+			"name": "app.css",
+			"dest": "assets/app.css",
 			"lang": "css",
 			"modules":
 			[
-				"Runtime.Web",
-				"Runtime.Components.AirDatepicker"
+				"@Bayrell.TimePlanner/core.css"
 			]
 		},
 		{
-			"name": "app",
-			"dest": "html/app.js",
+			"name": "app.js",
+			"dest": "assets/app.js",
 			"lang": "es6",
 			"modules":
 			[
 				"Bayrell.TimePlanner"
 			],
 			"websocket": true
-		},
-		{
-			"name": "html_admin_service",
-			"dest": "html_admin_service/app.js",
-			"lang": "es6",
-			"modules":
-			[
-				"Bayrell.TimePlanner.AdminService"
-			],
-			"websocket": true
 		}
 	],
 	"modules":
 	[
-		"admin/",
 		"app/",
 		"lib/"
 	],
@@ -94,7 +77,7 @@
 				"enable_async_await": true,
 				"emulate_async_await": false,
 				"enable_check_types": true,
-				"enable_context": true,
+				"enable_context": false,
 				"backend": false,
 				"frontend": true
 			}

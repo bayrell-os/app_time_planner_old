@@ -44,7 +44,7 @@
 <script src={ layout.route_prefix ~ "/assets/components.js?_=" ~ layout.f_inc }></script>
 <script src={ layout.route_prefix ~ "/assets/app.js?_=" ~ layout.f_inc }></script>
 
-<script>runWebApp(@json{ container.frontend_env }, "App", "App.Frontend");</script>
+<script>runWebApp(@json{ container.frontend_env }, "Bayrell.TimePlanner", "Bayrell.TimePlanner.Frontend");</script>
 
 </body>
 </html>

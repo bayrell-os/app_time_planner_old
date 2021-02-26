@@ -72,11 +72,10 @@ static class ModuleDescription
 	pure Collection<Dict> entities() =>
 	[
 		/* Register routes */
-		new Entity{ "name": "App.Routes" },
-		new Entity{ "name": "App.Page.MainPage" },
-		new Entity{ "name": "App.Page.TestPage" },
-		new Entity{ "name": "App.Page.Project.ProjectPage" },
-		new Entity{ "name": "App.Page.Task.TaskPage" },
+		new Entity{ "name": "Bayrell.TimePlanner.Routes" },
+		new Entity{ "name": "Bayrell.TimePlanner.Page.MainPage" },
+		new Entity{ "name": "Bayrell.TimePlanner.Page.Project.ProjectPage" },
+		new Entity{ "name": "Bayrell.TimePlanner.Page.Task.TaskPage" },
 		
 		#ifdef FRONTEND then
 		
@@ -89,9 +88,8 @@ static class ModuleDescription
 		#ifdef BACKEND then
 		
 		/* Api */
-		new Entity{ "name": "App.API.ProjectCrud" },
-		new Entity{ "name": "App.API.TaskCrud" },
-		new Entity{ "name": "App.API.TestCrud" },
+		new Entity{ "name": "Bayrell.TimePlanner.API.ProjectCrud" },
+		new Entity{ "name": "Bayrell.TimePlanner.API.TaskCrud" },
 		
 		/* Backend App */
 		new Entity{ "name": classof Backend },
