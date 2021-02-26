@@ -1,12 +1,6 @@
 [submodule "src/lib/Runtime"]
 	path = src/lib/Runtime
 	url = https://github.com/bayrell/Runtime
-[submodule "src/lib/Runtime.Core"]
-	path = src/lib/Runtime.Core
-	url = https://github.com/bayrell/Runtime.Core
-[submodule "src/lib/Runtime.Crypt"]
-	path = src/lib/Runtime.Crypt
-	url = https://github.com/bayrell/Runtime.Crypt
 [submodule "src/lib/Runtime.ORM"]
 	path = src/lib/Runtime.ORM
 	url = https://github.com/bayrell/Runtime.ORM
@@ -19,12 +13,6 @@
 [submodule "src/lib/Runtime.Web"]
 	path = src/lib/Runtime.Web
 	url = https://github.com/bayrell/Runtime.Web
-[submodule "src/lib/Runtime.Web.Auth"]
-	path = src/lib/Runtime.Web.Auth
-	url = https://github.com/bayrell/Runtime.Web.Auth
-[submodule "src/lib/Runtime.Web.Backend"]
-	path = src/lib/Runtime.Web.Backend
-	url = https://github.com/bayrell/Runtime.Web.Backend
 [submodule "src/lib/Runtime.Web.CRUD"]
 	path = src/lib/Runtime.Web.CRUD
 	url = https://github.com/bayrell/Runtime.Web.CRUD
@@ -34,18 +22,3 @@
 [submodule "src/lib/Runtime.Web.Input"]
 	path = src/lib/Runtime.Web.Input
 	url = https://github.com/bayrell/Runtime.Web.Input
-[submodule "src/lib/Runtime.Components.jQuery"]
-	path = src/lib/Runtime.Components.jQuery
-	url = https://github.com/bayrell/Runtime.Components.jQuery
-[submodule "src/lib/Runtime.Components.AirDatepicker"]
-	path = src/lib/Runtime.Components.AirDatepicker
-	url = https://github.com/bayrell/Runtime.Components.AirDatepicker
-[submodule "src/lib/Bayrell.CloudOS.Lib"]
-	path = src/lib/Bayrell.CloudOS.Lib
-	url = https://github.com/bayrell-os/Bayrell.CloudOS.Lib
-[submodule "src/lib/Runtime.Components.FontAwesome"]
-	path = src/lib/Runtime.Components.FontAwesome
-	url = https://github.com/bayrell/Runtime.Components.FontAwesome
-[submodule "src/lib/Runtime.Cron"]
-	path = src/lib/Runtime.Cron
-	url = https://github.com/bayrell/Runtime.Cron

@@ -1,7 +1,7 @@
 /*!
  *  Bayrell Time Planner
  *
- *  (c) Copyright 2020 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2020 - 2021 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,23 +16,24 @@
  *  limitations under the License.
  */
 
-namespace Bayrell.TimePlanner.Backend.ORM;
+namespace Bayrell.TimePlanner.ORM;
 
+use Runtime.lib;
+use Runtime.DateTime;
 use Runtime.ORM.Annotations.AutoIncrement;
 use Runtime.ORM.Annotations.BigIntType;
 use Runtime.ORM.Annotations.BooleanType;
+use Runtime.ORM.Annotations.DateTimeType;
 use Runtime.ORM.Annotations.ForeignKey;
 use Runtime.ORM.Annotations.Index;
 use Runtime.ORM.Annotations.JsonType;
 use Runtime.ORM.Annotations.Primary;
 use Runtime.ORM.Annotations.StringType;
+use Runtime.ORM.Annotations.TextType;
+use Runtime.ORM.Annotations.TinyIntType;
 use Runtime.ORM.Annotations.Unique;
 use Runtime.ORM.Annotations.Virtual;
-use Runtime.ORM.ConnectionInterface as Connection;
-use Runtime.ORM.CursorInterface as Cursor;
-use Runtime.ORM.DriverInterface as ORMDriver;
 use Runtime.ORM.Record;
-use Bayrell.TimePlanner.Backend.ORM.Layer;
 
 
 struct Project extends Record
@@ -41,17 +42,21 @@ struct Project extends Record
 	@BigIntType{}
 	int project_id;
 	
-	@BigIntType{}
-	int layer_id;
+	@TinyIntType{}
+	int is_archive;
 	
-	@StringType{ "length": 255 }
-	string project_name;
+	@StringType{}
+	string name;
+	
+	@DateTimeType{}
+	DateTime gmtime_create;
 	
 	
 	/**
 	 * Returns table name
 	 */
 	pure string table_name() => "projects";
+	
 	
 	
 	/**
@@ -62,17 +67,7 @@ struct Project extends Record
 		new Primary
 		{
 			"keys": ["project_id"],
-		},
-		new ForeignKey
-		{
-			"name": "layer_id",
-			"class_name": classof Layer,
-			"keys":
-			[
-				{"src": "layer_id", "dest": "layer_id"},
-			],
-			"delete": Record::RESTRICT,
-			"update": Record::CASCADE,
-		},
+		}
 	];
+	
 }

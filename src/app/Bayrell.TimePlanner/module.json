@@ -2,19 +2,13 @@
 	"name": "Bayrell.TimePlanner",
 	"assets":
 	[
-		"Admin/AdminInfo",
-		"Admin/AdminProjects",
-		"Tasks/TaskForm",
-		"Tasks/TasksPage",
-		"Tasks/TasksPageModel",
-		"Tasks/PlanPage",
-		"Tasks/PlanPageModel",		
-		"AdminLayout",
+		"Page/MainPage",
+		"Page/TestPage",
+		"Page/Project/ProjectPage",
+		"Page/Task/TaskPage",
 		"DefaultLayout",
-		"MainPage",
-		"MainPageModel",
+		"Frontend",
 		"Page404",
-		"Pattern",
 		"Routes",
 		"ModuleDescription"
 	]

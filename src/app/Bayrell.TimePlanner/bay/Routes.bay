@@ -1,7 +1,7 @@
 /*!
  *  Bayrell Time Planner
  *
- *  (c) Copyright 2020 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2020 - 2021 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -18,62 +18,48 @@
 
 namespace Bayrell.TimePlanner;
 
-use Runtime.Core.RemoteCallAnswer;
-use Runtime.ORM.MySQL.Driver as MySQLDriver;
-use Runtime.ORM.MySQL.Settings as MySQLSettings;
-use Runtime.Web.Auth.AuthToken;
-use Runtime.Web.Layout;
-use Runtime.Web.LayoutModel;
-use Runtime.Web.RenderContainer;
+use Runtime.LambdaChain;
+use Runtime.LambdaChainClass;
+use Runtime.LambdaChainDeclare;
 use Runtime.Web.RenderDriver;
-use Runtime.Web.Response;
-use Runtime.Web.Route;
-use Runtime.Web.RouteList;
-use Runtime.Web.RouteMiddleware;
-use Runtime.Web.CRUD.CrudPageModel;
-use Runtime.Web.Table.TableModel;
-use Bayrell.TimePlanner.AdminLayout;
+use Runtime.Web.App.LayoutModel;
+use Runtime.Web.App.RenderContainer;
+use Runtime.Web.App.Response;
+use Runtime.Web.App.Route;
+use Runtime.Web.App.RouteList;
+use Runtime.Web.App.WebApp;
 use Bayrell.TimePlanner.DefaultLayout;
 use Bayrell.TimePlanner.Page404;
 use Bayrell.TimePlanner.Pattern;
+use Bayrell.TimePlanner.Page.AdminerPage;
 
 
 @RouteList{}
+@LambdaChainClass{}
 static class Routes
 {
 	
 	/**
-	 * Layout chain
+	 * Extends components
 	 */
-	pure LayoutModel layoutChain(LayoutModel layout)
+	@LambdaChain
 	{
-		if (layout.layout_name == "default") layout <= layout_class <= classof DefaultLayout;
-		if (layout.layout_name == "admin") layout <= layout_class <= classof AdminLayout;
-		return [ layout ];
+		"name": RenderDriver::COMPONENTS_CHAIN,
 	}
-	
-	
-	
-	/**
-	 * Render chain. Set default pattern
-	 */
-	pure RenderContainer renderChainPatternDefault(RenderContainer container)
-	{
-		if (container.pattern_name == "default" and container.pattern_class == "" or container.pattern_class == "")
-		{
-			container <= pattern_class <= classof Pattern;
-		}
-		return [ container ];
-	}
+	pure list componentsChain(Collection components) => [ components ];
 	
 	
 	
 	/**
 	 * Title chain
 	 */
+	@LambdaChain
+	{
+		"name": WebApp::TITLE_CHAIN
+	}
 	pure RenderContainer titleChain(LayoutModel layout, string title)
 	{
-		title = title ~ " | BAYRELL Time Planner";
+		title = title ~ " | App";
 		return [ layout, title ];
 	}
 	
@@ -84,7 +70,12 @@ static class Routes
 	 * Page not found
 	 * @return RenderContainer
 	 */
-	static async RenderContainer Page404(RenderContainer container)
+	@LambdaChain
+	{
+		"name": WebApp::RENDER_CHAIN,
+		"pos": WebApp::RENDER_CHAIN_CALL_PAGE_NOT_FOUND
+	}
+	static async RenderContainer renderChain_Page404(RenderContainer container)
 	{
 		if (container == null or container.isResponseExists() or container.isPageExists()) return [ container ];
 		
@@ -92,21 +83,55 @@ static class Routes
 		container <= layout <= title <= "Page not found";
 		container <= layout <= layout_name <= "default";
 		
-		/* Set model */
-		container <= layout <= page_class <= classof Page404;
-		container <= layout <= page_model <= null;
+		/* Set page */
+		container = container.setPage(classof Page404, null);
 		
 		/* Set 404 code */
 		container <= new_http_code <= 404;
 		
-		/* Get auth token */
-		AuthToken auth_token = container.layout.keep_data[classof AuthToken] |> default AuthToken null;
-		if (auth_token)
-		{
-			container <= layout <= layout_name <= "admin";
-		}
-		
 		return [ container ];
 	}
+	
+	
+	
+	/**
+	 * Render chain. Set layout
+	 */
+	@LambdaChain
+	{
+		"name": WebApp::RENDER_CHAIN,
+		"pos": WebApp::RENDER_CHAIN_LAYOUT + 10,
+	}
+	pure LayoutModel renderChain_Layout(RenderContainer container)
+	{
+		if (container.layout.layout_name == "default") container <= layout <= layout_class <= classof DefaultLayout;
+		if (container.layout.layout_name == "admin") container <= layout <= layout_class <= classof DefaultLayout;
+		if (container.layout.layout_class == "") container <= layout <= layout_class <= classof DefaultLayout;
+		return [ container ];
+	}
+	
+	
+	
+	#ifdef BACKEND then
+	
+	
+	/**
+	 * Render chain. Set default pattern
+	 */
+	@LambdaChain
+	{
+		"name": WebApp::RENDER_CHAIN,
+		"pos": WebApp::RENDER_CHAIN_LAYOUT + 10,
+	}
+	pure RenderContainer renderChain_PatternDefault(RenderContainer container)
+	{
+		if (container.pattern_name == "default" and container.pattern_class == "" or container.pattern_class == "")
+		{
+			container <= pattern_class <= classof Pattern;
+		}
+		return [ container ];
+	}
+	
+	#endif
 	
 }

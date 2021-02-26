@@ -1,7 +1,7 @@
 /*!
  *  Bayrell Time Planner
  *
- *  (c) Copyright 2020 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2020 - 2021 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -18,40 +18,35 @@
 
 namespace Bayrell.TimePlanner;
 
-use Runtime.Core.Context;
-use Runtime.Core.Driver;
-use Runtime.Core.Entity;
-use Runtime.Core.LambdaChain;
+use Runtime.Driver;
+use Runtime.Entity;
+use Runtime.LambdaChain;
+use Runtime.LambdaChainClass;
+use Runtime.LambdaChainDeclare;
 use Runtime.ORM.MySQL.Driver as MySQLDriver;
 use Runtime.ORM.MySQL.Settings as MySQLSettings;
-use Runtime.Web.Layout;
-use Runtime.Web.LayoutModel;
-use Runtime.Web.RenderController;
-use Runtime.Web.RenderDriver;
-use Runtime.Web.Route;
-use Runtime.Web.RouteController;
-use Runtime.Web.RouteList;
-use Bayrell.TimePlanner.Routes;
-use Bayrell.TimePlanner.Backend.ORM.Layer;
+use Runtime.Web.App.Route;
+use Runtime.Web.App.RouteList;
+use Bayrell.TimePlanner.Backend;
+use Bayrell.TimePlanner.Frontend;
 
 
 static class ModuleDescription
 {
-
+	
+	/**
+	 * Returns module name
+	 * @return string
+ 	 */
+	pure string getModuleName() => "App";
+	
+	
 	
 	/**
 	 * Returns module name
 	 * @return string
 	 */
-	pure string getModuleName() => "Bayrell.TimePlanner";
-	
-	
-	
-	/**
-	 * Returns module name
-	 * @return string
-	 */
-	pure string getModuleVersion() => "0.1.0";
+	pure string getModuleVersion() => "0.0.1";
 	
 	
 	
@@ -61,15 +56,11 @@ static class ModuleDescription
 	 */
 	pure Dict<string> requiredModules() =>
 	{
-		'Runtime': '>=0.3',
-		'Runtime.Web': '*',
-		'Runtime.Web.Auth': '*',
-		'Runtime.Web.CRUD': '*',
+		"Runtime": ">=0.3",
+		"Runtime.Web.App": "*",
 		
-		/* Backend */
 		#ifdef BACKEND then
-		'Runtime.Web.Backend': '*',
-		'Bayrell.TimePlanner.Backend': '*',
+		"Runtime.Task": "*",
 		#endif
 	};
 	
@@ -80,60 +71,30 @@ static class ModuleDescription
 	 */
 	pure Collection<Dict> entities() =>
 	[
-		/* Register RenderController */
-		new Driver
-		{
-			"name": "root-controller",
-			"value": classof RenderController,
-			"params":
-			{
-				"selector": "#root",
-				"main_controller": true,
-				"window": "RootController",
-			}
-		},
-		
-		/* Layout chain */
-		new LambdaChain
-		{
-			"name": RenderDriver::LAYOUT_CHAIN,
-			"pos": 10,
-			"value": "Bayrell.TimePlanner.Routes::layoutChain",
-		},
-		
-		/* Render Chain. Page not found */
-		new LambdaChain
-		{
-			"name": RenderDriver::RENDER_CHAIN,
-			"value": "Bayrell.TimePlanner.Routes::Page404",
-			"pos": RenderDriver::RENDER_CHAIN_CALL_PAGE_NOT_FOUND,
-			"is_async": true,
-		},
-		
-		/* Render Chain. Route after */
-		new LambdaChain
-		{
-			"name": RenderDriver::TITLE_CHAIN,
-			"value": "Bayrell.TimePlanner.Routes::titleChain",
-		},
-		
 		/* Register routes */
-		new RouteList{ "name": "Bayrell.TimePlanner.Admin.AdminInfo" },
-		new RouteList{ "name": "Bayrell.TimePlanner.Admin.AdminProjects" },
-		new RouteList{ "name": "Bayrell.TimePlanner.Tasks.PlanPage" },
-		new RouteList{ "name": "Bayrell.TimePlanner.Tasks.TasksPage" },
-		new RouteList{ "name": "Bayrell.TimePlanner.MainPage" },
+		new Entity{ "name": "App.Routes" },
+		new Entity{ "name": "App.Page.MainPage" },
+		new Entity{ "name": "App.Page.TestPage" },
+		new Entity{ "name": "App.Page.Project.ProjectPage" },
+		new Entity{ "name": "App.Page.Task.TaskPage" },
+		
+		#ifdef FRONTEND then
+		
+		/* Frontend App */
+		new Entity{ "name": classof Frontend },
+		
+		#endif
 		
 		
 		#ifdef BACKEND then
 		
-		/* Render Chain. Pattern */
-		new LambdaChain
-		{
-			"name": RenderDriver::RENDER_CHAIN,
-			"value": "Bayrell.TimePlanner.Routes::renderChainPatternDefault",
-			"pos": RenderDriver::RENDER_CHAIN_RESPONSE_BEFORE,
-		},
+		/* Api */
+		new Entity{ "name": "App.API.ProjectCrud" },
+		new Entity{ "name": "App.API.TaskCrud" },
+		new Entity{ "name": "App.API.TestCrud" },
+		
+		/* Backend App */
+		new Entity{ "name": classof Backend },
 		
 		/* Register MySQL Driver */
 		new Driver
@@ -155,29 +116,17 @@ static class ModuleDescription
 	{
 		"config":
 		{
-			"Runtime.Web":
+			/* Web App settings */
+			"Runtime.Web.App":
 			{
-				/*"f_inc": (@.env("APP_MODE", "prod") == "prod") ? 1 : rtl::utime(),*/
-				"f_inc": "1",
-			},
-			
-			#ifdef BACKEND then
-			
-			"Runtime.Web.Auth":
-			{
-				"AUTH_PRIVATE_KEY": env.get("AUTH_PRIVATE_KEY", ""),
-				"AUTH_PUBLIC_KEY": env.get("AUTH_PUBLIC_KEY", ""),
-				"COOKIE_NAME": env.get("COOKIE_NAME", "auth_token"),
-				"COOKIE_EXPIRE": 7 * 24 * 60 * 60,
-			},
-			
-			/* Web Backend settings */
-			"Runtime.Web.Backend":
-			{
+				/*"f_inc": (@.env("APP_MODE", "prod") == "prod") ? 2 : rtl::utime(),*/
+				"f_inc": 2,
 				"api": true,
 				"external_bus_class": "",
 				"external_bus_default": true,
 			},
+			
+			#ifdef BACKEND then
 			
 			/* MySQL Settings */
 			"Runtime.ORM.MySQL":
@@ -185,89 +134,15 @@ static class ModuleDescription
 				"default": new MySQLSettings
 				{
 					"host": env.get("MYSQL_HOST", ""),
-					"username": env.get("MYSQL_USERNAME", ""),
+					"username": env.get("MYSQL_USER", ""),
 					"password": env.get("MYSQL_PASSWORD", ""),
-					"db": env.get("MYSQL_DB", ""),
-					"prefix": env.get("MYSQL_PREFIX", ""),
+					"db": env.get("MYSQL_DATABASE", ""),
 				},
 			},
 			
 			#endif
 		},
-		
-		#ifdef BACKEND then
-		
-		"secrets":
-		{
-		}
-		
-		#endif
 	};
 	
-	
-	
-	/**
-	 * Init app
-	 */
-	static Context appInit(Context c)
-	{
-		return c::init(c);
-	}
-	
-	
-	
-	/**
-	 * Start app
-	 */
-	static async Context appStart(Context c)
-	{
-		c = await c::start(c);
-		
-		
-		#ifdef BACKEND then
-		
-		/* Find space id */
-		string layer_uid = c.env("X-LAYER-UID", "");
-		if (layer_uid != "")
-		{
-			Layer item = Layer::select()
-				|> .filter([
-					["layer_uid", "=", layer_uid]
-				])
-				|> await .one()
-			;
-			if (item == null)
-			{
-				item = Layer::save
-				{
-					"layer_uid": layer_uid,
-				}
-			}
-			
-			c <= enviroments <= "X-LAYER-ID" <= item.layer_id;
-		}
-		
-		#endif
-		
-		
-		return c;
-	}
-	
-	
-	
-	#ifdef FRONTEND then
-	
-	
-	/**
-	 * Run app
-	 */
-	static async void appRun()
-	{
-		RenderController controller = @.getDriver(classof RouteController);
-		await controller.renderFirst();
-	}
-	
-	
-	#endif
 	
 }

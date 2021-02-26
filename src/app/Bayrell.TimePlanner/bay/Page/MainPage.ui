@@ -1,7 +1,7 @@
 <!--
  *  Bayrell Time Planner
  *
- *  (c) Copyright 2020 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2020 - 2021 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,21 +17,17 @@
 -->
 
 <class version="1.0"
-	name="Bayrell.TimePlanner.MainPage" extends="Runtime.Web.Component" 
-	module="Bayrell.TimePlanner" model="Bayrell.TimePlanner.MainPageModel"
+	name="Bayrell.TimePlanner.Page.MainPage" extends="Runtime.Web.Component" 
+	module="Bayrell.TimePlanner" model="Runtime.Dict"
 >
 
-<use name="Runtime.Core.Message" />
-<use name="Runtime.Core.RemoteCallAnswer" />
-<use name="Runtime.Web.LayoutModel" />
-<use name="Runtime.Web.RenderContainer" />
-<use name="Runtime.Web.RenderDriver" />
-<use name="Runtime.Web.Route" />
-<use name="Runtime.Web.RouteList" />
-<use name="Runtime.Web.RouteMiddleware" />
+<annotation name="Runtime.Web.App.RouteList" />
+<use name="Runtime.Web.App.LayoutModel" />
+<use name="Runtime.Web.App.RenderContainer" />
+<use name="Runtime.Web.App.Route" />
+<use name="Runtime.Web.App.RouteList" />
+<use name="Runtime.Web.App.RouteMiddleware" />
 <use name="Runtime.Web.Events.MouseClickEvent" />
-<use name="Bayrell.TimePlanner.MainPage" />
-<use name="Bayrell.TimePlanner.MainPageModel" />
 
 
 <script>
@@ -43,18 +39,12 @@
 @Route{ "uri": "/", "name": "app.main" }
 static async RenderContainer MainPage(RenderContainer container)
 {
-	/* Set page model */
-	MainPageModel page_model = new MainPageModel
-	{
-	};
-	
 	/* Set title */
 	container <= layout <= title <= "Index page";
-	container <= layout <= layout_name <= "admin";
+	container <= layout <= layout_name <= "default";
 	
-	/* Set model */
-	container <= layout <= page_class <= classof MainPage;
-	container <= layout <= page_model <= page_model;
+	/* Set page */
+	container = container.setPage(classof MainPage, new Dict{});
 	
 	return [ container ];
 }
@@ -62,21 +52,9 @@ static async RenderContainer MainPage(RenderContainer container)
 </script>
 
 
-
-<style>
-
-</style>
-
-
 <template name="render">
-	<div class="content">
-		Hello
-	</div>
+	<div>Main page 1</div>
 </template>
 
-
-<script type="frontend">
-
-</script>
 
 </class>

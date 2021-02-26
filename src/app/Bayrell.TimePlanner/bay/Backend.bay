@@ -1,7 +1,7 @@
 /*!
  *  Bayrell Time Planner
  *
- *  (c) Copyright 2020 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2020 - 2021 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -18,9 +18,50 @@
 
 namespace Bayrell.TimePlanner;
 
+use Runtime.BaseDriver;
 use Runtime.BaseStruct;
+use Runtime.Context;
+use Runtime.Driver;
+use Runtime.LambdaChainClass;
+use Runtime.Web.App.WebApp;
 
 
-struct MainPageModel extends BaseStruct
+@Driver
 {
+	"name": "WebApp",
+	"value": "Bayrell.TimePlanner.Backend",
+	"global": true,
+}
+@LambdaChainClass{}
+class Backend extends WebApp
+{
+	
+	/**
+	 * Init app
+	 */
+	static Context appInit(Context c)
+	{
+		return c::appInit(c);
+	}
+	
+	
+	
+	/**
+	 * Start app
+	 */
+	static async Context appStart(Context c)
+	{
+		return await c::appStart(c);
+	}
+	
+	
+	
+	/**
+	 * Start driver
+	 */
+	public async void startDriver()
+	{
+		await parent::startDriver();
+	}
+	
 }

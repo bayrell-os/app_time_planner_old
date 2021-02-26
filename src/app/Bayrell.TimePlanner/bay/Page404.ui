@@ -1,7 +1,7 @@
 <!--
  *  Bayrell Time Planner
  *
- *  (c) Copyright 2020 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2020 - 2021 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -21,22 +21,8 @@
 	module="Bayrell.TimePlanner" 
 >
 
-<use name="Runtime.Core.Message" />
-<use name="Runtime.Web.LayoutModel" />
-<use name="Runtime.Web.Events.MouseClickEvent" />
-
-<style>
-</style>
-
-
 <template name="render">
 	{ _("Bayrell.TimePlanner", "Page not found") }
 </template>
-
-
-<script type="frontend">
-
-
-</script>
 
 </class>

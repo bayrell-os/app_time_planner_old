@@ -1,0 +1,286 @@
+<!--
+ *  Bayrell Time Planner
+ *
+ *  (c) Copyright 2020 - 2021 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+-->
+
+<class version="1.0"
+	name="Bayrell.TimePlanner.Page.Task.TaskPage" extends="Runtime.Web.CRUD.CrudPage" 
+	module="Bayrell.TimePlanner" model="Runtime.Web.CRUD.CrudPageModel"
+>
+
+<annotation name="Runtime.Web.App.RouteList" />
+<use name="Runtime.lib" />
+<use name="Runtime.Web.App.LayoutModel" />
+<use name="Runtime.Web.App.PageModel" />
+<use name="Runtime.Web.App.RenderContainer" />
+<use name="Runtime.Web.App.Route" />
+<use name="Runtime.Web.App.RouteList" />
+<use name="Runtime.Web.App.RouteMiddleware" />
+<use name="Runtime.Web.App.WidgetModel" />
+<use name="Runtime.Web.Events.MouseClickEvent" />
+<use name="Runtime.Web.Events.MouseClickEvent" />
+<use name="Runtime.Web.CRUD.CrudPage" component="true" />
+<use name="Runtime.Web.CRUD.CrudPageModel" />
+<use name="Runtime.Web.CRUD.FieldInfo" />
+<use name="Runtime.Web.CRUD.DialogWidgetModel" />
+<use name="Runtime.Web.CRUD.SearchWidgetModel" />
+<use name="Runtime.Web.CRUD.TableWidgetModel" />
+<use name="Runtime.Web.CRUD.TopMenuWidgetModel" />
+<use name="Runtime.Web.Input.Input" component="true" />
+<use name="Runtime.Web.Input.Label" component="true" />
+<use name="Runtime.Web.Input.Select" component="true" />
+<use name="Runtime.Web.Input.SelectText" component="true" />
+<use name="Runtime.Web.Input.TextArea" component="true" />
+<use name="Runtime.Web.Table.TableModel" />
+
+
+<script>
+
+/**
+ * Returns object name
+ */
+pure string getCrudObjectName() => "Bayrell.TimePlanner.Task";
+
+
+/**
+ * Route Action
+ * @return RenderContainer
+ */
+@Route{ "uri": "/task/", "name": "app.task" }
+static async RenderContainer MainPage(RenderContainer container) => [
+	container
+		
+		/* Set title */
+		|> .setTitle("Task")
+		|> .setLayout("default")
+		
+		/* Set page */
+		|> .setPage(classof TaskPage)
+		|> .setPageModel(new CrudPageModel)
+		
+		/* Set action */
+		|> .setPageAction("search")
+		
+		/* Add widgets */
+		|> .addWidget("top_menu", new TopMenuWidgetModel)
+		|> .addWidget("dialog_add", new DialogWidgetModel{ "action": "add" })
+		|> .addWidget("dialog_edit", new DialogWidgetModel{ "action": "edit" })
+		|> .addWidget("dialog_delete", new DialogWidgetModel{ "action": "delete" })
+		|> .addWidget("table", new TableWidgetModel{
+			"search_params": TableWidgetModel::getCrudSearchParams(container.request)
+		})
+		
+		/* Default widgets */
+		|> .widgetsPosition("search", [ "top_menu", "table", "dialog_add", "dialog_edit", "dialog_delete" ])
+];
+
+
+
+/**
+ * Returns options
+ */
+pure Collection getOptions(LayoutModel layout, CrudPageModel model, Dict params, string name = "")
+{
+	if (name == "status")
+		return
+		[
+			{"id": 0, "value": "New"},
+			{"id": 1, "value": "Active"},
+			{"id": 2, "value": "Resolved"},
+			{"id": 3, "value": "Cancel"},
+		];
+	
+	if (name == "projects")
+		return model
+			|> attr "widgets", "table", "options", "projects"
+			|> lib::map
+			(
+				Dict (Dict item) =>
+				{
+					"id": item["project_id"],
+					"value": item["name"],
+					"item": item,
+				}
+			)
+			|> default Collection []
+		;
+	
+	return parent::getOptions(layout, model, params, name);
+}
+
+
+
+/**
+ * Returns crud struct
+ */
+pure Collection<FieldInfo> getStruct(LayoutModel layout, CrudPageModel model, Dict params) =>
+[
+	new FieldInfo
+	{
+		"api_name": "number",
+		"label": "",
+		"class_name": classof Label,
+	},
+	
+	new FieldInfo
+	{
+		"api_name": "task_id",
+		"primary": true,
+	},
+	
+	new FieldInfo
+	{
+		"api_name": "project_id",
+		"label": "Project",
+		"class_name": classof Select,
+		"class_settings":
+		{
+			"options": static::getOptions(layout, model, params, "projects"),
+		}
+	},
+	
+	new FieldInfo
+	{
+		"api_name": "status",
+		"label": "Status",
+		"class_name": classof Select,
+		"class_settings":
+		{
+			"options": static::getOptions(layout, model, params, "status"),
+		}
+	},
+	
+	new FieldInfo
+	{
+		"api_name": "name",
+		"label": "Name",
+		"class_name": classof Input,
+	},
+	
+	new FieldInfo
+	{
+		"api_name": "edit-buttons",
+		"label": "",
+		"class_name": classof Label,
+	},
+];
+
+
+
+/**
+ * Custom class name
+ */
+pure string customSettings(LayoutModel layout, Dict crud_settings)
+{
+	Dict item = crud_settings["crud_item"];
+	string kind = crud_settings["crud_kind"];
+	string field_name = crud_settings["crud_field", "api_name"];
+	
+	if (kind == "table" and field_name == "name")
+		crud_settings <= crud_field <= class_name <= classof Label;
+	
+	if (kind == "table" and (field_name == "project_id" or field_name == "status"))
+		crud_settings <= crud_field <= class_name <= classof SelectText;
+	
+	if (kind == "dialog" and (field_name == "project_id" or field_name == "status"))
+		crud_settings <= crud_field <= class_settings <= show_select_value <= true;
+	
+	return crud_settings;
+}
+
+
+
+/**
+ * Custom field render
+ */
+pure html renderField(LayoutModel layout, Dict crud_settings)
+{
+	Dict item = crud_settings["crud_item"];
+	string kind = crud_settings["crud_kind"];
+	string field_name = crud_settings["crud_field", "api_name"];
+	int index = crud_settings["crud_index"];
+	var value = crud_settings["value"];
+	
+	/* Table number */
+	if (kind == "table" and field_name == "number")
+		return static::renderNumber(layout, crud_settings);
+	
+	/* Table edit buttons */
+	if (kind == "table" and field_name == "edit-buttons")
+		return static::renderButtons(layout, crud_settings);
+	
+	return null;
+}
+
+
+
+/**
+ * Returns filter fields
+ */
+pure Collection<string> getFilterFields(LayoutModel layout, CrudPageModel model, Dict params) =>
+[
+	"name",
+];
+
+
+
+/**
+ * Returns form fields
+ */
+pure Collection<string> getFormFields(LayoutModel layout, CrudPageModel model, Dict params) =>
+[
+	"project_id",
+	"name",
+	"status",
+];
+
+
+
+/**
+ * Returns table fields
+ */
+pure Collection<string> getTableFields(LayoutModel layout, CrudPageModel model, Dict params) =>
+[
+	"number",
+	"project_id",
+	"name",
+	"status",
+	"edit-buttons"
+];
+
+
+
+/**
+ * Returns messages
+ */
+pure Dict<string> getMessages() =>
+{
+	"add": _("Bayrell.TimePlanner", "Add test"),
+	"delete": string (Dict item) =>
+		_("Runtime.Web.CRUD", "Do you realy want to delete '%name%' ?", { "name": item["name"] } ),
+};
+
+
+</script>
+
+
+<template>
+	<center>
+		{ static::renderWidgets(layout, model, params, "search") }
+	</center>
+</template>
+
+</class>

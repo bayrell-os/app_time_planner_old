@@ -1,7 +1,7 @@
 <!--
  *  Bayrell Time Planner
  *
- *  (c) Copyright 2020 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2020 - 2021 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -18,24 +18,78 @@
 
 <class version="1.0"
 	name="Bayrell.TimePlanner.DefaultLayout" extends="Runtime.Web.Component" 
-	module="Bayrell.TimePlanner" model="Runtime.Web.LayoutModel"
+	module="Bayrell.TimePlanner" model="Runtime.Web.App.LayoutModel"
 >
 
-<use name="Runtime.Core.Message" />
-<use name="Runtime.Web.RenderDriver" />
-<use name="Runtime.Web.Auth.AuthToken" />
-<use name="Runtime.Web.Events.MouseClickEvent" />
-<use name="Runtime.Web.Button.Button" component="true" />
-<use name="Bayrell.TimePlanner.ModuleDescription" />
 
+<style>
+*{box-sizing: border-box;}body{margin:0;padding:0;}
+a { text-decoration: inherit; color: #0000d0; cursor: pointer; }
+a:hover, a:visited:hover { text-decoration: underline; color: red; }
+a:visited { text-decoration: inherit; color: #0000d0; }
+a.link { text-decoration: none; color: #0000d0; cursor: pointer; }
+a.link:hover, a.link:visited:hover { text-decoration: underline; color: red; }
+a.link:visited { text-decoration: none; color: #0000d0; }
+body, html{
+	font-family: 'Ubuntu', sans-serif;
+	font-size: 14px;
+	width: 100%;
+	padding: 0;
+	margin: 0;
+}
+.layout_menu_wrap{
+	border-bottom: 1px #ccc solid;
+}
+.layout_menu_wrap ul, .layout_menu_wrap li{
+	padding: 0; margin: 0;
+	list-style: none;
+}
+.layout_menu_wrap ul{
+	text-align: center;
+}
+.layout_menu_wrap li{
+	display: inline-block;
+	vertical-align: top;
+}
+.layout_menu_wrap li a{
+	display: inline-block;
+	padding: 10px;
+}
+.layout_menu_wrap li.active{
+	background-color: #337ab7;
+	border-color: #337ab7;
+	color: white;
+}
+.layout_content{
+	padding: 10px;
+}
+</style>
 
 <template name="render">
 	%var string class_name = model.page_class;
 	%if (not rtl::isEmpty(class_name))
 	{
-		<{class_name} @bind="page_model" @key="view"></{class_name}>
+		<div class="layout">
+			<div class="layout_menu_wrap">
+				<ul>
+					<li class={ rs::start(layout["route", "name"], "app.main") ? "active": "" }>
+						<a class="nolink" href="/">Календарь</a>
+					</li>
+					<li class={ rs::start(layout["route", "name"], "app.task") ? "active": "" }>
+						<a class="nolink" href="/task/">Задачи</a>
+					</li>
+					<li class={ rs::start(layout["route", "name"], "app.project") ? "active": "" }>
+						<a class="nolink" href="/projects/">Проекты</a>
+					</li>
+				</ul>
+			</div>
+			<div class="layout_content">
+				<{class_name} @bind={["model", class_name]} @key="view"></{class_name}>
+			</div>
+		</div>
 	}
 </template>
+
 
 
 </class>

@@ -9,18 +9,19 @@ set_time_limit(30);
 // require ROOT_PATH . "/vendor/autoload.php";
 
 /* Include loader */
-include ROOT_PATH . "/lib/Runtime/php/loader.php";
+include ROOT_PATH . "/lib/Runtime/php/Loader.php";
 
 /* Include enviroments */
 $env = include ROOT_PATH . "/env.php";
 
 /* Run app */
-$loader = ( new Loader() )
+$loader = ( new \Runtime\Loader() )
 	->addIncludePath( ROOT_PATH . "/app" )
 	->addIncludePath( ROOT_PATH . "/lib" )
 	->setEnv($env)
 	->setMainModule("Bayrell.TimePlanner")
-	->setEntryPoint("Runtime.Web.Backend.CGI")
+	->setMainClass("Bayrell.TimePlanner.Backend")
+	->setEntryPoint("Runtime.Web.App.CGI")
 	->run();
 
 exit($loader->exit_code);

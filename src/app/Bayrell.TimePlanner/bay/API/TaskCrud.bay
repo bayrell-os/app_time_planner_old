@@ -1,0 +1,81 @@
+/*!
+ *  Bayrell Time Planner
+ *
+ *  (c) Copyright 2020 - 2021 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+namespace Bayrell.TimePlanner.API;
+
+use Runtime.fs;
+use Runtime.rtl;
+use Runtime.lib;
+use Runtime.Web.CRUD.CrudApi;
+use Runtime.Web.CRUD.CrudApiList;
+use Runtime.Web.CRUD.Rules.AllowFields;
+use Runtime.Web.CRUD.Rules.DefaultValue;
+use Runtime.Web.CRUD.Rules.Dictionary;
+use Runtime.Web.CRUD.Rules.ReadOnly;
+use Runtime.Web.CRUD.Rules.Required;
+use Runtime.Web.CRUD.Rules.Rule;
+use Bayrell.TimePlanner.ORM.Project;
+use Bayrell.TimePlanner.ORM.Task;
+
+
+/**
+ * Task CRUD
+ */
+@CrudApiList{ "object_name": "Bayrell.TimePlanner.Task" }
+static class TaskCrud extends CrudApi
+{
+	
+	/**
+	 * Returns orm class name
+	 */
+	pure string getORM() => classof Task;
+	
+	
+	
+	/**
+	 * Returns current rules
+	 */
+	Collection<Rule> rules() =>
+	[
+		new AllowFields{ "fields": ["task_id", "status", "project_id", "name", "gmtime_create"] },
+		new ReadOnly{ "api_name": "task_id" },
+		new ReadOnly{ "api_name": "gmtime_create" },
+		new Required{ "api_name": "name" },
+		new Dictionary
+		{
+			"name": "projects",
+			"class_name": classof Project,
+			"fields":
+			[
+				"project_id",
+				"name",
+			],
+		},
+	];
+	
+	
+	
+	/**
+	 * Returns table field value
+	 */
+	Collection<Collection<string>> getDefaultOrder() =>
+	[ 
+		["name", "asc"],
+	];
+	
+}
